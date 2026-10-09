@@ -104,12 +104,14 @@
      Gleich viele Karten wie bisher. Stamm, Äste und Ansatz bewegen sich nicht, nur die Kartenspitzen (Wind im Shader). */
   var TLOD=0; /* 1 = ferner Baum: Stamm einfach, Äste mit wenigen Segmenten, keine Zweigrohre (Krone unverändert) */
   function treeC(x,z,s,tint,stems){var t=C3(tint),ch=2.2*s,cr2=1.6*s,bark='#72675b',top;MAT=STE;
-    if(stems){stems.forEach(function(o){tube([x+o[0],-0.1,z+o[1]],[x+o[0]*3.2+0.05,ch,z+o[1]*3.2-0.04],0.045*s,9,bark,0,0,0.025*s);});top=[x,ch*0.82,z];}
+    var ENDS=null;
+    /* V17.1: mehrstämmig – die Äste wachsen aus den Stämmen selbst (vorher aus einem Punkt zwischen den Stämmen: V-Form mit Querast) */
+    if(stems){ENDS=[];stems.forEach(function(o){var e0=[x+o[0]*3.4,ch*0.86,z+o[1]*3.4];tube([x+o[0]*0.45,-0.1,z+o[1]*0.45],e0,0.045*s,9,bark,0,0,0.028*s);ENDS.push(e0);});top=[x,ch*0.86,z];}
     else{var mid=[x+(rnd()-0.5)*0.1*s,ch*0.32,z+(rnd()-0.5)*0.1*s];top=[x+(rnd()-0.5)*0.22*s,ch*0.68,z+(rnd()-0.5)*0.22*s];
       if(TLOD)tube([x,-0.06,z],top,0.12*s,7,bark,0,0,0.075*s,false);else{tube([x,-0.06,z],[x,0.16*s,z],0.19*s,12,bark,0,0,0.115*s,false);tube([x,0.16*s,z],mid,0.115*s,12,bark,0,0,0.098*s,false);tube(mid,top,0.098*s,10,bark,0,0,0.075*s,false);}}
     var NB=4+((rnd()*2)|0),CL=[];
-    for(var b=0;b<NB;b++){var a=b/NB*Math.PI*2+rnd()*0.7,L=cr2*(0.42+rnd()*0.22),el=0.55+rnd()*0.45,e=[top[0]+Math.cos(a)*L,top[1]+L*el,top[2]+Math.sin(a)*L];
-      tube(top,e,0.055*s,TLOD?4:7,bark,0,0,0.03*s,false);
+    for(var b=0;b<NB;b++){var a=b/NB*Math.PI*2+rnd()*0.7,L=cr2*(0.42+rnd()*0.22),el=0.55+rnd()*0.45,o0=ENDS?ENDS[b%ENDS.length]:top,e=[o0[0]+Math.cos(a)*L*(ENDS?0.7:1),o0[1]+L*el,o0[2]+Math.sin(a)*L*(ENDS?0.7:1)];
+      tube(o0,e,(ENDS?0.03:0.055)*s,TLOD?4:7,bark,0,0,(ENDS?0.018:0.03)*s,false);
       for(var k2=0;k2<2;k2++){var a2=a+(k2?0.55:-0.55)+(rnd()-0.5)*0.4,L2=cr2*(0.22+rnd()*0.18),e2=[e[0]+Math.cos(a2)*L2,e[1]+L2*(0.45+rnd()*0.5),e[2]+Math.sin(a2)*L2];
         if(!TLOD)tube(e,e2,0.028*s,5,bark,0,0,0.012*s,false);CL.push([e2,cr2*(0.36+rnd()*0.2),0.85+rnd()*0.3]);}}
     CL.push([[top[0],top[1]+cr2*1.15,top[2]],cr2*0.5,1.0]);
@@ -171,11 +173,15 @@
     grp('Umgebung',ENV);
     MAT=RAS;withSub(1.0,function(){plane(-16,16,-9,-5.5,0.02,'#56663f');plane(-16,-9,-5.5,5.5,0.02,'#56663f');plane(9,16,-5.5,5.5,0.02,'#56663f');plane(-16,-1.62,19.25,19.3,0.02,'#4f5f3b');});
     withSub(18,function(){plane(-90,90,-90,-9,0,'#2e3428');plane(-90,-16,-9,19.3,0,'#2e3428');plane(16,90,-9,19.3,0,'#2e3428');plane(-90,90,28.5,90,0,'#2e3428');});
-    MAT=PUTZ;withSub(40,function(){[[-440,440,-440,-90],[-440,440,90,440],[-440,-90,-90,90],[90,440,-90,90]].forEach(function(r){plane(r[0],r[1],r[2],r[3],0,'#2e3428');});});MAT=RAS;
+    /* V17.1: ferner Boden mit Bodenmaterial (vorher Fassadenputz: unbeleuchtet → dunkles Band am Horizont) */
+    MAT=RAS;withSub(40,function(){[[-440,440,-440,-90],[-440,440,90,440],[-440,-90,-90,90],[90,440,-90,90]].forEach(function(r){plane(r[0],r[1],r[2],r[3],0,'#2e3428');});});MAT=RAS;
     /* Trottoir, Randstein, Strasse */
+    /* V17.1: Strasse und Trottoir laufen bis an den Rand des Quartiers (vorher endeten sie bei ±30 m, dahinter war eine Lücke im Boden) */
     MAT=ASP;withSub(1.2,function(){box(0,-0.1,20.3,60,0.16,2.0,'#6f6c67',0,0);box(0,-0.1,24.95,60,0.12,7.1,'#3a3b3d',0,0);},'up');
-    MAT=STE;BEV=0.012;for(var x=-29.5;x<30;x+=1.0)box(x,-0.12,21.37,0.994,0.2,0.14,'#9a958d',0,0);BEV=0;
-    MAT=PLA;box(0,0.019,25,60,0.003,0.12,'#d6d2c8',0,0);
+    withSub(4,function(){[-1,1].forEach(function(sg){box(sg*46,-0.1,20.3,32,0.16,2.0,'#6f6c67',0,0);box(sg*46,-0.1,24.95,32,0.12,7.1,'#3a3b3d',0,0);});},'up');
+    MAT=RAS;withSub(14,function(){plane(-90,-62,19.3,28.5,0,'#2e3428');plane(62,90,19.3,28.5,0,'#2e3428');});
+    MAT=STE;BEV=0.012;for(var x=-29.5;x<30;x+=1.0)box(x,-0.12,21.37,0.994,0.2,0.14,'#9a958d',0,0);BEV=0;[-1,1].forEach(function(sg){box(sg*46,-0.12,21.37,32,0.2,0.14,'#9a958d',0,0);});
+    MAT=PLA;box(0,0.019,25,124,0.003,0.12,'#d6d2c8',0,0);
     /* Strassenleuchten */
     [[-7.5,21.0],[13.5,21.0],[34,21.0]].forEach(function(s){MAT=MET;cyl(s[0],0,s[1],0.07,5.4,10,'#4a4a4a',0,0,0.05);tube([s[0],5.35,s[1]],[s[0],5.55,s[1]+0.5],0.045,8,'#4a4a4a',0,0);box(s[0],5.42,s[1]+0.62,0.26,0.1,0.5,'#4a4a4a',0,0);
       MAT=LEU;box(s[0],5.41,s[1]+0.62,0.2,0.012,0.42,'#ffe1b8',1.25,0);MAT=PUTZ;light(s[0],5.2,s[1]+0.6,10,'#ffd2a0',0.75,0);halo(s[0],5.36,s[1]+0.62,0.7,'#ffd2a0',0.3);});
@@ -291,7 +297,8 @@
       var lx=x1-x0,lz=z1-z0,along=lx>lz,L=Math.max(lx,lz),n=Math.round(L/0.45);
       for(var i=0;i<n;i++){var t=(i+0.5)/n,cx=along?x0+lx*t:(x0+x1)/2,cz=along?(z0+z1)/2:z0+lz*t,yaw=along?0:Math.PI/2,th=Math.min(lx,lz)/2;
         [-1,1].forEach(function(sd){var ox=along?0:sd*th,oz=along?sd*th:0;card(cx+ox*0.96+(rnd()-0.5)*0.1,hgt-0.34+rnd()*0.12,cz+oz*0.96+(rnd()-0.5)*0.1,0.55+rnd()*0.25,0.5+rnd()*0.08,yaw+(rnd()-0.5)*0.4,0,'#a3b28c',{cx:(x0+x1)/2,cz:(z0+z1)/2,ao:0.7,sw:0.35,tilt:sd*(along?1:-1)*0.35});});
-        card(cx,hgt-0.07+rnd()*0.07,cz,0.55,Math.min(lx,lz)*0.9,yaw+Math.PI/2,0,'#a3b28c',{ao:0.9,sw:0.3,tilt:1.45});
+        /* V17.1: Oberseite aus zwei kleineren, gegeneinander geneigten Karten statt einer flachen Platte (wirkt aus der Nähe gewölbt) */
+        [-1,-0.5,0,0.5,1].forEach(function(sd){var ox=along?(rnd()-0.5)*0.3:sd*th*0.55,oz=along?sd*th*0.55:(rnd()-0.5)*0.3;card(cx+ox,hgt-0.12+rnd()*0.06,cz+oz,0.36+rnd()*0.16,0.32+rnd()*0.12,yaw+(rnd()-0.5)*1.2,0,['#a3b28c','#9aab84','#a8b690'][(rnd()*3)|0],{cx:(x0+x1)/2,cz:(z0+z1)/2,ao:0.88,sw:0.35,tilt:(sd||(rnd()<0.5?-1:1))*(along?-1:1)*(0.7+rnd()*0.35)});});
         /* V17: unregelmässige Oberkante – einzelne Triebe ragen 5–15 cm über den Schnitt */
         if(i%2===0)card(cx+(rnd()-0.5)*0.2,hgt-0.18,cz+(rnd()-0.5)*0.2,0.38+rnd()*0.2,0.3+rnd()*0.12,yaw+(rnd()-0.5)*0.8,0,'#9fb087',{cx:(x0+x1)/2,cz:(z0+z1)/2,ao:0.85,sw:0.5,tilt:(rnd()-0.5)*0.5});}
       WALLS.push([x0,x1,0,hgt,z0,z1]);occ((x0+x1)/2,(z0+z1)/2,lx/2,lz/2);}
@@ -327,8 +334,9 @@
     WIN.forEach(function(o){var hh={u0:o.u-o.w/2,u1:o.u+o.w/2,y0:o.y,y1:o.y+o.h};(o.F===FRONT?HF:o.F===SIDE?HS:o.F===BACK?HB:HL).push(hh);});
     /* Fassadenflächen (WDVS, Abriebputz), fein gerastert für Licht und Umgebungsverdeckung */
     MAT=PUTZ;
+    /* V17.1: Vorder- und Seitenfassade (Hauptansichten) feiner gerastert – Balkonschatten ohne schräge Interpolationsfahnen */
+    withSub(0.34,function(){holed(FRONT,-XS,XS,FLOOR,PAR,0,HF,[0,0,1],FAC,true);holed(SIDE,-ZI,ZI,FLOOR,PAR,0,HS,[1,0,0],FAC,true);},'v');
     withSub(0.55,function(){
-      holed(FRONT,-XS,XS,FLOOR,PAR,0,HF,[0,0,1],FAC,true);holed(SIDE,-ZI,ZI,FLOOR,PAR,0,HS,[1,0,0],FAC,true);
       holed(BACK,-XS,XS,FLOOR,PAR,0,HB,[0,0,-1],FAC,true);holed(LEFT,-ZI,ZI,FLOOR,PAR,0,HL,[-1,0,0],FAC,true);
       /* Wandstirnen an den Ecken (gehören optisch zur Seitenfassade) */
       [[XS,1],[-XS,-1]].forEach(function(e){rect([e[0],FLOOR,ZI],[0,0,ETW],[0,PAR-FLOOR,0],[e[1],0,0],FAC);rect([e[0],FLOOR,-ZF],[0,0,ETW],[0,PAR-FLOOR,0],[e[1],0,0],FAC);});
@@ -462,14 +470,18 @@
     /* V17: Gleitschutzstreifen an den Stufenvorderkanten, dunkle Fuge Stufe/Wand */
     BEV=0;MAT=TEX;for(s=0;s<11;s++){plane(-2.9,-1.81,4.975-s*0.29,4.997-s*0.29,FLOOR+0.176*(s+1)+0.0012,'#5f5a53');}
     for(s=0;s<11;s++)box(-2.937,FLOOR+0.176*(s+1)-0.004,4.865-s*0.29,0.006,0.008,0.29,'#6b655d',0,0);MAT=STE;
-    /* Brüstung: verputzte Wand parallel zum Lauf (Oberkante 0,95 m über den Stufen), Eichen-Handlauf auf Konsolen */
-    BEV=0;MAT=IPU;(function(){var xa=-1.77,xb=-1.65,z0=5.02,z1=1.82,z2=1.72,y0=FLOOR,t0=FLOOR+nose(z0)+0.95,t1=FLOOR+nose(z1)+0.95,PW='#e2ddd4';
+    /* V17.1: Wange (verputzt) bis 6 cm über die Stufenkanten, darauf Staketengeländer aus Flachstahl (Abstand < 12 cm), Eichenhandlauf
+       0,9 m über den Stufenkanten. Vorher eine 0,95 m hohe Brüstung, die durch einen Unterteilungsfehler waagrecht gezeichnet wurde. */
+    BEV=0;MAT=IPU;(function(){var xa=-1.77,xb=-1.65,z0=5.02,z1=1.82,z2=1.72,y0=FLOOR,t0=FLOOR+nose(z0)+0.06,t1=FLOOR+nose(z1)+0.06,PW='#e2ddd4',xm=(xa+xb)/2;
       withSub(0.3,function(){[[xa,-1],[xb,1]].forEach(function(w){var x=w[0];quadN([x,y0,z0],[x,t0,z0],[x,t1,z1],[x,y0,z1],[w[1],0,0],PW);quadN([x,y0,z1],[x,t1,z1],[x,t1,z2],[x,y0,z2],[w[1],0,0],PW);});
         quadN([xa,t0,z0],[xb,t0,z0],[xb,t1,z1],[xa,t1,z1],[0,1,0],PW);quadN([xa,t1,z1],[xb,t1,z1],[xb,t1,z2],[xa,t1,z2],[0,1,0],PW);
         quadN([xa,y0,z0],[xb,y0,z0],[xb,t0,z0],[xa,t0,z0],[0,0,1],PW);quadN([xa,y0,z2],[xb,y0,z2],[xb,t1,z2],[xa,t1,z2],[0,0,-1],PW);},'all');
-      WALLS.push([xa,xb,FLOOR,t1,z2,z0]);
-      MAT=HOLZ;tube([-1.815,FLOOR+nose(5.05)+0.9,5.05],[-1.815,FLOOR+nose(1.82)+0.9,1.82],0.022,12,'#a47e57',0,0.3);
-      MAT=MET;[4.7,3.5,2.3].forEach(function(z){var y=FLOOR+nose(z)+0.9;tube([-1.815,y-0.02,z],[-1.77,y-0.06,z],0.007,8,'#3d3b39',0,0);});})();
+      WALLS.push([xa,xb,FLOOR,FLOOR+nose(z1)+0.95,z2,z0]);
+      MAT=MET;var ST2='#3b3b3a';for(var zz=z0-0.06;zz>z1+0.02;zz-=0.115){var yb=FLOOR+nose(zz)+0.06;box(xm,yb,zz,0.012,0.84,0.03,ST2,0,0);}
+      [[z0-0.03,0],[z1+0.03,0]].forEach(function(q){var yb=FLOOR+nose(q[0])+0.06;box(xm,yb,q[0],0.03,0.86,0.03,ST2,0,0);});
+      /* Handlauf folgt der Steigung bis zum Podest (Knick bei zk), dann waagrecht */
+      var zk=5.01-0.29*(1.94/0.176-1);tube([xm,FLOOR+nose(z0-0.03)+0.9,z0-0.03],[xm,FLOOR+1.94+0.9,zk],0.012,6,ST2,0,0);tube([xm,FLOOR+1.94+0.9,zk],[xm,FLOOR+1.94+0.9,z1+0.03],0.012,6,ST2,0,0);
+      MAT=HOLZ;tube([xm,FLOOR+nose(5.05)+0.935,5.05],[xm,FLOOR+1.94+0.935,zk],0.024,14,'#a47e57',0,0.3);tube([xm,FLOOR+1.94+0.935,zk],[xm,FLOOR+1.94+0.935,1.82],0.024,14,'#a47e57',0,0);})();
     tube([-2.9,FLOOR+1.0,4.9],[-2.9,FLOOR+2.85,1.7],0.018,8,'#8d8a86',0,0);
     /* Briefkastenanlage, Anschlagbrett, Leuchtband, Pflanze, Fussabtreter, Sockelleisten, Türzargen */
     /* Lift: Schachttür Chromstahl geschliffen (zwei Teleskopflügel), Portal, Schwelle, Ruftaster, Stockwerkanzeige */
@@ -554,7 +566,8 @@
     /* Schale auf dem Tisch, kleiner Kräutertopf auf der Arbeitsplatte */
     MAT=KER;tube([7.85,FLOOR+0.755,0.85],[7.85,FLOOR+0.835,0.85],0.07,24,'#d9d3c8',0,0,0.14,false);tube([7.85,FLOOR+0.765,0.85],[7.85,FLOOR+0.835,0.85],0.062,24,'#e4dfd6',0,0,0.13,false);cyl(7.85,FLOOR+0.765,0.85,0.062,0.002,20,'#cfc8bc',0,0);
     MAT=STE;cyl(5.72,FLOOR+0.896,-0.8,0.06,0.11,14,'#b6a48e',0,0,0.065);MAT=BLA;for(var hk=0;hk<7;hk++){var ha=hk*0.9;leaf([5.72,FLOOR+1.0,-0.8],[Math.cos(ha),1.2,Math.sin(ha)],0.09,0.035,0.012,'#5d7c45');}MAT=IPU;
-    withBev(0.01,function(){MAT=HOLZ;box(8.44,FLOOR,1.0,0.32,0.42,1.3,'#9c7652',0,0.2);MAT=TEX;box(8.44,FLOOR+0.42,1.0,0.3,0.05,1.26,'#6f7469',0,0);});MAT=IPU;
+    /* V17.1: Sitzbank auf vier Beinen mit Zarge (unten offen statt Holzkiste), Sitzkissen */
+    withBev(0.006,function(){MAT=HOLZ;box(8.44,FLOOR+0.38,1.0,0.34,0.035,1.3,'#9c7652',0,0.2);box(8.44,FLOOR+0.31,1.0,0.3,0.07,1.22,'#8a6648',0,0);MAT=TEX;box(8.44,FLOOR+0.415,1.0,0.32,0.05,1.26,'#6f7469',0,0);});MAT=HOLZ;[[8.3,0.4],[8.58,0.4],[8.3,1.6],[8.58,1.6]].forEach(function(l){box(l[0],FLOOR,l[1],0.04,0.38,0.04,'#8a6648',0,0);});MAT=IPU;
     /* Wohnbereich: Sofa, Couchtisch, Teppich, Sideboard mit Bild, Stehleuchte, grosse Zimmerpflanze */
     MAT=TEX;var sc='#8b867e';BEV=0.03;box(8.17,FLOOR+0.06,3.0,0.88,0.36,1.9,sc,0,0.2);box(8.48,FLOOR+0.42,3.0,0.26,0.4,1.9,sc,0,0);box(8.12,FLOOR+0.42,2.55,0.6,0.12,0.88,'#938e86',0,0);box(8.12,FLOOR+0.42,3.45,0.6,0.12,0.88,'#938e86',0,0);
     box(8.17,FLOOR+0.06,2.0,0.88,0.56,0.12,sc,0,0);box(8.17,FLOOR+0.06,4.0,0.88,0.56,0.12,sc,0,0);box(8.32,FLOOR+0.55,2.6,0.16,0.32,0.5,'#a19a8f',0,0);box(8.32,FLOOR+0.55,3.35,0.16,0.32,0.5,'#7d7f78',0,0);BEV=0;
@@ -587,7 +600,7 @@
     /* ---- Bad x[3,5.4] z[-1,2.4] (V17): Bodenplatten 60×60 anthrazit, Wandplatten 60×30 weiss raumhoch – Fugen je Pixel ab der
        Raumecke x 3,072 / z −0,928 / Boden (Shader), Dusche bodeneben mit Glaswand ---- */
     MAT=BPL;withSub(0.25,function(){box(4.2,FLOOR-0.02,0.7,2.28,0.02,3.28,'#6f6d6a',0,0);},'up');
-    MAT=WPL;withSub(0.3,function(){box(3.066,FLOOR,0.7,0.012,CEIL-FLOOR,3.28,'#efeeea',0,0);box(4.2,FLOOR,-0.934,2.28,CEIL-FLOOR,0.012,'#efeeea',0,0);box(4.2,FLOOR,2.334,2.28,CEIL-FLOOR,0.012,'#efeeea',0,0);
+    MAT=WPL;withSub(0.1,function(){box(3.066,FLOOR,0.7,0.012,CEIL-FLOOR,3.28,'#efeeea',0,0);box(4.2,FLOOR,-0.934,2.28,CEIL-FLOOR,0.012,'#efeeea',0,0);box(4.2,FLOOR,2.334,2.28,CEIL-FLOOR,0.012,'#efeeea',0,0);
       box(XW-0.066,FLOOR,-0.17,0.012,CEIL-FLOOR,1.54,'#efeeea',0,0);box(XW-0.066,FLOOR,1.9,0.012,CEIL-FLOOR,0.88,'#efeeea',0,0);box(XW-0.066,FLOOR+2.05,1.025,0.012,CEIL-FLOOR-2.05,0.85,'#efeeea',0,0);},'v');
     MAT=IPU;withSub(0.3,function(){box(4.2,CEIL,0.7,2.28,0.04,3.28,CW,0,0);},'down');
     /* neutralwarmes Licht (≈ 3500 K) statt gelbbeiger Grundstimmung: zwei Deckenleuchten, Spiegelleuchte */
@@ -608,7 +621,7 @@
     MAT=EDS;box(5.13,FLOOR+1.22,-0.86,0.34,0.008,0.12,'#b4b3af',0,0);tube([4.97,FLOOR+1.245,-0.8],[5.29,FLOOR+1.245,-0.8],0.004,8,'#b4b3af',0,0);
     MAT=KER;cyl(5.05,FLOOR+1.228,-0.87,0.028,0.17,16,'#d9dfe2',0,0,0.024);cyl(5.14,FLOOR+1.228,-0.87,0.025,0.14,16,'#e8e2d6',0,0,0.021);
     /* Vorwandinstallation 1,20 m (genau 4 Plattenreihen) mit Steinablage – Unterputzspülkasten, Betätigungsplatte */
-    var VX=3.222,ac='#d6d9dc';MAT=WPL;withSub(0.3,function(){box((3.072+VX)/2,FLOOR,-0.339,VX-3.072,1.2,1.178,'#efeeea',0,0);},'v');
+    var VX=3.222,ac='#d6d9dc';MAT=WPL;withSub(0.1,function(){box((3.072+VX)/2,FLOOR,-0.339,VX-3.072,1.2,1.178,'#efeeea',0,0);},'v');
     MAT=STE;withBev(0.004,function(){box(3.159,FLOOR+1.2,-0.334,0.174,0.02,1.2,'#dcd8d0',0,0.2);});WALLS.push([3.07,3.25,FLOOR,FLOOR+1.22,-0.93,0.27]);
     MAT=KER;tube([VX+0.002,FLOOR+0.002,-0.926],[VX+0.002,FLOOR+0.002,0.25],0.0035,6,'#d3d1cd',0,0,undefined,false);
     /* Betätigungsplatte 246 × 164 mm (Chrom matt), zwei Tasten (gross/klein, 2,5 mm erhaben), Fuge 10 mm */
@@ -631,8 +644,10 @@
       surf([wr(0.530,0.400,0.174),bo],cc,0,function(q,n){return n[1]<0;});
       var BW=[[0.300,0.400,0.150,0.115],[0.298,0.394,0.147,0.113],[0.292,0.370,0.138,0.106],[0.278,0.335,0.120,0.093],[0.262,0.300,0.100,0.080],[0.249,0.268,0.082,0.066],[0.241,0.245,0.068,0.056]];
       surf(BW.map(function(b){return ov(VX+b[0],b[1],b[2],b[3],0.85);}),cc,0,function(q,n){return dot(n,sub([VX+0.27,FLOOR+0.6,cz],q))<0;});
-      surf([ov(VX+0.241,0.245,0.068,0.056,0.85),ov(VX+0.241,0.245,0.0001,0.0001,0.85)],'#cdd3d3',0,function(q,n){return n[1]<0;});
-      surf([ov(VX+0.205,0.2453,0.03,0.031,0.9),ov(VX+0.205,0.2453,0.0001,0.0001,0.9)],'#8a9293',0,function(q,n){return n[1]<0;});
+      /* V17.1: Wasserfläche mit weichem Übergang zum Geruchsverschluss (drei Ringe statt einer harten grauen Scheibe) */
+      surf([ov(VX+0.241,0.245,0.068,0.056,0.85),ov(VX+0.228,0.245,0.048,0.042,0.88),ov(VX+0.212,0.245,0.034,0.034,0.9)],'#c9d0d1',0,function(q,n){return n[1]<0;});
+      surf([ov(VX+0.212,0.245,0.034,0.034,0.9),ov(VX+0.206,0.2452,0.026,0.026,0.9)],'#a9b2b3',0,function(q,n){return n[1]<0;});
+      surf([ov(VX+0.206,0.2452,0.026,0.026,0.9),ov(VX+0.205,0.2453,0.0001,0.0001,0.9)],'#7f898a',0,function(q,n){return n[1]<0;});
       /* Brille: Duroplast 21 mm, gerundet, 4,5 mm über dem Rand auf vier Puffern */
       shellR(sel(VX+0.302,cz,0.146,0.113,0.85),sel(VX+0.315,cz,0.205,0.172,0.85),
         [[0.03,0.4045,-0.3,-1],[0.0,0.409,-1,-0.3],[0.0,0.417,-1,0.35],[0.07,0.4233,-0.4,1],[0.3,0.4256,-0.06,1],[0.7,0.4256,0.06,1],[0.93,0.4233,0.4,1],[1.0,0.417,1,0.35],[1.0,0.409,1,-0.3],[0.97,0.4045,0.3,-1],[0.03,0.4045,-0.3,-1]],
@@ -669,7 +684,8 @@
     /* Unterschrank: Korpus und Front Sand matt lackiert, Front mit 3 mm Schattenfuge, Griffmulde unter der Keramik, 38 cm Bodenfreiheit */
     var vy0=FLOOR+0.38,vy1=bY-bD,vx1=3.512;
     MAT=MET;withBev(0.003,function(){box((3.074+vx1-0.02)/2,vy0,bcz,vx1-0.02-3.074,vy1-vy0-0.002,0.58,'#c9bcaa',0,0);box(vx1-0.009,vy0,bcz,0.018,vy1-vy0-0.02,0.574,'#d4c8b6',0,-1);});
-    MAT=TEX;box(3.488,vy1-0.0195,bcz,0.012,0.018,0.566,'#5a534c',0,0);
+    /* V17.1: Griffmulde als eloxiertes Aluprofil über die ganze Breite (statt dunkler Lücke zwischen den Korpusseiten), darüber 3 mm Schattenfuge */
+    MAT=ALM;withBev(0.002,function(){box(3.494,vy1-0.021,bcz,0.016,0.019,0.58,'#9d9a94',0,0);});MAT=TEX;box(3.5,vy1-0.0025,bcz,0.012,0.0025,0.575,'#3a3632',0,0);
     WALLS.push([3.07,3.52,vy0,vy1,bcz-0.29,bcz+0.29]);
     /* Spiegelschrank: Korpus weiss lackiert, Spiegelfront (planare Spiegelung), Lichtleiste unten */
     MAT=IPU;withBev(0.004,function(){box(3.16,FLOOR+1.14,0.8,0.16,0.72,0.76,'#eceae6',0,0.3);});MAT=SPI;box(3.2445,FLOOR+1.15,0.8,0.011,0.7,0.74,'#e8ecee',0,0);

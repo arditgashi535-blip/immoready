@@ -221,7 +221,8 @@
       if ((SUBMODE === 'v' && Math.abs(ny) > 0.5) || (SUBMODE === 'up' && ny < 0.5) || (SUBMODE === 'down' && ny > -0.5)) { quad(a, b, c, d, col, em); return; }
       var nu = Math.max(1, Math.ceil(Math.hypot(u[0], u[1], u[2]) / SUB)), nv = Math.max(1, Math.ceil(Math.hypot(v[0], v[1], v[2]) / SUB));
       if (nu * nv === 1) { quad(a, b, c, d, col, em); return; }
-      function P(i, j) { var x = i / nu, y = j / nv; return [a[0] + u[0] * x + v[0] * y, a[1] + u[1] * x + v[1] * y, a[2] + u[2] * x + v[2] * y]; }
+      /* bilinear über alle vier Ecken (V17.1): Trapeze wie die schräge Treppenbrüstung behalten ihre Form */
+      function P(i, j) { var x = i / nu, y = j / nv, k = 0, o = [0, 0, 0]; for (; k < 3; k++) { var ab = a[k] + (b[k] - a[k]) * x, dc = d[k] + (c[k] - d[k]) * x; o[k] = ab + (dc - ab) * y; } return o; }
       for (var i = 0; i < nu; i++) for (var j = 0; j < nv; j++) quad(P(i, j), P(i + 1, j), P(i + 1, j + 1), P(i, j + 1), col, em);
     }
     /* SUBMODE: 'all' | 'v' (nur senkrechte Flächen) | 'up' (nur Oberseiten) | 'down' (nur Unterseiten, z. B. Decken) */
@@ -417,7 +418,7 @@
        Himmel, Badspiegel aus einer planaren Spiegelung. Materialwerte (Rauheit, F0, Metall, Relief) aus einer LUT. */
     var SKYF = 'vec3 sky(vec3 d){float t=d.y;vec3 hz=vec3(0.6,0.54,0.53),lo=vec3(0.33,0.39,0.53),zn=vec3(0.075,0.11,0.21);vec3 c=mix(hz,lo,smoothstep(0.0,0.14,t));c=mix(c,zn,smoothstep(0.14,0.8,t));' +
       'float g=pow(max(dot(normalize(d.xz+vec2(0.0001)),vec2(-0.896,0.443)),0.0),3.0);c+=vec3(0.34,0.17,0.04)*g*(1.0-smoothstep(0.0,0.3,t));' +
-      'c=mix(c,vec3(0.22,0.25,0.31),smoothstep(0.0,-0.3,t));return c*c;}' +
+      'c=mix(c,hz*0.93,smoothstep(0.0,-0.04,t));return c*c;}' + /* V17.1: unter dem Horizont Dunstton statt Dunkelblau (keine schwarzen Flächen hinter fernen Häusern) */
       /* ferner Hügelzug im Dunst (Silhouette am Horizont statt einer geraden Bodenkante) */
       'vec3 hil(vec3 d){return sky(vec3(d.x,0.0,d.z))*0.55;}';
     /* Filmkurve (ACES-Näherung nach Narkowicz) mit weicher Schulter, danach einmalig linear → sRGB */
@@ -457,7 +458,7 @@
       'vd=vec4(dif,em.y);vs=vec4(add,0.0);vn=vec4(N,sl.w);vl=vec4(sl.xyz,(sc.x+sc.y+sc.z)*0.3333);va=c;}';
     /* Software-Grafik (lite): Dunst wieder je Eckpunkt (die fernen Bodenflächen sind dafür in 40-m-Felder geteilt) */
     var VSML = VSM.replace('varying vec3 va;', 'varying vec3 va;varying vec4 vf;').replace(/va=c;}$/, 'va=c;' + FOGV +
-      'if(wp.y<0.25){float rr=length(wp.xz-vec2(-1.0,5.0));float g=smoothstep(40.0,120.0,rr);vec3 land=mix(vec3(0.007,0.01,0.017),fc*0.55,smoothstep(140.0,430.0,rr));fc=mix(fc,land,g);f=max(f,g);}vf=vec4(fc,f);}');
+      'if(wp.y<0.25){float rr=length(wp.xz-vec2(-1.0,5.0));float g=smoothstep(40.0,120.0,rr);vec3 land=mix(fc*0.36,fc*0.58,smoothstep(140.0,430.0,rr));fc=mix(fc,land,g);f=max(f,g);}vf=vec4(fc,f);}');
     /* mode: 0 normal · 1 Reflexionsaufnahme (nur diffus, Ausgabe √linear) · 2 Spiegelbild (ohne Spiegel-Rekursion) */
     /* lite: Software-Grafik ohne IR_FORCE_HQ – ohne Relief und ohne Reflexionsaufnahme (gemessen: Bildzeit ≈ −…%, siehe Testbericht) */
     function FSM(der, lite) {
@@ -500,7 +501,7 @@
         (lite ? 'col=mix(col,vf.rgb,vf.a);gl_FragColor=vec4(tm(col*expo),1.0);}' :
         'vec3 fv=P-eye;float fdi=max(length(fv),0.001);float f=clamp(1.0-exp(-pow(fdi/220.0,2.0)),0.0,1.0),g=0.0,rr=0.0;' +
         'if(P.y<0.25){rr=length(P.xz-vec2(-1.0,5.0));g=smoothstep(40.0,120.0,rr);}float fa=max(f,g);' +
-        'if(fa>0.002){vec3 fd=fv/fdi;vec3 fc=sky(vec3(fd.x,max(fd.y,0.0)*0.2,fd.z));vec3 land=mix(vec3(0.007,0.01,0.017),fc*0.55,smoothstep(140.0,430.0,rr));fc=mix(fc,land,g);col=mix(col,fc,fa);}' +
+        'if(fa>0.002){vec3 fd=fv/fdi;vec3 fc=sky(vec3(fd.x,max(fd.y,0.0)*0.2,fd.z));vec3 land=mix(fc*0.36,fc*0.58,smoothstep(140.0,430.0,rr));fc=mix(fc,land,g);col=mix(col,fc,fa);}' +
         'gl_FragColor=vec4(tm(col*expo),1.0);}');
     }
     /* Himmel: Verlauf der blauen Stunde + feine, flache Wolkenschleier (nur nahe am Horizont) */
