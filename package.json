@@ -5,7 +5,7 @@
   "scripts": {
     "build": "python3 build.py",
     "check:rise": "python3 tools/rise.py",
-    "test": "npm run build && python3 tests/test_rise.py && node tests/t15-velo.js && node tests/t7.js && node tests/t9.js && node tests/t11.js && node tests/t14-v13.js && node tests/t16-v14.js && node tests/t17-v15.js && node tests/t18-v16.js && node tests/t19-v17.js",
+    "test": "npm run build && python3 tests/test_rise.py && node tests/t15-velo.js && node tests/t7.js && node tests/t9.js && node tests/t11.js && node tests/t14-v13.js && node tests/t16-v14.js && node tests/t17-v15.js && node tests/t18-v16.js && node tests/t19-v17.js && node tests/t20-v171.js",
     "test:servers": "python3 -m http.server 8702 --bind 127.0.0.1 & (cd tests/harness && python3 -m http.server 8701 --bind 127.0.0.1 &) ; (cd tests/harness && python3 -m http.server 8703 --bind 127.0.0.1)",
     "test:embed": "node tests/t12.js",
     "test:component": "node tests/t13-component.js",
@@ -18,7 +18,9 @@
     "shots": "node tests/shots-stations.js dist/immoready-vorschau.html nachher",
     "vergleich": "node tools/vergleich.js dist/immoready-vorschau.html shots/v17-nachher abnahme",
     "test:v17": "node tests/t19-v17.js",
-    "site": "python3 tools/site.py"
+    "site": "python3 tools/site.py",
+    "test:v171": "node tests/t20-v171.js",
+    "abnahme": "node tools/abnahme-final.js dist/immoready-vorschau.html shots/v171-abnahme alle && python3 tools/abnahme-final-collage.py"
   },
   "devDependencies": {
     "playwright": "^1.48.0"

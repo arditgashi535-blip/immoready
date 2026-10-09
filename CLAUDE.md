@@ -76,7 +76,30 @@ Ausgaben in `dist/`:
 - `immoready-rundgang-embed.html` – Alternative für ein Wix-HTML-iFrame (postMessage).
 - `embed-test.html` – wie die Embed-Datei, aber für den lokalen Nachrichtentest.
 
-## 3D-Rundgang (`src/tour/tour-core.js`) – V17 «Final Production Candidate»
+## 3D-Rundgang (`src/tour/tour-core.js`) – V17.1 «Final Realism & Mobile Release Candidate»
+
+**Neu in V17.1 (Korrekturdurchgang, keine neue Version):**
+- **Unterteilung:** `face()` interpoliert bei `withSub` bilinear über alle vier Ecken (vorher Parallelogramm aus drei Ecken –
+  Trapeze wie die schräge Treppenbrüstung wurden waagrecht gezeichnet, die Stufen ragten als «Kisten» darüber).
+- **Treppenhaus:** verputzte Wange 6 cm über den Stufenkanten mit Knick am Podest, Staketengeländer aus Flachstahl
+  (Abstand 11,5 cm), Eichenhandlauf 0,9 m über den Stufenkanten, waagrecht am Podest.
+- **Bad:** Wände und Vorwand auf 10 cm gerastert (vorher 30 cm: diagonale Lichtfächer aus dem gebackenen Schatten des
+  Spiegelschranks). Griffmulde als Aluprofil über die ganze Breite mit Schattenfuge. WC-Wasserfläche mit weichem Übergang
+  zum Geruchsverschluss.
+- **Horizont:** Der Boden ab 120 m wurde im Shader mit fast Schwarz überblendet (dunkles Band in Gesamt- und Dachansicht) –
+  jetzt abgedunkelter Dunstton (`land` in `VSM`/`VSML`); Himmel unter dem Horizont im Dunstton; ferner Boden mit
+  Bodenmaterial. Strasse/Trottoir bis ±62 m, Bodenlücke bis ±90 m geschlossen.
+- **Fassade:** Vorder- und Seitenfassade auf 34 cm gerastert (Balkonschatten ohne Interpolationsfahnen).
+- **Garten:** mehrstämmiger Baum mit Ästen aus den Stämmen; Heckenoberseite aus fünf kleinen, geneigten Karten statt einer Platte.
+- **Wohnung:** Sitzbank auf vier Beinen mit Zarge statt Holzkiste.
+- **Seite:** Kontaktleiste und kompakter Kopf deckend, alle Bedienelemente ≥ 44 px (`.btn.sm`, Stationsknöpfe, «Kopieren»),
+  320 px bei 200 % Text ohne Überlauf (Segmentwahl, Überzeilen, Personenkarte, Formularfuss), Fokus nach Fehlern auf dem
+  ersten fehlerhaften Feld, Skip-Link bleibt beim Laden erster Tabstopp und führt zum Inhalt der aktuellen Seite.
+- Tests neu: `tests/t20-v171.js`. Abnahme: `npm run abnahme` (32 Bilder, `tools/kameras-vergleich.json → abnahme_final`,
+  Vergleich mit dem Ausgangsstand: `node tools/abnahme-final.js <V17-Datei> shots/v171-vorher szene`). Wix: zusätzlich
+  `wix/velo-offertseite.js` (Vorauswahl der Leistung).
+
+### V17 «Final Production Candidate»
 
 **Neu in V17:**
 - **Bad:** Plattenfugen je Pixel im Shader (`vq` mit negativem `z` = 2D-Raster in Metern, Raster ab der Raumecke
@@ -248,7 +271,8 @@ Ausgaben in `dist/`:
 python3 tools/rise.py             # rise.json prüfen
 python3 build.py                  # baut dist/ (prüft rise.json zuerst)
 npm install && npx playwright install chromium
-npm test                          # Build, RISE, Velo (t15), t7 Seite, t9 Interaktionen, t11 Rundgang, t14 V13/V14, t16 V14, t17 V15, t18 V16, t19 V17
+npm test                          # Build, RISE, Velo (t15), t7 Seite, t9 Interaktionen, t11 Rundgang, t14 V13/V14, t16 V14, t17 V15, t18 V16, t19 V17, t20 V17.1
+npm run abnahme                   # 32 Abnahmebilder + Übersicht/Vergleich → docs/v171/
 npm run bake                      # Build → Licht vorab rechnen → Build (nach Geometrieänderungen Pflicht)
 npm run perf                      # Ladeleistung gedrosselt (Server: python3 -m http.server 8702)
 npm run test:servers &            # lokale Server für die folgenden zwei Tests

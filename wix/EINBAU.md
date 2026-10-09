@@ -1,4 +1,4 @@
-# Einbau des Rundgangs in Wix (V17) – kurz
+# Einbau des Rundgangs in Wix (V17.1) – kurz
 
 Stand: vorbereitet, **nicht eingebaut**. In Wix wurde nichts verändert, nichts veröffentlicht, keine Domain angefasst.
 Veröffentlichung nur nach ausdrücklicher Freigabe durch Ardit Gashi.
@@ -11,6 +11,7 @@ Veröffentlichung nur nach ausdrücklicher Freigabe durch Ardit Gashi.
 | `component/assets/tour/` | 16 Stations- und Detailbilder (quer 1440×900, hoch 960×864), 9 Materialtexturen, `licht.json` |
 | `component/immoready-tour.inline.js` | Ausweichvariante ohne Bilderordner (alles eingebettet, ca. 2 MB) |
 | `wix/velo-custom-element.js` | Velo-Seitencode für die Startseite |
+| `wix/velo-offertseite.js` | Velo-Seitencode für die Offertseite (Vorauswahl der Leistung aus `?leistung=`) |
 | `site/` | Produktionsform der ganzen Seite mit getrennten Dateien (für eigenes Hosting/Tests, nicht für Wix nötig) |
 
 ## Empfohlen: Custom Element `<immoready-tour>` im Stationsmodus
@@ -51,6 +52,26 @@ Smartphone-Stationsleiste waagrecht scrollbar, Bad mit Unterschrank; Bildnamen u
 
 Steuerung von der Wix-Seite: `$w('#immoreadyTour').setAttribute('station', '4')` (0–5).
 
+## Vorauswahl der Leistung auf der Offertseite (neu in V17.1)
+
+| Was | Wert |
+|---|---|
+| Ablauf | Rundgang → `request-quote {service}` → Startseiten-Code → `wixLocation.to('/offerte?leistung=<service>')` → Offertseite liest `wixLocation.query.leistung` |
+| Seitencode | `wix/velo-offertseite.js` in den Code der Offertseite kopieren |
+| **Element-ID** des Leistungsfelds | `leistungFeld` (Dropdown oder Optionsfeld; **vor dem Einbau prüfen**) |
+| Werte | Option mit dem Schlüssel (`hauswartung` …) oder mit der Beschriftung aus der Liste im Code |
+| Prüfung | unbekannter oder fehlender Parameter → keine Vorauswahl; nur die 8 Schlüssel aus `rise.json` werden akzeptiert |
+| Einschränkung | Felder des neuen Wix-Forms-Elements sind je nach Version nicht per Velo setzbar – dann eigenes Velo-Formular oder ohne Vorauswahl |
+
+## Wo die Dateien in Wix liegen
+
+| Datei | Ort in Wix |
+|---|---|
+| `dist/component/immoready-tour.js` | Velo-Seitenleiste → «Öffentlich» → `public/custom-elements/immoready-tour.js` |
+| `dist/component/assets/tour/*` (16 WebP, 9 Texturen, `licht.json`) | HTTPS-Ordner mit CORS-Freigabe (Adresse **offen**); Wert für `assets-base` |
+| `wix/velo-custom-element.js` | Seitencode der Startseite |
+| `wix/velo-offertseite.js` | Seitencode der Offertseite |
+
 ## Warum Stationsmodus statt Scrollmodus in Wix
 
 Der Scrollmodus braucht einen Abschnitt von rund 7,6 Bildschirmhöhen, dessen Fortschritt aus dem Seitenscroll
@@ -75,7 +96,8 @@ Der Stationsmodus («Weiter»/«Zurück», Stationspunkte, Tastatur) funktionier
 2. Custom Element einfügen, ID `immoreadyTour`, Attribute setzen, Seitencode einfügen.
 3. Vorschau: `tour-ready` erscheint in der Konsole (`console.info` aus dem Seitencode ergänzen), sechs Stationen
    anwählen, im Bad «Übersicht · Waschtisch · WC».
-4. «Offerte anfragen» an jeder Station und jeden Leistungspunkt klicken → richtige Offertseite mit `?leistung=…`.
+4. «Offerte anfragen» an jeder Station und jeden Leistungspunkt klicken → richtige Offertseite mit `?leistung=…`,
+   Leistungsfeld ist vorausgewählt; `/offerte?leistung=unbekannt` wählt nichts vor.
 5. Smartphone-Ansicht im Editor und auf einem echten iPhone und Android-Gerät: Stationsbilder, Stationsleiste,
    Kontaktleiste verdeckt nichts.
 6. Safari (macOS/iOS) prüfen. Erst danach – mit Freigabe – veröffentlichen.
@@ -84,4 +106,7 @@ Der Stationsmodus («Weiter»/«Zurück», Stationspunkte, Tastatur) funktionier
 
 1. Hosting für Komponente und Bilder festlegen (Wix `public/` bzw. Medienverwaltung oder eigene HTTPS-Adresse).
 2. Pfade der Offert- und Kontaktseite in Wix bestätigen und im Velo-Code eintragen.
-3. Formular an Wix Forms anbinden; bis dahin bleibt es als Demo gekennzeichnet (keine Erfolgsmeldung ohne Versand).
+3. Formular an Wix Forms anbinden und einen echten Testversand prüfen (Eintrag gespeichert, Benachrichtigung an
+   info.immoready@gmail.com); bis dahin bleibt es als Demo gekennzeichnet (keine Erfolgsmeldung ohne Versand).
+4. Impressum: Adresse, Rechtsform und UID eintragen (in `rise.json` noch `[UNSPECIFIED]`).
+5. Test auf echtem iPhone (Safari) und Android-Gerät (Chrome) – bisher nur Browser-Emulation.
