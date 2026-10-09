@@ -55,7 +55,7 @@ function pageFacts() {
     for (const r of ['#start', '#offerte', '#leistungen', '#sanitaer', '#kontakt', '#impressum']) {
       const p = await b.newPage({ viewport: { width: 320, height: 640 }, isMobile: true, hasTouch: true }); await p.goto(url + r); await p.waitForTimeout(600);
       await p.evaluate(() => { document.documentElement.style.fontSize = '200%'; }); await p.waitForTimeout(400);
-      const q = await p.evaluate(() => ({ sw: document.documentElement.scrollWidth, cut: Array.from(document.querySelectorAll('h1,h2,h3,p,label,.btn')).filter(e => e.offsetParent && e.scrollWidth > e.clientWidth + 2 && getComputedStyle(e).overflow !== 'visible').length }));
+      const q = await p.evaluate(() => ({ sw: document.documentElement.scrollWidth, cut: Array.from(document.querySelectorAll('h1,h2,h3,p,label,.btn')).filter(e => e.offsetParent && !e.classList.contains('sr') && e.scrollWidth > e.clientWidth + 2 && getComputedStyle(e).overflow !== 'visible').length }));
       if (q.sw > 321 || q.cut) bad.push(r + ' ' + q.sw + '/' + q.cut); await p.close();
     }
     ok(bad.length === 0, `320 px bei 200 % Textgrösse: 6 Seiten ohne seitliches Scrollen und ohne abgeschnittene Texte${bad.length ? ' – ' + bad.join(', ') : ''}`);
