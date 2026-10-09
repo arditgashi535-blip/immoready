@@ -1,0 +1,197 @@
+
+function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+
+/* ---------------- Leistungsseite rendern ---------------- */
+var SICON={hauswartung:'house',sanitaer:'drop',gartenunterhalt:'leaf',reinigung:'clean',raeumung:'box',leerstand:'key',verkauf:'tag',fotografie:'camera'};
+function renderService(key){
+  var d=S[key], h='';
+  h+='<section class="phead"><div class="wrap"><div>';
+  h+='<p class="crumbs mono"><a href="#start">Start</a><span>/</span><a href="#leistungen">Leistungen</a><span>/</span><span>'+esc(d.name)+'</span></p>';
+  h+='<p class="k" style="margin-top:22px"><i class="ico" data-icon="'+(SICON[key]||'house')+'"></i><span class="mono">'+esc(d.name)+' · Zürich &amp; Aargau</span></p>';
+  h+='<h1>'+esc(d.h1).replace(/(\S+\s\S+)$/,'<b>$1</b>')+'</h1><p class="lead" style="color:#DAD8D0;max-width:46ch">'+esc(d.intro)+'</p>';
+  h+='<div style="margin-top:30px;display:flex;flex-wrap:wrap;gap:12px"><a class="btn" href="#offerte" data-pre="'+key+'" data-mode="'+(d.mode||'')+'">'+esc(d.cta)+' <i class="a"></i></a>';
+  h+='<a class="btn ghost on-dark" href="#umfang-'+key+'">Leistungsumfang <i class="a"></i></a></div></div>';
+  h+='<figure class="fig"><div class="illu" data-illu="'+d.illu+'"></div><figcaption class="review-only">Bildplatzhalter · echtes Foto '+esc(d.name)+'</figcaption></figure></div></section>';
+  // Umfang
+  h+='<section class="sec" id="umfang-'+key+'"><div class="wrap side-l"><div><p class="mono eyebrow">Leistungsumfang</p><h2 class="h2" style="font-size:clamp(1.8rem,3.4vw,2.8rem)">Was wir übernehmen.</h2>';
+  if(d.scope.some(function(s){return s[2];}))h+='<p class="review-only placeholder-box" style="margin-top:22px;font-size:.92rem">Gelb markierte Punkte sind noch zu bestätigen (zulässige Arbeiten, Qualifikation, Bewilligungen). In der öffentlichen Ansicht sind sie ausgeblendet.</p>';
+  h+='</div><div class="scope" style="margin-top:0">';
+  d.scope.forEach(function(s){h+='<div'+(s[2]?' class="unconfirmed"':'')+'><b>'+esc(s[0])+(s[2]?'<span class="tbc">zu bestätigen</span>':'')+'</b><p>'+esc(s[1])+'</p></div>';});
+  h+='</div></div>';
+  if(d.note)h+='<div class="wrap" style="margin-top:40px"><p class="note">'+esc(d.note)+'</p></div>';
+  h+='</section>';
+  if(d.extra)h+='<section class="sec paper" style="padding-block:clamp(56px,7vw,96px)"><div class="wrap side-l"><div><p class="mono eyebrow">Gut zu wissen</p></div><div><h2 class="h3" style="font-size:clamp(1.5rem,2.4vw,2rem);margin-bottom:14px">'+esc(d.extra[0])+'</h2><p class="prose">'+esc(d.extra[1])+'</p></div></div></section>';
+  // Zielgruppen + Ablauf
+  h+='<section class="sec dark"><div class="wrap"><div class="side-l"><div><p class="mono eyebrow" style="color:var(--lime)">Geeignet für</p></div><ul class="aud">';
+  d.aud.forEach(function(a){h+='<li>'+esc(a)+'</li>';});
+  h+='</ul></div><hr class="rule" style="margin:clamp(48px,6vw,80px) 0 0"><p class="mono eyebrow" style="margin-top:40px">Ablauf</p><ol class="steps" style="border-color:var(--line-d);margin-top:20px">';
+  d.steps.forEach(function(s,i){h+='<li style="border-color:var(--line-d)"><span class="n" style="color:var(--stone-d)">'+(i+1)+'</span><b>'+esc(s[0])+'</b><span class="muted">'+esc(s[1])+'</span></li>';});
+  h+='</ol></div></section>';
+  // FAQ
+  h+='<section class="sec"><div class="wrap faqwrap"><div><p class="mono eyebrow">Häufige Fragen</p><h2 class="h2" style="font-size:clamp(1.8rem,3.4vw,2.8rem)">'+esc(d.name)+'</h2></div><div class="faq">';
+  d.faq.forEach(function(f){h+='<details><summary>'+esc(f[0])+' <span class="pm"></span></summary><p>'+esc(f[1])+'</p></details>';});
+  h+='</div></div></section>';
+  // CTA
+  h+='<section class="sec paper" style="padding-block:clamp(56px,7vw,96px)"><div class="wrap cta-band"><h2>Anfrage für '+esc(d.name)+' stellen.</h2><div class="acts"><a class="btn inkb" href="#offerte" data-pre="'+key+'" data-mode="'+(d.mode||'')+'">'+esc(d.cta)+' <i class="a"></i></a>';
+  if(d.book)h+='<a class="btn ghost" href="'+BOOK+d.book[1]+'" target="_blank" rel="noopener">'+esc(d.book[0])+' ↗</a>';
+  h+='</div></div>';
+  if(d.books){h+='<div class="wrap" style="margin-top:28px;display:flex;flex-wrap:wrap;gap:10px 22px"><span class="mono muted">Weitere Termine:</span>';d.books.forEach(function(b){h+='<a class="lnk" href="'+BOOK+b[1]+'" target="_blank" rel="noopener">'+esc(b[0])+' ↗</a>';});h+='</div>';}
+  h+='</section>';
+  // Verwandte
+  h+='<section class="sec" style="padding-block:clamp(48px,6vw,80px)"><div class="wrap"><p class="mono eyebrow">Passt dazu</p><div class="related">';
+  d.rel.forEach(function(r){var x=S[r];h+='<a href="#'+r+'"><span class="mono muted">'+x.nr+' · '+esc(x.area)+'</span><b style="font-size:1.2rem">'+esc(x.name)+' →</b></a>';});
+  h+='</div></div></section>';
+  var el=document.getElementById('leistungPage');el.innerHTML=h;paintIllus(el);paintArrows(el);paintIcons(el);
+}
+function renderOverview(){
+  var h='<div class="related" style="grid-template-columns:1fr">';
+  ORDER.forEach(function(k){var d=S[k];h+='<a href="#'+k+'" style="grid-template-columns:5rem minmax(0,1fr) minmax(0,1.4fr);display:grid;gap:8px 24px;align-items:baseline;padding:26px 0;border-left:0"><span class="mono muted">'+d.nr+'</span><b style="font-size:clamp(1.3rem,2.4vw,1.9rem);font-stretch:108%;font-family:var(--f-display)">'+esc(d.name)+'</b><span class="muted">'+esc(d.intro.split('. ')[0])+'.</span></a>';});
+  h+='</div>';
+  var el=document.getElementById('overviewList');el.innerHTML=h;
+}
+var mq=window.matchMedia('(max-width:700px)');
+function fixOverview(){document.querySelectorAll('#overviewList a').forEach(function(a){a.style.gridTemplateColumns=mq.matches?'3rem minmax(0,1fr)':'5rem minmax(0,1fr) minmax(0,1.4fr)';});}
+
+/* ---------------- Seitentitel ---------------- */
+var META={
+ start:['ImmoReady – Hauswartung, Sanitär & Immobilienservice in Zürich und Aargau','Hauswartung, Sanitär, Gartenunterhalt, Reinigung, Räumung und Vermarktung für Liegenschaften in Zürich und Aargau. Persönlich geführt. Offerte anfragen.'],
+ leistungen:['Leistungen rund um Ihre Liegenschaft | ImmoReady','Hauswartung, Sanitär & Unterhalt, Gartenunterhalt, Reinigung, Räumung, Leerstandsmanagement und Vermarktung in Zürich und Aargau.'],
+ verwaltungen:['Liegenschaftsbetreuung für Verwaltungen | ImmoReady','Hauswartung, Garten, Reinigung und Unterhalt für kleine und mittlere Wohnliegenschaften – ein Ansprechpartner für Verwaltungen in Zürich und Aargau.'],
+ ueber:['Über ImmoReady – Ardit Gashi | ImmoReady','ImmoReady wird von Ardit Gashi geführt: Fachmann Betriebsunterhalt EFZ und Facility Services Specialist WSF. Persönliche Betreuung in Zürich und Aargau.'],
+ offerte:['Offerte anfragen | ImmoReady','Unverbindliche Offerte für Hauswartung, Sanitär, Garten, Reinigung, Räumung oder Vermarktung anfragen – in drei kurzen Schritten, mit Foto-Upload.'],
+ kontakt:['Kontakt | ImmoReady','ImmoReady erreichen: Telefon 076 340 44 01, E-Mail info.immoready@gmail.com. Einsatzgebiet Zürich und Aargau.'],
+ impressum:['Impressum | ImmoReady','Impressum von ImmoReady.'],
+ datenschutz:['Datenschutz | ImmoReady','Datenschutzerklärung von ImmoReady.'],
+ umsetzung:['Umsetzungsmappe | ImmoReady Relaunch','Interne Übergabe zum Relaunch.']
+};
+ORDER.forEach(function(k){META[k]=S[k].seo;});
+
+/* ---------------- Router ---------------- */
+var PAGES=['start','leistungen','verwaltungen','ueber','offerte','kontakt','impressum','datenschutz','umsetzung'];
+var current=null;
+function show(page){
+  document.querySelectorAll('[data-page]').forEach(function(p){p.hidden=p.getAttribute('data-page')!==page;});
+}
+function route(){
+  var h=(location.hash||'').replace('#','')||'start', page, target=null;
+  if(S[h]){page='leistung';renderService(h);}
+  else if(PAGES.indexOf(h)>-1){page=h;}
+  else {var el=document.getElementById(h);
+    if(el&&el.closest('[data-page]')){page=el.closest('[data-page]').getAttribute('data-page');target=el;}
+    else if(h.indexOf('umfang-')===0&&S[h.slice(7)]){page='leistung';renderService(h.slice(7));target=document.getElementById(h);}
+    else page='start';}
+  var key=S[h]?h:page;
+  if(page==='leistung'&&!S[h]&&target){/* Anker innerhalb Leistungsseite */}
+  show(page);
+  var fr=document.getElementById('formRoot'),slot=document.getElementById(page==='offerte'?'formSlotPage':'formSlotHome');if(fr&&slot&&fr.parentNode!==slot)slot.appendChild(fr);
+  document.body.className=document.body.className.replace(/\broute-\S+/g,'').trim()+' route-'+page;
+  var m=META[S[h]?h:page]||META.start; document.title=m[0];
+  var md=document.querySelector('meta[name=description]'); if(md)md.setAttribute('content',m[1]);
+  if(page==='offerte')applyPreset();
+  if(page==='umsetzung')renderUmsetzung();
+  document.querySelectorAll('.nav a, .mnav a').forEach(function(a){var t=a.getAttribute('href').slice(1);if(t===key||(page==='leistung'&&t==='leistungen'))a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
+  closeMenus();
+  if(target){target.scrollIntoView();}
+  else if(current!==h){window.scrollTo(0,0);var mn=document.getElementById('main');mn.focus({preventScroll:true});}
+  current=h; lazyIllus(); observeReveal(); collectPlx(); onFrame();
+}
+window.addEventListener('hashchange',route);
+
+/* ---------------- Navigation ---------------- */
+var ddBtn=document.getElementById('ddBtn'), ddP=document.getElementById('ddLeistungen');
+var burger=document.getElementById('burger'), mnav=document.getElementById('mnav');
+function setDd(o){ddBtn.setAttribute('aria-expanded',String(o));ddP.classList.toggle('open',o);ddP.inert=!o;}
+ddP.hidden=false;ddP.inert=true;
+function closeMenus(){setDd(false);if(mnav.dataset.open==='true'){mnav.dataset.open='false';burger.setAttribute('aria-expanded','false');document.body.style.overflow='';}}
+var ddHoverAt=0;
+ddBtn.addEventListener('click',function(e){e.stopPropagation();var o=ddBtn.getAttribute('aria-expanded')==='true';if(o&&Date.now()-ddHoverAt<600)return;setDd(!o);if(!o&&e.detail===0)ddP.querySelector('a').focus();});
+/* Desktop: Menü öffnet bei Maus mit kurzer Absicht, schliesst mit etwas Toleranz */
+(function(){var dd=ddBtn.closest('.dd'),t=null;dd.addEventListener('pointerenter',function(e){if(e.pointerType!=='mouse')return;clearTimeout(t);t=setTimeout(function(){if(ddBtn.getAttribute('aria-expanded')!=='true')ddHoverAt=Date.now();setDd(true);},80);});dd.addEventListener('pointerleave',function(e){if(e.pointerType!=='mouse')return;clearTimeout(t);t=setTimeout(function(){setDd(false);},220);});})();
+document.addEventListener('click',function(e){if(!e.target.closest('.dd'))setDd(false);});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){var wasDd=ddP.classList.contains('open'), wasM=mnav.dataset.open==='true';closeMenus();if(wasDd)ddBtn.focus();if(wasM)burger.focus();}});
+burger.addEventListener('click',function(){mnav.dataset.open='true';burger.setAttribute('aria-expanded','true');document.body.style.overflow='hidden';document.getElementById('mclose').focus();});
+document.getElementById('mclose').addEventListener('click',function(){closeMenus();burger.focus();});
+mnav.addEventListener('click',function(e){if(e.target.closest('a'))closeMenus();});
+
+/* Vorauswahl aus Links */
+var preset=null;
+document.addEventListener('click',function(e){var a=e.target.closest('a[href="#offerte"]');if(!a)return;
+  preset={leistung:a.dataset.pre||'',mode:a.dataset.mode||'',kunde:a.dataset.kunde||''};
+  if(location.hash==='#offerte'){applyPreset();window.scrollTo(0,0);}
+});
+
+/* Kopieren */
+document.addEventListener('click',function(e){var b=e.target.closest('[data-copy]');if(!b)return;var t=b.dataset.copy;
+  function done(){var o=b.textContent;b.textContent='Kopiert';setTimeout(function(){b.textContent=o;},1600);}
+  try{navigator.clipboard.writeText(t).then(done,function(){sel(b);});}catch(err){sel(b);}
+  function sel(btn){var a=btn.previousElementSibling;var r=document.createRange();r.selectNodeContents(a);var s=window.getSelection();s.removeAllRanges();s.addRange(r);}
+});
+
+/* Prüfhinweise */
+var rt=document.getElementById('reviewToggle');
+try{var saved=localStorage.getItem('ir-review');if(saved==='0'){rt.checked=false;}}catch(e){}
+function applyReview(){document.body.classList.toggle('review',rt.checked);try{localStorage.setItem('ir-review',rt.checked?'1':'0');}catch(e){}}
+rt.addEventListener('change',applyReview);applyReview();
+
+/* Tastatur offen (mobile) */
+/* Bildschirmtastatur: Kontaktleiste ausblenden (Texteingabe fokussiert oder sichtbarer Bereich deutlich kleiner) */
+var KBSEL='input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=submit]),textarea,select';
+function kbSync(){var vv=window.visualViewport,small=!!vv&&vv.height<window.innerHeight-120,f=document.activeElement&&document.activeElement.matches&&document.activeElement.matches(KBSEL);document.body.classList.toggle('kb-open',!!(f||small));}
+document.addEventListener('focusin',kbSync);document.addEventListener('focusout',function(){setTimeout(kbSync,0);});
+if(window.visualViewport)window.visualViewport.addEventListener('resize',kbSync);
+
+/* Scroll-Einblendung: nur Elemente unterhalb des ersten Bildschirms */
+var RMQ=window.matchMedia('(prefers-reduced-motion: reduce)'),RM=RMQ.matches;
+/* Live-Reaktion, wenn «Bewegung reduzieren» während der Nutzung umgestellt wird */
+function onRM(){RM=RMQ.matches;if(RM){pending.forEach(function(el){el.classList.add('in');el.classList.remove('pre');el.style.transitionDelay='';});pending=[];plx.forEach(function(el){el.style.transform='';});}}
+if(RMQ.addEventListener)RMQ.addEventListener('change',onRM);else if(RMQ.addListener)RMQ.addListener(onRM);
+var pending=[];
+function revealEl(t,i){t.style.transitionDelay=Math.min(i,4)*60+'ms';t.classList.remove('pre');t.classList.add('in');setTimeout(function(){t.style.transitionDelay='';},1000);}
+function checkReveal(){if(!pending.length)return;var vh=innerHeight,n=0;pending=pending.filter(function(el){var r=el.getBoundingClientRect();if(r.top<vh*.92&&r.bottom>0){revealEl(el,n++);return false;}if(r.bottom<=0){revealEl(el,0);return false;}return true;});}
+function observeReveal(){pending=[];document.querySelectorAll('[data-page]:not([hidden]) .reveal:not(.in), [data-page]:not([hidden]) .mask:not(.in), [data-page]:not([hidden]) .finale-title:not(.in)').forEach(function(el){var r=el.getBoundingClientRect();if(RM||r.top<innerHeight*.95){el.classList.add('in');el.classList.remove('pre');}else{el.classList.add('pre');pending.push(el);}});}
+/* Header kompakt, Parallax */
+var plx=[];function collectPlx(){plx=Array.prototype.slice.call(document.querySelectorAll('[data-page]:not([hidden]) [data-parallax]'));}
+var ticking=false;
+function onFrame(){ticking=false;var y=window.scrollY;checkReveal();checkLazy();document.body.classList.toggle('hdr-compact',y>24);document.body.classList.toggle('scrolled',y>420);
+  if(RM||innerWidth<901){plx.forEach(function(el){el.style.transform='';});return;}
+  var vh=innerHeight;plx.forEach(function(el){var r=el.parentElement.getBoundingClientRect();if(r.bottom<0||r.top>vh)return;var f=parseFloat(el.dataset.parallax)||.05;var d=(r.top+r.height/2-vh/2)*-f;
+    if(el.classList.contains('hero-logo'))el.style.transform='translateY(calc(-50% + '+d.toFixed(1)+'px))';else el.style.transform='translateY('+d.toFixed(1)+'px) scale(1.08)';});}
+window.addEventListener('scroll',function(){if(!ticking){ticking=true;requestAnimationFrame(onFrame);}},{passive:true});
+window.addEventListener('resize',function(){requestAnimationFrame(onFrame);});
+
+/* Vorher-nachher */
+document.addEventListener('input',function(e){if(e.target.matches('.ba input[type=range]'))e.target.closest('.ba').style.setProperty('--pos',e.target.value+'%');});
+
+/* V7: Staffelung der Menüeinträge */
+document.querySelectorAll('#mnav li').forEach(function(li,i){li.style.setProperty('--i',Math.min(i,8));});
+
+/* V8: FAQ-Akkordeon mit sauberer Höhenanimation (unterbrechbar, über Web Animations API) */
+(function(){var RM=window.matchMedia('(prefers-reduced-motion: reduce)');
+document.querySelectorAll('.faq details').forEach(function(d){var sm=d.querySelector('summary'),body=d.querySelector('summary~*');if(!body)return;
+  var wrap=document.createElement('div');wrap.className='faq-body';d.insertBefore(wrap,body);while(wrap.nextSibling)wrap.appendChild(wrap.nextSibling);
+  var anim=null;
+  sm.addEventListener('click',function(e){if(RM.matches)return;e.preventDefault();
+    var opening=!d.open||d.classList.contains('closing');var from=wrap.getBoundingClientRect().height;
+    if(anim){anim.cancel();}
+    if(opening){d.classList.remove('closing');d.open=true;}
+    var to=opening?wrap.scrollHeight:0;
+    if(!opening)d.classList.add('closing');
+    d.classList.toggle('is-open',opening);
+    anim=wrap.animate([{height:from+'px'},{height:to+'px'}],{duration:opening?320:240,easing:'cubic-bezier(.23,1,.32,1)'});
+    anim.onfinish=function(){anim=null;if(!opening){d.open=false;d.classList.remove('closing');}};
+  });
+  d.addEventListener('toggle',function(){if(!anim)d.classList.toggle('is-open',d.open);});
+  if(d.open)d.classList.add('is-open');
+});})();
+
+/* V8: Mobile Kontaktleiste blendet sich im Abschluss mit Formular aus (keine Doppelung) */
+(function(){var fin=null;function chk(){fin=fin||document.querySelector('.finale');if(!fin)return;var r=fin.getBoundingClientRect();document.body.classList.toggle('in-finale',r.top<innerHeight*.6&&r.bottom>0);}
+window.addEventListener('scroll',chk,{passive:true});window.addEventListener('hashchange',function(){fin=null;setTimeout(chk,50);});})();
+
+/* V8: Leistungs-Chips im Abschluss wählen die Leistung im Formular vor */
+document.addEventListener('click',function(e){var c=e.target.closest('.fchip,[data-toform]');if(!c||!document.querySelector('#formSlotHome #qf'))return;e.preventDefault();preset=null;
+  if(c.classList.contains('fchip'))document.querySelectorAll('.fchip').forEach(function(x){x.setAttribute('aria-pressed',String(x===c));});
+  var r=c.dataset.pre&&document.querySelector('#qf input[name="leistung"][value="'+c.dataset.pre+'"]');
+  if(r){r.checked=true;r.dispatchEvent(new Event('change',{bubbles:true}));var lab=r.closest('label');if(lab){lab.classList.remove('pulse');void lab.offsetWidth;lab.classList.add('pulse');}}
+  var form=document.getElementById('qf');if(form){var rm=window.matchMedia('(prefers-reduced-motion: reduce)').matches;form.scrollIntoView({behavior:rm?'auto':'smooth',block:'start'});setTimeout(function(){var o=document.getElementById('ort');if(o)o.focus({preventScroll:true});},rm?0:450);}
+});

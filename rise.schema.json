@@ -1,0 +1,694 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://immoready.ch/schemas/rise-1.0.json",
+  "title": "ImmoReady RISE (Requirements · Identity · Site · Experience)",
+  "type": "object",
+  "required": [
+    "rise",
+    "metadata",
+    "firm",
+    "contact",
+    "legal",
+    "services",
+    "pages",
+    "design_tokens",
+    "assets",
+    "tour",
+    "webcomponent",
+    "events",
+    "wix",
+    "fallbacks",
+    "tests",
+    "acceptance"
+  ],
+  "$defs": {
+    "unspecified": {
+      "type": "string",
+      "pattern": "^\\[UNSPECIFIED[A-Z_]*\\]$"
+    },
+    "textOrUnspecified": {
+      "type": "string",
+      "minLength": 1
+    },
+    "unit": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "range": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/unit"
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "vec3": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "hex": {
+      "type": "string",
+      "pattern": "^#[0-9A-Fa-f]{6}$"
+    },
+    "serviceKey": {
+      "enum": [
+        "hauswartung",
+        "sanitaer",
+        "gartenunterhalt",
+        "reinigung",
+        "raeumung",
+        "leerstand",
+        "verkauf",
+        "fotografie"
+      ]
+    },
+    "noEszett": {
+      "type": "string",
+      "not": {
+        "pattern": "ß"
+      }
+    }
+  },
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "rise": {
+      "type": "object",
+      "required": [
+        "version"
+      ],
+      "properties": {
+        "version": {
+          "type": "string"
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "required": [
+        "project",
+        "release",
+        "contentLocale",
+        "publishWithoutApproval"
+      ],
+      "properties": {
+        "contentLocale": {
+          "const": "de-CH"
+        },
+        "publishWithoutApproval": {
+          "const": false
+        }
+      }
+    },
+    "firm": {
+      "type": "object",
+      "required": [
+        "brand",
+        "contactPerson",
+        "qualifications",
+        "area",
+        "legalName",
+        "legalForm",
+        "address",
+        "uid"
+      ],
+      "properties": {
+        "brand": {
+          "const": "ImmoReady"
+        },
+        "contactPerson": {
+          "const": "Ardit Gashi"
+        },
+        "qualifications": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "Fachmann Betriebsunterhalt EFZ",
+              "Facility Services Specialist WSF"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "area": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "Zürich",
+              "Aargau"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "legalForm": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/unspecified"
+            },
+            {
+              "type": "string",
+              "minLength": 2
+            }
+          ]
+        }
+      }
+    },
+    "contact": {
+      "type": "object",
+      "required": [
+        "phone",
+        "email"
+      ],
+      "properties": {
+        "phone": {
+          "type": "string",
+          "pattern": "^\\+41 \\d{2} \\d{3} \\d{2} \\d{2}$"
+        },
+        "email": {
+          "type": "string",
+          "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"
+        }
+      }
+    },
+    "legal": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "services": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "required": [
+          "key",
+          "label",
+          "priority"
+        ],
+        "properties": {
+          "key": {
+            "$ref": "#/$defs/serviceKey"
+          },
+          "label": {
+            "$ref": "#/$defs/noEszett"
+          },
+          "priority": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      }
+    },
+    "pages": {
+      "type": "object",
+      "required": [
+        "previewRoutes",
+        "quotePath"
+      ]
+    },
+    "design_tokens": {
+      "type": "object",
+      "required": [
+        "color",
+        "motion",
+        "confirmed"
+      ],
+      "properties": {
+        "color": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/hex"
+          }
+        },
+        "confirmed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "assets": {
+      "type": "object",
+      "required": [
+        "logo",
+        "stationStills"
+      ]
+    },
+    "tour": {
+      "type": "object",
+      "required": [
+        "doors",
+        "highlights",
+        "introScan",
+        "keyframes",
+        "routeClearance",
+        "scene",
+        "scrollScreens",
+        "smoothing",
+        "stations",
+        "wind"
+      ],
+      "properties": {
+        "scene": {
+          "type": "object",
+          "required": [
+            "illustrative",
+            "label"
+          ],
+          "properties": {
+            "illustrative": {
+              "const": true
+            },
+            "label": {
+              "type": "string",
+              "minLength": 10
+            }
+          }
+        },
+        "wind": {
+          "type": "object",
+          "required": [
+            "idleMs",
+            "maxFps"
+          ],
+          "properties": {
+            "idleMs": {
+              "type": "integer",
+              "minimum": 3000,
+              "maximum": 60000
+            },
+            "maxFps": {
+              "type": "integer",
+              "minimum": 10,
+              "maximum": 60
+            }
+          }
+        },
+        "scrollScreens": {
+          "type": "number",
+          "minimum": 2,
+          "maximum": 20
+        },
+        "routeClearance": {
+          "type": "number",
+          "minimum": 0.05
+        },
+        "smoothing": {
+          "type": "object",
+          "required": [
+            "tauMs",
+            "jumpTauMs",
+            "stepsTauMs"
+          ],
+          "additionalProperties": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 2000
+          }
+        },
+        "stations": {
+          "type": "array",
+          "minItems": 6,
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "required": [
+              "key",
+              "nav",
+              "range",
+              "hold",
+              "kicker",
+              "title",
+              "text",
+              "ctas",
+              "still",
+              "stillAlt"
+            ],
+            "properties": {
+              "key": {
+                "type": "string",
+                "pattern": "^[a-z]+$"
+              },
+              "nav": {
+                "$ref": "#/$defs/noEszett"
+              },
+              "range": {
+                "$ref": "#/$defs/range"
+              },
+              "hold": {
+                "$ref": "#/$defs/unit"
+              },
+              "title": {
+                "$ref": "#/$defs/noEszett"
+              },
+              "text": {
+                "$ref": "#/$defs/noEszett"
+              },
+              "still": {
+                "type": "string",
+                "pattern": "^station-0[1-6]-[a-z]+$"
+              },
+              "ctas": {
+                "type": "array",
+                "minItems": 0,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "label"
+                  ],
+                  "properties": {
+                    "label": {
+                      "$ref": "#/$defs/noEszett"
+                    },
+                    "service": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/$defs/serviceKey"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "goTo": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 5
+                    },
+                    "mode": {
+                      "enum": [
+                        "einzel",
+                        "laufend"
+                      ]
+                    },
+                    "primary": {
+                      "type": "boolean"
+                    },
+                    "contact": {
+                      "const": true
+                    },
+                    "ghost": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              },
+              "choices": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 4,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "service",
+                    "label",
+                    "text",
+                    "cta"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "service": {
+                      "$ref": "#/$defs/serviceKey"
+                    },
+                    "label": {
+                      "$ref": "#/$defs/noEszett"
+                    },
+                    "text": {
+                      "$ref": "#/$defs/noEszett"
+                    },
+                    "cta": {
+                      "$ref": "#/$defs/noEszett"
+                    }
+                  }
+                }
+              },
+              "kicker": {
+                "$ref": "#/$defs/noEszett"
+              },
+              "portraitShift": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": -0.6,
+                  "maximum": 0.6
+                },
+                "minItems": 2,
+                "maxItems": 2,
+                "description": "Bildverschiebung (NDC) für Hochformat-Ansichten: Motiv zur Mitte bzw. nach oben, weil dort der Text unten steht"
+              },
+              "details": {
+                "type": "array",
+                "maxItems": 3,
+                "description": "Nahansichten innerhalb der Station (z. B. Waschtisch, WC): Schaltflächen in der Stationskarte; im 3D-Modus fährt die Kamera zum Fortschritt q, im Bildmodus erscheint das Detailbild (aus derselben Szene gerendert).",
+                "items": {
+                  "type": "object",
+                  "required": ["key", "label", "q", "still", "stillAlt"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "key": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+                    "label": {"$ref": "#/$defs/noEszett"},
+                    "q": {"$ref": "#/$defs/unit"},
+                    "still": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+                    "stillAlt": {"$ref": "#/$defs/noEszett"}
+                  }
+                }
+              },
+              "hotspots": {
+                "type": "array",
+                "maxItems": 2,
+                "description": "Interaktive Leistungspunkte im 3D-Bild (nur WebGL, nur wenn die Kamera an der Station ruht). Führen wie die Stations-CTA zur Offertanfrage mit vorgewählter Leistung; in der Bildansicht entfallen sie, die CTA bleibt.",
+                "items": {
+                  "type": "object",
+                  "required": ["label", "service", "at"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "label": {"$ref": "#/$defs/noEszett"},
+                    "service": {"$ref": "#/$defs/serviceKey"},
+                    "at": {"$ref": "#/$defs/vec3"}
+                  }
+                }
+              }
+            }
+          }
+        },
+        "keyframes": {
+          "type": "array",
+          "minItems": 4,
+          "items": {
+            "type": "object",
+            "required": [
+              "p",
+              "pos",
+              "lookAt",
+              "fovRad"
+            ],
+            "properties": {
+              "p": {
+                "$ref": "#/$defs/unit"
+              },
+              "pos": {
+                "$ref": "#/$defs/vec3"
+              },
+              "lookAt": {
+                "$ref": "#/$defs/vec3"
+              },
+              "fovRad": {
+                "type": "number",
+                "exclusiveMinimum": 0.2,
+                "maximum": 1.4
+              }
+            }
+          }
+        },
+        "doors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "open",
+              "close"
+            ],
+            "properties": {
+              "open": {
+                "$ref": "#/$defs/range"
+              },
+              "close": {
+                "$ref": "#/$defs/range"
+              },
+              "angleRad": {
+                "type": "number",
+                "minimum": -3.2,
+                "maximum": 3.2
+              },
+              "slideM": {
+                "type": "number",
+                "minimum": 0.2,
+                "maximum": 3
+              },
+              "id": {
+                "enum": [
+                  "haustuer",
+                  "wohnungstuer",
+                  "terrassentuer"
+                ]
+              }
+            },
+            "oneOf": [
+              {
+                "required": [
+                  "angleRad"
+                ]
+              },
+              {
+                "required": [
+                  "slideM"
+                ]
+              }
+            ]
+          },
+          "minItems": 3
+        },
+        "highlights": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "in",
+              "out"
+            ],
+            "properties": {
+              "in": {
+                "$ref": "#/$defs/range"
+              },
+              "out": {
+                "$ref": "#/$defs/range"
+              },
+              "labels": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "name",
+                    "at"
+                  ],
+                  "properties": {
+                    "name": {
+                      "$ref": "#/$defs/noEszett"
+                    },
+                    "at": {
+                      "$ref": "#/$defs/vec3"
+                    }
+                  }
+                }
+              },
+              "pulseMs": {
+                "type": "integer",
+                "minimum": 500,
+                "maximum": 5000
+              }
+            }
+          }
+        },
+        "introScan": {
+          "type": "object",
+          "required": [
+            "durationMs",
+            "once"
+          ],
+          "properties": {
+            "durationMs": {
+              "type": "integer",
+              "minimum": 900,
+              "maximum": 1400
+            },
+            "delayMs": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1500
+            },
+            "once": {
+              "const": true
+            }
+          }
+        }
+      }
+    },
+    "webcomponent": {
+      "type": "object",
+      "required": [
+        "tag",
+        "modes",
+        "defaultMode"
+      ],
+      "properties": {
+        "tag": {
+          "type": "string",
+          "pattern": "^[a-z]+-[a-z-]+$"
+        },
+        "defaultMode": {
+          "enum": [
+            "steps",
+            "scroll"
+          ]
+        }
+      }
+    },
+    "events": {
+      "type": "object",
+      "required": [
+        "version",
+        "tour-ready",
+        "station-change",
+        "request-quote",
+        "request-contact",
+        "tour-error"
+      ]
+    },
+    "wix": {
+      "type": "object",
+      "required": [
+        "allowedOrigins",
+        "publishWithoutApproval"
+      ],
+      "properties": {
+        "allowedOrigins": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^https://[a-z0-9.-]+$"
+          },
+          "minItems": 1
+        },
+        "publishWithoutApproval": {
+          "const": false
+        }
+      }
+    },
+    "fallbacks": {
+      "type": "object",
+      "required": [
+        "mobile",
+        "reducedMotion",
+        "noWebGL",
+        "contextLost"
+      ]
+    },
+    "tests": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "acceptance": {
+      "type": "object"
+    }
+  }
+}

@@ -1,0 +1,95 @@
+
+/* ---------------- Offertanfrage (einfach, eine Seite) ---------------- */
+var LEIST=[['hauswartung','Hauswartung'],['sanitaer','Sanitär & Unterhalt'],['gartenunterhalt','Gartenunterhalt'],['reinigung','Reinigung'],['raeumung','Räumung & Aufbereitung'],['leerstand','Leerstand'],['verkauf','Vermarktung & Vermittlung'],['fotografie','Immobilien­präsentation'],['mehrere','Mehrere / noch unklar']];
+function radios(name,list,type,cls){return '<div class="opts'+(cls?' '+cls:'')+'">'+list.map(function(o){var id=name+'_'+o[0];return '<label class="opt" for="'+id+'"><input type="'+(type||'radio')+'" id="'+id+'" name="'+name+'" value="'+o[0]+'"><span>'+esc(o[1])+'</span></label>';}).join('')+'</div>';}
+function fld(id,label,input,cls,hint){return '<div class="f '+(cls||'')+'"><label for="'+id+'">'+label+'</label>'+(hint?'<span class="hint" id="'+id+'_h" style="margin:0">'+hint+'</span>':'')+input+'<span class="err" id="'+id+'_e" aria-live="polite"></span></div>';}
+function txt(id,type,attrs){return '<input type="'+(type||'text')+'" id="'+id+'" name="'+id+'" '+(attrs||'')+'>';}
+var OPT=' <small>(optional)</small>';
+function buildForm(){
+  var h='<form id="qf" class="form" novalidate aria-labelledby="qfTitle"><h2 class="sr" id="qfTitle">Offertanfrage</h2>';
+  h+='<div class="demo-flag" role="note" style="margin-bottom:18px"><b>Vorschau – Formular nicht verbunden</b><span>Eingaben werden geprüft, aber nicht gesendet und nicht gespeichert.</span></div>';
+  h+='<div class="failbox" id="failbox" role="alert" hidden><b>Ihre Anfrage konnte nicht gesendet werden.</b><br>Ihre Eingaben sind erhalten. Bitte versuchen Sie es erneut oder rufen Sie uns an: 076 340 44 01.</div>';
+  h+='<div class="errsum" id="errsum" tabindex="-1" hidden><b>Bitte prüfen Sie folgende Angaben:</b><ul></ul></div>';
+  h+='<div class="fgroup"><h3><span>01</span>Ihr Anliegen</h3>';
+  h+='<fieldset id="fs_leistung" aria-describedby="leistung_e" style="margin:0"><legend class="lbl" style="font-size:.95rem">Welche Leistung benötigen Sie?</legend>'+radios('leistung',LEIST)+'<span class="err" id="leistung_e" aria-live="polite"></span></fieldset>';
+  h+='<fieldset style="margin:0"><legend class="lbl" style="font-size:.95rem">Einmaliger Auftrag oder regelmässige Betreuung?'+OPT+'</legend>'+radios('auftrag',[['einzel','Einmalig'],['laufend','Regelmässig']],'radio','seg')+'</fieldset></div>';
+  h+='<div class="fgroup"><h3><span>02</span>Ihr Objekt</h3><div class="fields">';
+  h+=fld('ort','Ort oder Postleitzahl',txt('ort','text','autocomplete="address-level2" placeholder="z. B. Baden oder 5400"'),'');
+  h+=fld('beschreibung','Beschreibung','<textarea id="beschreibung" name="beschreibung" aria-describedby="beschreibung_h beschreibung_e"></textarea>','','Worum geht es? Bei Sanitär: Was ist defekt und wo? Verwaltungen können mehrere Objekte auflisten.');
+  h+='<div class="f"><span class="lbl" id="fotoLbl">Fotos'+OPT+'</span><div class="upload" id="drop"><span class="muted" style="font-size:.92rem">Bis zu 5 Bilder (JPG, PNG, HEIC), je max. 10 MB.</span><label class="btn ghost sm" for="fotos" style="cursor:pointer">Fotos auswählen</label><input type="file" id="fotos" name="fotos" accept="image/*" multiple class="sr" aria-labelledby="fotoLbl"><ul class="files" id="fileList"></ul></div><span class="err" id="fotos_e" aria-live="polite"></span></div>';
+  h+='</div></div>';
+  h+='<div class="fgroup" style="border-bottom:0;margin-bottom:0"><h3><span>03</span>Ihre Kontaktdaten</h3><div class="fields">';
+  h+=fld('name','Name',txt('name','text','autocomplete="name"'),'');
+    h+=fld('email','E-Mail',txt('email','email','autocomplete="email" placeholder="name@beispiel.ch"'),'s3');
+  h+=fld('tel','Telefon <small id="telReq">(optional)</small>',txt('tel','tel','autocomplete="tel" placeholder="079 123 45 67"'),'s3');
+    h+='<div class="f" aria-hidden="true" style="position:absolute;left:-9999px"><label for="website">Website</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>';
+  h+='<p class="privacy">Wir verwenden Ihre Angaben und Fotos nur, um Ihre Anfrage zu bearbeiten und mit Ihnen Kontakt aufzunehmen. Keine Weitergabe zu Werbezwecken, keine Newsletter-Anmeldung. Mehr dazu in der <a href="#datenschutz">Datenschutzerklärung</a>.</p>';
+  h+='</div></div>';
+  h+='<div class="fnav"><span class="review-only" style="font-size:.85rem"><label style="display:inline-flex;gap:8px;align-items:center;cursor:pointer"><input type="checkbox" id="simFail"> Demo: Übermittlungsfehler testen</label></span><button type="submit" class="btn inkb" id="next" data-primary>Unverbindliche Offerte anfragen <span class="spin" aria-hidden="true"></span><i class="a"></i></button><span class="sr" id="busyMsg" aria-live="polite"></span></div>';
+  h+='</form><div id="result" class="result" hidden tabindex="-1"></div>';
+  var root=document.getElementById('formRoot');root.innerHTML=h;paintArrows(root);wireForm();
+}
+var files=[];
+function $(id){return document.getElementById(id);}
+function val(name){var f=$('qf');var el=f.elements[name];if(!el)return '';if(el instanceof RadioNodeList){var o='';Array.prototype.forEach.call(el,function(x){if(x.checked)o=x.value;});return o;}if(el.type==='checkbox')return el.checked;return (el.value||'').trim();}
+function setRadio(name,v){var el=$('qf')&&$('qf').querySelector('input[name="'+name+'"][value="'+v+'"]');if(el)el.checked=true;}
+function applyPreset(){if(!$('qf'))buildForm();if(!preset)return;
+  if(!$('result').hidden){$('result').hidden=true;$('qf').hidden=false;}
+  if(preset.leistung)setRadio('leistung',preset.leistung);
+  if(preset.mode)setRadio('auftrag',preset.mode);
+  
+  preset=null;}
+function setErr(id,msg,focusEl){var e=$(id+'_e');if(e)e.textContent=msg||'';var inp=$(id)||$('fs_'+id);if(inp){if(msg)inp.setAttribute('aria-invalid','true');else inp.removeAttribute('aria-invalid');}return msg?{id:id,msg:msg}:null;}
+function validate(){var errs=[];function add(x){if(x)errs.push(x);}
+  add(setErr('leistung',val('leistung')?'':'Bitte wählen Sie die gewünschte Leistung.'));
+    add(setErr('ort',val('ort').length>1?'':'Bitte geben Sie den Ort oder die Postleitzahl an.'));
+  add(setErr('beschreibung',val('beschreibung').length>=15?'':'Bitte beschreiben Sie Ihr Anliegen in ein paar Worten (mindestens 15 Zeichen).'));
+  add(setErr('name',val('name').length>1?'':'Bitte geben Sie Ihren Namen an.'));
+  add(setErr('email',/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(val('email'))?'':'Bitte prüfen Sie die E-Mail-Adresse, z. B. name@beispiel.ch.'));
+  var t=val('tel').replace(/[\s\-\/().]/g,''),tm='';
+  if(t&&!/^(\+|00)?\d{9,13}$/.test(t))tm='Bitte prüfen Sie die Telefonnummer, z. B. 079 123 45 67.';
+  add(setErr('tel',tm));
+  var es=$('errsum');
+  errs.forEach(function(x){var el=$(x.id)||$('fs_'+x.id);var box=el&&(el.closest('.f')||el);if(box){box.classList.remove('shake');void box.offsetWidth;box.classList.add('shake');}});
+  if(errs.length){es.querySelector('ul').innerHTML=errs.map(function(x){return '<li><a href="#" data-f="'+x.id+'">'+esc(x.msg)+'</a></li>';}).join('');es.hidden=false;es.focus();}else es.hidden=true;
+  return errs.length===0;}
+function renderFiles(){$('fileList').innerHTML=files.map(function(f,i){return '<li><span>'+esc(f.name)+' · '+(f.size/1048576).toFixed(1)+' MB</span><button type="button" data-rm="'+i+'">Entfernen</button></li>';}).join('');}
+function addFiles(list){var msgs=[];Array.prototype.forEach.call(list,function(f){
+  if(!/^image\//.test(f.type)&&!/\.heic$/i.test(f.name)){msgs.push(f.name+' ist kein Bild.');return;}
+  if(f.size>10*1048576){msgs.push(f.name+' ist grösser als 10 MB.');return;}
+  if(files.length>=5){msgs.push('Maximal 5 Fotos – '+f.name+' wurde nicht hinzugefügt.');return;}
+  files.push(f);});$('fotos_e').textContent=msgs.join(' ');renderFiles();}
+function summary(){var l=LEIST.filter(function(x){return x[0]===val('leistung');})[0];
+  var L=['Leistung: '+(l?l[1]:'–')];if(val('auftrag'))L.push('Art: '+(val('auftrag')==='laufend'?'Regelmässige Betreuung':'Einmaliger Auftrag'));
+  L.push('Ort: '+val('ort'),'Beschreibung: '+val('beschreibung'),'Fotos: '+(files.length?files.map(function(f){return f.name;}).join(', '):'keine'),'—','Name: '+val('name'));
+  L.push('E-Mail: '+val('email'));if(val('tel'))L.push('Telefon: '+val('tel'));
+  return L.join('\n');}
+function wireForm(){var f=$('qf');
+  f.addEventListener('change',function(e){if(e.target.name&&$(e.target.name+'_e'))setErr(e.target.name,'');});
+  f.addEventListener('input',function(e){var id=e.target.id;if($(id+'_e')&&$(id+'_e').textContent)setErr(id,'');});
+  $('errsum').addEventListener('click',function(e){var a=e.target.closest('a');if(!a)return;e.preventDefault();var id=a.dataset.f;var el=$(id)||f.querySelector('input[name="'+id+'"]');if(el)el.focus();});
+  $('fotos').addEventListener('change',function(e){addFiles(e.target.files);e.target.value='';});
+  $('fileList').addEventListener('click',function(e){var b=e.target.closest('[data-rm]');if(!b)return;files.splice(+b.dataset.rm,1);renderFiles();});
+  var drop=$('drop');['dragenter','dragover'].forEach(function(t){drop.addEventListener(t,function(e){e.preventDefault();drop.classList.add('drag');});});
+  ['dragleave','drop'].forEach(function(t){drop.addEventListener(t,function(e){e.preventDefault();drop.classList.remove('drag');});});
+  drop.addEventListener('drop',function(e){if(e.dataTransfer&&e.dataTransfer.files)addFiles(e.dataTransfer.files);});
+  var busy=false;
+  function setBusy(on){busy=on;var b=$('next');if(on){b.setAttribute('aria-busy','true');b.setAttribute('aria-disabled','true');$('busyMsg').textContent='Anfrage wird übermittelt …';}else{b.removeAttribute('aria-busy');b.removeAttribute('aria-disabled');$('busyMsg').textContent='';}}
+  f.addEventListener('submit',function(e){e.preventDefault();if(busy)return;$('failbox').hidden=true;
+    if(!validate())return;
+    if($('website').value)return;
+    /* Demo: zeigt den Lade- und Fehlerzustand, wie er bei einer echten, fehlgeschlagenen Übermittlung erscheint */
+    if($('simFail').checked){setBusy(true);setTimeout(function(){setBusy(false);$('failbox').hidden=false;$('failbox').scrollIntoView({block:'center'});},700);return;}
+    var r=$('result');
+    r.innerHTML='<p class="mono" style="color:var(--stone)">Demo-Modus · keine Übermittlung</p><p class="ok">Es wurde nichts gesendet und nichts gespeichert.</p><p>In der Wix-Version erscheint erst <b>nach erfolgreicher Speicherung</b> diese Bestätigung:</p><blockquote class="okq"><span>Vielen Dank für Ihre Anfrage. Wir prüfen Ihre Angaben und melden uns bei Ihnen, um die nächsten Schritte zu besprechen.</span></blockquote><p class="muted">Inhalt, der in Wix gespeichert und an info.immoready@gmail.com gemeldet würde:</p><pre>'+esc(summary())+'</pre><div style="display:flex;flex-wrap:wrap;gap:12px"><button type="button" class="btn ghost" id="editAgain">Angaben bearbeiten</button><button type="button" class="btn inkb" id="newReq">Neue Anfrage</button></div>';
+    f.hidden=true;r.hidden=false;r.classList.remove('in');void r.offsetWidth;r.classList.add('in');r.focus();
+    $('editAgain').onclick=function(){r.hidden=true;f.hidden=false;};
+    $('newReq').onclick=function(){f.reset();files=[];renderFiles();r.hidden=true;f.hidden=false;};
+  });
+}
+
+/* V8: Feldbestätigung beim Verlassen – nur wenn das Feld wirklich gültig ist */
+var OKRULE={ort:function(v){return v.length>1;},beschreibung:function(v){return v.length>=15;},name:function(v){return v.length>1;},email:function(v){return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);},tel:function(v){var t=v.replace(/[\s\-\/().]/g,'');return t.length>0&&/^(\+|00)?\d{9,13}$/.test(t);}};
+document.addEventListener('focusout',function(e){var el=e.target;if(!el.form||el.form.id!=='qf'||!OKRULE[el.id])return;var box=el.closest('.f');if(box)box.classList.toggle('is-ok',OKRULE[el.id]((el.value||'').trim()));});
+document.addEventListener('input',function(e){var el=e.target;if(!el.form||el.form.id!=='qf'||!OKRULE[el.id])return;var box=el.closest('.f');if(box&&box.classList.contains('is-ok')&&!OKRULE[el.id]((el.value||'').trim()))box.classList.remove('is-ok');});
+document.addEventListener('animationend',function(e){if(e.animationName==='fShake')e.target.classList.remove('shake');});

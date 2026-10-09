@@ -1,0 +1,10 @@
+node_modules/
+shots/
+dist/embed-test.html
+dist/immoready-relaunch.html
+model/geo.json
+*.png
+!assets/*.png
+!tests/fixtures/*.png
+__pycache__/
+*.pyc

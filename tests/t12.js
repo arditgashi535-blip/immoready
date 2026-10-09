@@ -1,0 +1,38 @@
+const { chromium } = require('playwright');
+(async()=>{const b=await chromium.launch({...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{}),args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']});
+const log=[];const ok=(c,m)=>log.push((c?'PASS ':'FAIL ')+m);
+let p=await b.newPage({viewport:{width:1300,height:820}});const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.goto('http://127.0.0.1:8701/parent.html');
+let ready=true;try{await p.waitForFunction(()=>window.LOG.some(m=>m&&m.type==='SCENE_READY'),null,{timeout:30000});}catch(e){ready=false;}
+ok(ready,'Eingebettet: SCENE_READY an freigegebene Elternseite');
+const fr=p.frames().find(f=>f.url().includes('8702'));
+const st=()=>fr.evaluate(()=>{const e=document.querySelector('.jr-st.on');return e&&e.dataset.k});
+ok(await fr.evaluate(()=>document.getElementById('reise').classList.contains('jr-button')&&getComputedStyle(document.querySelector('.jr-steps')).display!=='none'),'Eingebettet: Stationsmodus mit «Weiter»/«Zurück» (keine Scroll-Abhängigkeit)');
+await p.evaluate(()=>send({type:'GO_TO_STATION',index:4}));await fr.waitForFunction(()=>document.querySelector('.jr-st.on').dataset.k==='bad',null,{timeout:10000}).catch(()=>{});
+ok(await st()==='bad','GO_TO_STATION 4 → Bad');
+await p.evaluate(()=>{send({type:'GO_TO_STATION',index:99});send({type:'GO_TO_STATION',index:'2'});send({type:'SET_PROGRESS',value:'x'});send({type:'SET_PROGRESS',value:7});send('GO_TO_STATION');send({foo:1});});await p.waitForTimeout(800);
+ok(await st()==='bad','Ungültige Nachrichten werden ignoriert');
+await p.evaluate(()=>send({type:'SET_PROGRESS',value:0.235}));await p.waitForTimeout(800);ok(await st()==='garten','SET_PROGRESS 0.235 → Garten');
+await fr.click('.jr-st.on .btn[data-pre]');await p.waitForTimeout(500);
+const lastQ=await p.evaluate(()=>window.LOG.filter(m=>m.type==='REQUEST_QUOTE').pop());
+ok(lastQ&&lastQ.leistung==='gartenunterhalt'&&Object.keys(lastQ).length===2&&await fr.evaluate(()=>location.hash!=='#offerte'),'Anfrage-Knopf → REQUEST_QUOTE {leistung} an Elternseite, keine Formulardaten');
+await fr.click('.jr-stepb[data-step="1"]');await fr.waitForFunction(()=>document.querySelector('.jr-st.on').dataset.k==='eingang',null,{timeout:8000}).catch(()=>{});ok(await st()==='eingang','«Weiter» → nächste Station');
+await fr.click('.jr-stepb[data-step="-1"]');await fr.waitForFunction(()=>document.querySelector('.jr-st.on').dataset.k==='garten',null,{timeout:8000}).catch(()=>{});ok(await st()==='garten','«Zurück» → vorherige Station');
+await p.evaluate(()=>send({type:'GO_TO_STATION',index:5}));await fr.waitForFunction(()=>document.querySelector('.jr-st.on').dataset.k==='zurueck',null,{timeout:8000}).catch(()=>{});await p.waitForTimeout(600);
+await fr.click('.jr-st.on a[data-contact]');await p.waitForTimeout(500);
+const lastC=await p.evaluate(()=>window.LOG.filter(m=>m.type==='REQUEST_CONTACT').pop());
+ok(lastC&&Object.keys(lastC).length===1&&await fr.evaluate(()=>location.hash!=='#kontakt'),'«Kontakt aufnehmen» → REQUEST_CONTACT an Elternseite (ohne Daten), keine interne Navigation');
+await fr.click('.jr-st.on a[data-primary]');await p.waitForTimeout(500);
+const lastG=await p.evaluate(()=>window.LOG.filter(m=>m.type==='REQUEST_QUOTE').pop());
+ok(lastG&&lastG.leistung==='','Allgemeine Offerte → REQUEST_QUOTE {leistung:""}');
+ok(errs.length===0,'keine Fehler in der Elternseite');
+await p.close();
+// Nicht freigegebener Ursprung
+p=await b.newPage({viewport:{width:1300,height:820}});await p.goto('http://127.0.0.1:8703/evil.html');await p.waitForTimeout(6000);
+const f2=p.frames().find(f=>f.url().includes('8702'));
+ok(await p.evaluate(()=>window.LOG.length===0),'Fremder Ursprung erhält keine Nachrichten (kein SCENE_READY)');
+await p.evaluate(()=>send({type:'GO_TO_STATION',index:4}));await p.waitForTimeout(1500);
+ok(await f2.evaluate(()=>document.querySelector('.jr-st.on').dataset.k)==='aussen','Fremder Ursprung kann die Szene nicht steuern');
+await f2.click('.jr-st.on .btn[href="#offerte"]').catch(()=>{});await p.waitForTimeout(400);
+ok(await p.evaluate(()=>window.LOG.length===0),'Fremder Ursprung erhält keine Anfrage-Nachricht');
+console.log(log.join('\n'));await b.close();})();

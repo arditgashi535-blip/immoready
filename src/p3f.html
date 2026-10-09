@@ -1,0 +1,48 @@
+
+/* ===================== V9 · Räumliche Bildkarten, Fokusführung (Magnet-Label in V13 entfernt) ===================== */
+(function(){
+  if(window.__irFx)return;window.__irFx={cleanups:[]};
+  var FINE=window.matchMedia('(hover:hover) and (pointer:fine)'),RMQ=window.matchMedia('(prefers-reduced-motion: reduce)');
+  function allowed(){return FINE.matches&&!RMQ.matches;}
+  function listen(el,t,f,o){el.addEventListener(t,f,o);window.__irFx.cleanups.push(function(){el.removeEventListener(t,f,o);});}
+
+  /* Neigung: max. 3°, Lichtreflex folgt dem Zeiger. Eigener Wrapper = das Bildelement selbst,
+     Reveal (Maske/.mask-in) und Zoom (.ph) liegen auf anderen Elementen → keine transform-Konflikte. */
+  function tilt(el){if(el.__tilt)return;el.__tilt=true;el.classList.add('tilt');
+    var g=document.createElement('span');g.className='tilt-glare';g.setAttribute('aria-hidden','true');el.appendChild(g);
+    var rect=null,raf=0,px=0,py=0,active=false;
+    function frame(){raf=0;if(!active)return;if(!rect)rect=el.getBoundingClientRect();
+      var x=Math.max(0,Math.min(1,(px-rect.left)/rect.width)),y=Math.max(0,Math.min(1,(py-rect.top)/rect.height));
+      el.style.setProperty('--ry',((x-.5)*6).toFixed(2)+'deg');el.style.setProperty('--rx',((.5-y)*6).toFixed(2)+'deg');
+      el.style.setProperty('--mx',(x*100).toFixed(1)+'%');el.style.setProperty('--my',(y*100).toFixed(1)+'%');}
+    function reset(){active=false;rect=null;if(raf){cancelAnimationFrame(raf);raf=0;}el.classList.remove('tilting');el.style.setProperty('--rx','0deg');el.style.setProperty('--ry','0deg');}
+    listen(el,'pointerenter',function(e){if(e.pointerType!=='mouse'||!allowed())return;active=true;rect=null;el.classList.add('tilting');});
+    listen(el,'pointermove',function(e){if(!active)return;px=e.clientX;py=e.clientY;if(!raf)raf=requestAnimationFrame(frame);});
+    listen(el,'pointerleave',reset);
+    listen(window,'scroll',function(){rect=null;},{passive:true});
+    el.__tiltReset=reset;
+    window.__irFx.cleanups.push(function(){reset();g.remove();el.classList.remove('tilt');el.__tilt=false;});
+  }
+
+  /* V13: Magnet-Effekt entfernt – Schaltflächen bleiben unter dem Mauszeiger ruhig (Bedienbarkeit vor Effekt). */
+
+  function init(){
+    document.querySelectorAll('.hw-media, .svc .fig').forEach(tilt);
+  }
+  setTimeout(init,0); /* nach Render von Leistungsbühne und Übersicht */
+  /* Neue Seiten des Routers (z. B. Leistungsübersicht) nachträglich ausstatten – Guards verhindern Doppel-Initialisierung */
+  listen(window,'hashchange',function(){setTimeout(init,0);});
+  /* Einstellung ändert sich während der Nutzung: laufende Effekte sofort zurücksetzen */
+  function onPref(){if(!allowed()){document.querySelectorAll('.tilt').forEach(function(el){el.__tiltReset&&el.__tiltReset();});}}
+  [RMQ,FINE].forEach(function(q){if(q.addEventListener)q.addEventListener('change',onPref);else if(q.addListener)q.addListener(onPref);});
+
+  /* Mobiles Menü: Fokus bleibt im geöffneten Menü (Tab/Shift+Tab) */
+  var mn=document.getElementById('mnav');
+  if(mn)listen(document,'keydown',function(e){if(e.key!=='Tab'||mn.dataset.open!=='true')return;
+    var f=Array.prototype.filter.call(mn.querySelectorAll('a[href],button:not([disabled])'),function(x){return x.offsetParent!==null;});if(!f.length)return;
+    var first=f[0],last=f[f.length-1];
+    if(e.shiftKey&&(document.activeElement===first||!mn.contains(document.activeElement))){e.preventDefault();last.focus();}
+    else if(!e.shiftKey&&(document.activeElement===last||!mn.contains(document.activeElement))){e.preventDefault();first.focus();}});
+
+  window.__irFx.destroy=function(){window.__irFx.cleanups.forEach(function(f){try{f();}catch(_){}});window.__irFx=null;};
+})();

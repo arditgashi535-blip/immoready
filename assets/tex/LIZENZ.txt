@@ -1,0 +1,2 @@
+Alle Texturen in diesem Ordner wurden mit tools/make-textures.py prozedural erzeugt (eigenes Werk für ImmoReady).
+Keine Fotos, keine Fremdtexturen, keine KI-Bildgenerierung. Frei verwendbar im Projekt.

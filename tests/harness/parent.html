@@ -1,0 +1,7 @@
+<!doctype html><html><body style="margin:0">
+<iframe id="f" src="http://127.0.0.1:8702/dist/embed-test.html" style="width:1280px;height:800px;border:0"></iframe>
+<script>
+window.LOG=[];var CHILD='http://127.0.0.1:8702';
+window.addEventListener('message',function(e){if(e.origin!==CHILD)return;window.LOG.push(e.data);});
+window.send=function(m){document.getElementById('f').contentWindow.postMessage(m,CHILD);};
+</script></body></html>

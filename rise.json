@@ -1,0 +1,371 @@
+{
+  "$schema": "./rise.schema.json",
+  "rise": {
+    "version": "1.0.0",
+    "meaning": "Requirements · Identity · Site · Experience",
+    "note": "Einzige Quelle für Projektfakten, Tour-Konfiguration und Ereignisse. build.py prüft diese Datei gegen rise.schema.json und erzeugt daraus die Rundgang-Markup, die Tour-Konfiguration und die Komponente. Unbekanntes bleibt als \"[UNSPECIFIED]\" stehen und darf nicht erfunden werden."
+  },
+  "metadata": {
+    "project": "ImmoReady Website-Relaunch",
+    "release": "V17",
+    "source": "Repository immoready-website, Branch v16-schweizer-mfh (Ausgangsstand V15, Tag v15-stand)",
+    "contentLocale": "de-CH",
+    "promptLocale": "de-DE",
+    "status": "vorschau-nicht-veroeffentlicht",
+    "publishWithoutApproval": false
+  },
+  "firm": {
+    "brand": "ImmoReady",
+    "contactPerson": "Ardit Gashi",
+    "role": "Inhaber",
+    "qualifications": ["Fachmann Betriebsunterhalt EFZ", "Facility Services Specialist WSF"],
+    "area": ["Zürich", "Aargau"],
+    "legalName": "[UNSPECIFIED]",
+    "legalForm": "[UNSPECIFIED]",
+    "address": "[UNSPECIFIED]",
+    "uid": "[UNSPECIFIED]",
+    "vat": "[UNSPECIFIED]",
+    "insurance": "[UNSPECIFIED]",
+    "doNotClaim": [
+      "GmbH ohne Bestätigung",
+      "Bewertungen",
+      "Preise",
+      "Garantien",
+      "Fachbewilligungen",
+      "Notdienst oder 24/7",
+      "Referenzobjekte",
+      "Kundenlogos",
+      "Teammitglieder",
+      "Firmengeschichte"
+    ]
+  },
+  "contact": {
+    "phone": "+41 76 340 44 01",
+    "phoneDisplay": "076 340 44 01",
+    "email": "info.immoready@gmail.com",
+    "tone": "formell, Sie-Anrede",
+    "orthography": "Schweizer Hochdeutsch, ss statt ß",
+    "booking": "https://www.immoready.ch/book-online",
+    "social": "[UNSPECIFIED]",
+    "whatsapp": "[UNSPECIFIED]"
+  },
+  "legal": {
+    "imprint": "[UNSPECIFIED_FINAL_TEXT]",
+    "privacy": "[UNSPECIFIED_FINAL_TEXT]",
+    "terms": "[UNSPECIFIED_FINAL_TEXT]",
+    "hosting": "[UNSPECIFIED]",
+    "analytics": "[UNSPECIFIED]",
+    "canvaImageLicense": "[UNSPECIFIED_TO_CHECK]"
+  },
+  "services": [
+    {"key": "hauswartung", "label": "Hauswartung", "priority": 1, "route": "#hauswartung"},
+    {
+      "key": "sanitaer",
+      "label": "Sanitär & Unterhalt",
+      "priority": 2,
+      "route": "#sanitaer",
+      "note": "Detailumfang noch zu bestätigen; nicht bestätigte Einzelleistungen öffentlich ausgeblendet"
+    },
+    {"key": "gartenunterhalt", "label": "Gartenunterhalt", "priority": 3, "route": "#gartenunterhalt"},
+    {"key": "reinigung", "label": "Reinigung", "priority": 4, "route": "#reinigung"},
+    {"key": "raeumung", "label": "Räumung & Aufbereitung", "priority": 5, "route": "#raeumung"},
+    {"key": "leerstand", "label": "Leerstandsmanagement", "priority": 6, "route": "#leerstand"},
+    {"key": "verkauf", "label": "Vermarktung & Vermittlung", "priority": 7, "route": "#verkauf"},
+    {"key": "fotografie", "label": "Immobilienpräsentation (Fotografie, Drohne, 360°)", "priority": 8, "route": "#fotografie"}
+  ],
+  "pages": {
+    "previewRoutes": ["#start", "#leistungen", "#verwaltungen", "#ueber", "#kontakt", "#offerte", "#impressum", "#datenschutz", "#umsetzung"],
+    "wixPaths": "[UNSPECIFIED]",
+    "quotePath": "/offerte",
+    "contactPath": "[UNSPECIFIED]",
+    "previewContactRoute": "#kontakt"
+  },
+  "design_tokens": {
+    "direction": "Digital Twin at Dusk – Architektur in der blauen Stunde, warme Fensterlichter, feine Konturlinien als Akzent",
+    "source": "aus den Original-Logodateien abgeleitet; Hexwerte vom Inhaber nicht ausdrücklich bestätigt",
+    "confirmed": false,
+    "color": {
+      "ivory": "#FCF8F5",
+      "paper": "#F3EDE6",
+      "ink": "#3B3A39",
+      "graphite": "#302E2C",
+      "night": "#252321",
+      "sand": "#DCC5A8",
+      "sandDark": "#B39674",
+      "accentText": "#7E6343",
+      "steel": "#9A9798",
+      "logoGrey": "#5E5E5E"
+    },
+    "fontDisplay": "Archivo",
+    "fontBody": "Archivo",
+    "motion": {"ease": "cubic-bezier(.22,1,.36,1)", "easeUi": "cubic-bezier(.2,.8,.2,1)", "pressMs": 140, "uiMs": 240, "revealMs": 650, "staggerMs": 60}
+  },
+  "assets": {
+    "logo": {
+      "file": "assets/logo_orig.png",
+      "type": "image/png",
+      "aspectRatio": 1.318,
+      "rules": "Original, transparentes PNG; nie neu zeichnen, umfärben, verzerren, beschneiden oder mit Filtern versehen; immer auf hellem Grund"
+    },
+    "logoVector": "[UNSPECIFIED]",
+    "model": {
+      "file": "model/immoready-wohnblock.glb",
+      "objects": 14,
+      "note": "aus der Szenengeometrie exportiert; die Website erzeugt die Geometrie im Code"
+    },
+    "stationStills": "assets/tour/station-{nn}-{key}.webp",
+    "stillSize": [1440, 900],
+    "stationStillsPortrait": "assets/tour/station-{nn}-{key}-hoch.webp",
+    "stillSizePortrait": [960, 864]
+  },
+  "tour": {
+    "renderer": "WebGL (eigener Code, keine Bibliothek)",
+    "scene": {"floors": 4, "units": "Meter (Planungsmasse, nicht vermessen)", "illustrative": true, "label": "Illustrative Visualisierung · kein Referenzobjekt", "floorHeightM": 3.0, "roomHeightM": 2.6, "exteriorWallM": 0.38},
+    "wind": {"idleMs": 15000, "maxFps": 30, "reducedMotion": "entfällt"},
+    "scrollScreens": 7.6,
+    "interpolation": "Catmull-Rom für die Position; Blickrichtung als stetig abgewickelter Gier-/Neigungswinkel",
+    "routeClearance": 0.12,
+    "smoothing": {"tauMs": 110, "jumpTauMs": 420, "stepsTauMs": 520},
+    "stations": [
+      {
+        "key": "aussen",
+        "portraitShift": [-0.36, 0.14],
+        "nav": "Gebäude",
+        "range": [0, 0.15],
+        "hold": 0.03,
+        "kicker": "Immobilienservice · Zürich & Aargau",
+        "title": "Ihre Immobilie. Bis ins Detail betreut.",
+        "text": "Hauswartung, Sanitär und Unterhalt für Immobilien in Zürich und Aargau.",
+        "ctas": [
+          {"label": "Offerte anfragen", "service": null, "primary": true},
+          {"label": "Gebäude entdecken", "goTo": 1}
+        ],
+        "still": "station-01-aussen",
+        "stillAlt": "Wohnblock in der blauen Stunde mit Garten"
+      },
+      {
+        "key": "garten",
+        "portraitShift": [-0.06, 0.12],
+        "nav": "Garten",
+        "range": [0.15, 0.3],
+        "hold": 0.235,
+        "kicker": "Station 2 · Garten",
+        "title": "Ein gepflegter erster Eindruck.",
+        "text": "Gartenunterhalt für ein ordentliches und einladendes Umfeld.",
+        "ctas": [
+          {"label": "Gartenunterhalt anfragen", "service": "gartenunterhalt"}
+        ],
+        "hotspots": [{"label": "Gartenunterhalt", "service": "gartenunterhalt", "at": [-1.2, 0.6, 8.6]}],
+        "still": "station-02-garten",
+        "stillAlt": "Gartenweg mit Beeten, Wegleuchten und Hecken"
+      },
+      {
+        "key": "eingang",
+        "portraitShift": [-0.22, 0.12],
+        "nav": "Eingang",
+        "range": [0.3, 0.47],
+        "hold": 0.44,
+        "kicker": "Station 3 · Eingang & Treppenhaus",
+        "title": "Hauswartung, die den Überblick behält.",
+        "text": "Wir betreuen Ihre Liegenschaft und stimmen die anfallenden Arbeiten mit Ihnen ab.",
+        "ctas": [
+          {"label": "Hauswartung anfragen", "service": "hauswartung", "mode": "laufend"}
+        ],
+        "hotspots": [{"label": "Hauswartung", "service": "hauswartung", "at": [1.7, 1.55, 1.6]}],
+        "still": "station-03-eingang",
+        "stillAlt": "Eingangshalle mit Treppe und Briefkästen"
+      },
+      {
+        "key": "wohnung",
+        "portraitShift": [0.0, 0.12],
+        "nav": "Wohnung",
+        "range": [0.47, 0.63],
+        "hold": 0.59,
+        "kicker": "Station 4 · Wohnung",
+        "title": "Bereit für den nächsten Schritt.",
+        "text": "Wählen Sie, wobei wir Sie unterstützen können:",
+        "ctas": [],
+        "hotspots": [{"label": "Reinigung", "service": "reinigung", "at": [7.9, 0.8, 0.6]}],
+        "still": "station-04-wohnung",
+        "stillAlt": "Wohnraum mit Küche, Sideboard und Leuchten am Abend",
+        "choices": [
+          {
+            "service": "reinigung",
+            "label": "Reinigung",
+            "text": "Wohnungen vor oder nach einem Umzug, Treppenhäuser und Gemeinschaftsflächen – regelmässig oder einmalig.",
+            "cta": "Reinigung anfragen"
+          },
+          {
+            "service": "raeumung",
+            "label": "Räumung & Aufbereitung",
+            "text": "Wir räumen, entsorgen und bereiten die Räume nach vereinbartem Umfang für die Vermietung oder den Verkauf vor.",
+            "cta": "Räumung anfragen"
+          },
+          {
+            "service": "leerstand",
+            "label": "Leerstandsmanagement",
+            "text": "Vereinbarte Kontrollgänge und Zustandsmeldungen, solange eine Wohnung leer steht.",
+            "cta": "Leerstandsbetreuung anfragen"
+          }
+        ]
+      },
+      {
+        "key": "bad",
+        "portraitShift": [-0.34, 0.16],
+        "nav": "Sanitär",
+        "range": [0.63, 0.8],
+        "hold": 0.73,
+        "kicker": "Station 5 · Badezimmer",
+        "title": "Sanitär und Unterhalt. Sorgfältig bis ins Detail.",
+        "text": "Beschreiben Sie uns Ihr Anliegen. Wir klären den passenden Leistungsumfang mit Ihnen.",
+        "ctas": [
+          {"label": "Sanitäranfrage stellen", "service": "sanitaer"}
+        ],
+        "hotspots": [{"label": "Sanitär", "service": "sanitaer", "at": [3.23, 1.5, -0.38]}],
+        "still": "station-05-bad",
+        "stillAlt": "Badezimmer mit wandhängendem WC an der Vorwand und Waschtisch auf wandhängendem Unterschrank",
+        "details": [
+          {"key": "waschtisch", "label": "Waschtisch", "q": 0.752, "still": "station-05-bad-waschtisch", "stillAlt": "Waschtisch mit Armatur, Ablaufventil und Überlauf auf wandhängendem Unterschrank (Siphon und Eckventile verdeckt)"},
+          {"key": "wc", "label": "WC", "q": 0.772, "still": "station-05-bad-wc", "stillAlt": "Wandhängendes WC mit Brille, geöffnetem Deckel, zwei Scharnieren und Betätigungsplatte mit zwei Tasten"}
+        ]
+      },
+      {
+        "key": "zurueck",
+        "portraitShift": [-0.36, 0.14],
+        "nav": "Offerte",
+        "range": [0.8, 1.0],
+        "hold": 1.0,
+        "kicker": "Station 6 · Gesamtansicht",
+        "title": "Eine Immobilie. Viele Aufgaben. Ein Ansprechpartner.",
+        "text": "Erzählen Sie uns von Ihrem Objekt oder Ihrem Auftrag. Wir besprechen mit Ihnen die passende Unterstützung.",
+        "ctas": [
+          {"label": "Offerte anfragen", "service": null, "primary": true},
+          {"label": "Kontakt aufnehmen", "contact": true}
+        ],
+        "still": "station-06-zurueck",
+        "stillAlt": "Wohnblock in der Gesamtansicht am Abend"
+      }
+    ],
+    "keyframes": [
+      {"p": 0.0, "pos": [38, 18, 50], "lookAt": [-10, 4.5, 5.5], "fovRad": 0.55},
+      {"p": 0.1, "pos": [24, 11, 35], "lookAt": [-8, 4, 5], "fovRad": 0.64},
+      {"p": 0.18, "pos": [-6, 4.5, 30], "lookAt": [-2, 1, 12], "fovRad": 0.68},
+      {"p": 0.235, "pos": [1.2, 1.95, 20.5], "lookAt": [-1.4, 0.9, 10], "fovRad": 0.74},
+      {"p": 0.3, "pos": [0, 1.75, 13.5], "lookAt": [0, 1.9, 5.5], "fovRad": 0.78},
+      {"p": 0.355, "pos": [0, 1.95, 7.6], "lookAt": [0, 2.0, 4], "fovRad": 0.84},
+      {"p": 0.39, "pos": [0, 2.1, 4.7], "lookAt": [0, 2.1, 2.4], "fovRad": 0.88},
+      {"p": 0.44, "pos": [-0.35, 2.1, 4.75], "lookAt": [1.6, 1.5, 1.6], "fovRad": 0.9},
+      {"p": 0.46, "pos": [0.4, 2.1, 4.3], "lookAt": [2.8, 1.8, 2.0], "fovRad": 0.9},
+      {"p": 0.48, "pos": [1.5, 2.1, 3.75], "lookAt": [4.0, 2.0, 2.9], "fovRad": 0.9},
+      {"p": 0.5, "pos": [2.4, 2.1, 3.3], "lookAt": [5, 2.05, 3.3], "fovRad": 0.9},
+      {"p": 0.535, "pos": [4.5, 2.1, 3.3], "lookAt": [7, 2.05, 3.3], "fovRad": 0.9},
+      {"p": 0.59, "pos": [5.85, 2.0, 3.6], "lookAt": [8.0, 1.55, 0.7], "fovRad": 0.9},
+      {"p": 0.618, "pos": [6.45, 2.05, 2.75], "lookAt": [5.85, 1.7, -0.2], "fovRad": 0.9},
+      {"p": 0.645, "pos": [6.9, 2.1, 1.9], "lookAt": [5.0, 1.8, 0.9], "fovRad": 0.9},
+      {"p": 0.7, "pos": [6.0, 1.95, 1.1], "lookAt": [3.3, 1.3, 0.85], "fovRad": 0.88},
+      {"p": 0.715, "pos": [5.35, 1.75, 1.05], "lookAt": [3.3, 1.2, 0.55], "fovRad": 0.9},
+      {"p": 0.73, "pos": [4.85, 1.62, 1.62], "lookAt": [3.2, 1.0, 0.25], "fovRad": 0.94},
+      {"p": 0.752, "pos": [3.95, 1.62, 1.3], "lookAt": [3.22, 1.2, 0.8], "fovRad": 0.66},
+      {"p": 0.772, "pos": [4.0, 1.32, 0.62], "lookAt": [3.3, 0.82, -0.38], "fovRad": 0.74},
+      {"p": 0.79, "pos": [4.3, 1.7, 1.15], "lookAt": [3.3, 1.25, 0.7], "fovRad": 0.82},
+      {"p": 0.81, "pos": [5.15, 1.85, 1.05], "lookAt": [3.4, 1.35, 0.8], "fovRad": 0.84},
+      {"p": 0.83, "pos": [6.55, 1.95, 0.9], "lookAt": [4.11, 1.55, 0.01], "fovRad": 0.88},
+      {"p": 0.855, "pos": [7.0, 2.0, 2.0], "lookAt": [5.6, 1.7, 0.3], "fovRad": 0.9},
+      {"p": 0.88, "pos": [6.8, 2.0, 4.3], "lookAt": [6.2, 1.5, 0.6], "fovRad": 0.9},
+      {"p": 0.893, "pos": [6.82, 2.04, 5.3], "lookAt": [6.6, 1.6, 1.0], "fovRad": 0.88},
+      {"p": 0.905, "pos": [6.84, 2.12, 6.4], "lookAt": [6.5, 1.6, 1.0], "fovRad": 0.88},
+      {"p": 0.922, "pos": [8.6, 3.4, 11.0], "lookAt": [4.5, 2.3, 2.0], "fovRad": 0.8},
+      {"p": 0.94, "pos": [12, 5.5, 17], "lookAt": [3, 2.5, 2], "fovRad": 0.74},
+      {"p": 0.97, "pos": [26, 11, 35], "lookAt": [-6, 4, 5], "fovRad": 0.64},
+      {"p": 1.0, "pos": [38, 18, 50], "lookAt": [-10, 4.5, 5.5], "fovRad": 0.55}
+    ],
+    "doors": [
+      {"id": "haustuer", "open": [0.31, 0.35], "close": [0.8, 0.84], "angleRad": 1.75, "hinge": "Scharnier links (x = -0,76), Alu-Glastür 1,08 m mit Türschliesser, öffnet nach innen"},
+      {"id": "wohnungstuer", "open": [0.455, 0.485], "close": [0.8, 0.84], "angleRad": -1.6, "hinge": "Scharnier bei z = 3,80, Flügel 0,94 m (lichte Breite 0,91 m), öffnet in die Wohnung"},
+      {"id": "terrassentuer", "open": [0.845, 0.875], "close": [0.93, 0.955], "slideM": 1.0, "hinge": "Hebeschiebetür: innerer Flügel gleitet 1,0 m nach rechts vor den festen Flügel"}
+    ],
+    "highlights": [
+      {
+        "id": "sanitaer",
+        "in": [0.68, 0.725],
+        "out": [0.785, 0.815],
+        "pulseMs": 2580,
+        "labels": [
+          {"name": "Armatur", "at": [3.17, 1.53, 0.8]},
+          {"name": "Ablaufventil", "at": [3.345, 1.235, 0.8]},
+          {"name": "Siphon und Eckventile im Unterschrank", "at": [3.515, 1.06, 0.8]}
+        ],
+        "caption": "Schematische Kennzeichnung"
+      }
+    ],
+    "introScan": {"durationMs": 1200, "delayMs": 420, "once": true, "reducedMotion": "entfällt"}
+  },
+  "webcomponent": {
+    "tag": "immoready-tour",
+    "modes": ["steps", "scroll"],
+    "defaultMode": "steps",
+    "attributes": ["mode", "station", "assets-base"],
+    "cleanupRequired": true,
+    "multiInstanceSafe": true,
+    "shadowDom": true
+  },
+  "events": {
+    "version": 1,
+    "tour-ready": {"version": "17", "mode": "webgl | stills"},
+    "station-change": {"station": "<station.key>", "index": "<0-5>", "progress": "<0-1>"},
+    "request-quote": {"service": "<services.key | empty>", "station": "<station.key>", "source": "tour", "version": 1},
+    "request-contact": {"station": "<station.key>", "source": "tour", "version": 1},
+    "tour-error": {"code": "WEBGL_UNAVAILABLE | WEBGL_INIT_FAILED | WEBGL_CONTEXT_LOST", "fallback": "stills"}
+  },
+  "wix": {
+    "site": "Immoready (Classic Editor, Premium, eigene Domain, Velo aktiv)",
+    "preferred": "Custom Element <immoready-tour> + Velo",
+    "alternative": "HTML-iFrame mit postMessage (dist/immoready-rundgang-embed.html)",
+    "elementHosting": "[UNSPECIFIED]",
+    "assetsHosting": "[UNSPECIFIED]",
+    "allowedOrigins": ["https://www.immoready.ch", "https://immoready.ch"],
+    "previewWarning": "Editor und Vorschau zeigen Custom Elements in einem iFrame; das Verhalten auf der Live-Seite separat prüfen",
+    "liveRequirements": ["Premium", "eigene Domain", "Wix-Werbung entfernt"],
+    "changesMade": "keine",
+    "publishWithoutApproval": false
+  },
+  "fallbacks": {
+    "mobile": "station-stills (Hochformat-Bilder ≤700 px)",
+    "reducedMotion": "station-stills (Seite) bzw. steps ohne Kamerafahrt (Komponente)",
+    "noWebGL": "station-stills",
+    "contextLost": "station-stills"
+  },
+  "tests": [
+    "baseline",
+    "route-2000",
+    "forward-reverse",
+    "doors",
+    "station-navigation",
+    "keyboard",
+    "request-quote-whitelist",
+    "reduced-motion",
+    "no-webgl",
+    "context-loss",
+    "cleanup",
+    "multi-instance",
+    "viewports-390-768-1440",
+    "embed-messages",
+    "rise-schema",
+    "intro-scan",
+    "door-passage",
+    "view-rotation",
+    "choice-selection",
+    "contact-event",
+    "layout-390-768-1440",
+    "highlight-pulse"
+  ],
+  "acceptance": {
+    "sixStations": true,
+    "sameBuilding": true,
+    "realOpenings": true,
+    "fallbackUsable": true,
+    "quoteAlwaysReachable": true,
+    "realSafariAndPhoneTest": "REQUIRED_BEFORE_LAUNCH",
+    "wixLiveTest": "REQUIRED_BEFORE_LAUNCH"
+  }
+}

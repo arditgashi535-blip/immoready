@@ -1,0 +1,54 @@
+
+/* ===================== V14 · Rundgang auf der Seite =====================
+   Der Kern (src/tour/tour-core.js) wird vom Build hier eingesetzt. Konfiguration: window.IR_RISE aus rise.json. */
+/*{{TOUR_CORE}}*/
+
+(function(){
+  var root=document.getElementById('reise');if(!root||root.__tour)return;
+  var EMBED=!!window.IR_EMBED;
+  var t=IRTour.create(root,{
+    config:window.IR_RISE,
+    mode:EMBED?'steps':'scroll',
+    textures:function(){return window.IR_TEX;},
+    bake:function(){return window.IR_BAKE;},
+    emit:function(name,detail){
+      if(name==='tour-ready'){window.__jr=detail.mode==='webgl';if(EMBED&&window.__irMsg)window.__irMsg.ready();}
+      try{root.dispatchEvent(new CustomEvent(name,{detail:detail,bubbles:true}));}catch(e){}
+    },
+    interceptQuote:function(d){return !!(EMBED&&window.__irMsg&&window.__irMsg.quote(d));},
+    interceptContact:function(d){return !!(EMBED&&window.__irMsg&&window.__irMsg.contact(d));}
+  });
+  root.__tour=t;window.__JR=t;window.__jrGo=t.goStation;
+})();
+
+/* ---------- Einbettung als HTML-iFrame (Alternative zum Custom Element): Nachrichten mit geprüftem Ursprung ----------
+   Eingehend: SET_PROGRESS {value:0…1}, GO_TO_STATION {index:0…5}
+   Ausgehend: SCENE_READY {stations}, REQUEST_QUOTE {leistung}, REQUEST_CONTACT {} – keine Formulardaten. */
+(function(){
+  if(!window.IR_EMBED)return;
+  var CFG=window.IR_RISE,ALLOWED=(window.IR_ALLOWED_ORIGINS||CFG.allowedOrigins||[]).slice(),N=CFG.stations.length;
+  var parentOrigin=null;try{var ro=document.referrer?new URL(document.referrer).origin:null;if(ro&&ALLOWED.indexOf(ro)>-1)parentOrigin=ro;}catch(e){}
+  function send(msg){if(!parentOrigin||window.parent===window)return false;window.parent.postMessage(msg,parentOrigin);return true;}
+  window.__irMsg={ready:function(){send({type:'SCENE_READY',version:1,stations:N});},quote:function(d){return send({type:'REQUEST_QUOTE',leistung:d.service||''});},contact:function(){return send({type:'REQUEST_CONTACT'});},origin:function(){return parentOrigin;}};
+  window.addEventListener('message',function(e){
+    if(e.source!==window.parent)return;if(ALLOWED.indexOf(e.origin)<0){if(window.console)console.info('ImmoReady-Rundgang: Nachricht von nicht freigegebenem Ursprung ignoriert:',e.origin);return;}
+    var m=e.data;if(!m||typeof m!=='object'||typeof m.type!=='string')return;
+    if(!parentOrigin)parentOrigin=e.origin;
+    var t=window.__JR;if(!t)return;
+    if(m.type==='GO_TO_STATION'){if(typeof m.index!=='number')return;if(Number.isInteger(m.index)&&m.index>=0&&m.index<N)t.goStation(m.index);}
+    else if(m.type==='SET_PROGRESS'){if(typeof m.value!=='number')return;if(isFinite(m.value)&&m.value>=0&&m.value<=1)t.setProgress(m.value);}
+  });
+})();
+
+/* ---------- Navigation: wandernde Markierung ---------- */
+(function(){var nav=document.querySelector('.nav');if(!nav||nav.__ind)return;nav.__ind=true;
+  var ind=document.createElement('span');ind.className='nav-ind';ind.setAttribute('aria-hidden','true');nav.appendChild(ind);
+  function to(a){if(!a){ind.style.opacity='0';return;}var nr=nav.getBoundingClientRect(),r=a.getBoundingClientRect();ind.style.opacity='1';ind.style.transform='translateX('+(r.left-nr.left)+'px) scaleX('+(r.width/100)+')';}
+  function cur(){return nav.querySelector('a[aria-current="page"]');}
+  nav.addEventListener('pointerover',function(e){var a=e.target.closest('.nav>a,.nav>.dd>button');if(a)to(a);});
+  nav.addEventListener('focusin',function(e){var a=e.target.closest('.nav>a,.nav>.dd>button');if(a)to(a);});
+  nav.addEventListener('pointerleave',function(){to(cur());});
+  window.addEventListener('hashchange',function(){setTimeout(function(){to(cur());},60);});
+  setTimeout(function(){to(cur());},400);
+})();
+

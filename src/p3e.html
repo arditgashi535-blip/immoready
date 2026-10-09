@@ -1,0 +1,49 @@
+
+/* ---------------- V5: Interaktive Leistungsübersicht ---------------- */
+var SX=[
+ ['hauswartung','house','Hauswartung','Regelmässige Liegenschaftsbetreuung: Kontrollrundgänge, gemeinschaftliche Bereiche und vereinbarte Unterhaltsarbeiten – mit festem Ansprechpartner.','entrance2','Betreuung anfragen','laufend'],
+ ['sanitaer','drop','Sanitär & Unterhalt','Kleinere Sanitärarbeiten und Reparaturen in Bad und Küche. Weitergehende Facharbeiten koordinieren wir nach Absprache.','faucet2','Sanitäranfrage stellen','einzel'],
+ ['gartenunterhalt','leaf','Gartenunterhalt','Rasenpflege, Hecken- und Strauchschnitt, Rabattenpflege, Laubarbeiten und Entsorgung des Grünabfalls.','garden2','Gartenarbeiten anfragen',''],
+ ['reinigung','clean','Reinigung','Unterhalts-, Treppenhaus-, Grund- und Umzugsreinigung nach vereinbartem Umfang.','stair2','Reinigung anfragen',''],
+ ['raeumung','box','Räumung & Aufbereitung','Räumung, Entsorgung, Reinigung und Vorbereitung von Wohnungen und Häusern für Verkauf oder Vermietung.','room','Räumung anfragen','einzel'],
+ ['leerstand','key','Leerstandsmanagement','Vereinbarte Kontrollgänge, Zustandsmeldungen und Betreuung leerstehender Immobilien.','keys2','Betreuung anfragen','laufend'],
+ ['verkauf','tag','Vermarktung, Bewertung & Vermittlung','Persönliche Begleitung bei Verkauf und Vermittlung sowie Immobilienbewertung im Gespräch.','sale','Gespräch anfragen',''],
+ ['fotografie','camera','Fotografie, Drohne & 360°','Immobilienfotos, Drohnenaufnahmen und 360°-Rundgänge für Inserat, Verkauf oder Dokumentation.','aerial','Aufnahmen anfragen','']
+];
+function renderSX(){var root=document.getElementById('svcx');if(!root)return;
+  var N=SX.length,pad=function(n){return (n<10?'0':'')+n;};
+  var l='<ul class="sx-list" role="list">',st='<div class="sx-right"><figure class="sx-stage">',rail='';
+  SX.forEach(function(d,i){var id='sx'+i;
+    l+='<li class="sx-item'+(i===0?' on':'')+'" data-i="'+i+'"><h3 style="margin:0"><button type="button" class="sx-head" aria-pressed="'+(i===0)+'" aria-controls="sxDetail"><span class="n">'+pad(i+1)+'</span><i class="ico" data-icon="'+d[1]+'"></i><span class="t">'+esc(d[2])+'</span><svg class="chev" viewBox="0 0 20 20" aria-hidden="true"><path d="M7 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button></h3></li>';
+    st+='<div class="sx-layer'+(i===0?' on':'')+'" data-i="'+i+'" aria-hidden="true"><div class="illu" data-illu="'+d[4]+'"></div></div>';
+    rail+='<li class="sx-card" data-i="'+i+'" ><div class="sx-cimg"><div class="illu" data-illu="'+d[4]+'"></div><span class="ph-tag">Symbolbild</span></div><div class="sx-cb"><span class="n">'+pad(i+1)+'</span><h3><i class="ico" data-icon="'+d[1]+'"></i>'+esc(d[2])+'</h3><p>'+esc(d[3])+'</p><div class="acts"><a class="btn sm" href="#offerte" data-pre="'+d[0]+'" data-mode="'+d[6]+'">'+esc(d[5])+' <i class="a"></i></a><a class="tlink" href="#'+d[0]+'">Details <i class="a"></i></a></div></div></li>';
+  });
+  l+='<li class="sx-ind" aria-hidden="true" role="presentation"></li></ul>';st+='<span class="sx-tag" id="sxTag" aria-hidden="true">'+esc(SX[0][2])+'</span><span class="sx-count" aria-hidden="true"><b id="sxNum">01</b> / '+pad(N)+'</span><figcaption class="review-only">Symbolbilder (KI-generiert mit Canva)</figcaption></figure><div class="sx-detail" id="sxDetail" aria-live="polite"></div></div>';
+  var mob='<ul class="sx-mob" role="list">'+rail+'</ul>';
+  root.innerHTML=l+st+mob;paintArrows(root);paintIcons(root);
+  var cur=-1;
+  function detail(i){var d=SX[i],el=document.getElementById('sxDetail');el.classList.remove('show');void el.offsetWidth;el.innerHTML='<span class="n">'+pad(i+1)+' · '+esc(d[2])+'</span><p>'+esc(d[3])+'</p><div class="acts"><a class="btn sm" href="#offerte" data-pre="'+d[0]+'" data-mode="'+d[6]+'">'+esc(d[5])+' <i class="a"></i></a><a class="tlink" href="#'+d[0]+'">Details <i class="a"></i></a></div>';paintArrows(el);el.classList.add('show');}
+  function act(i){if(i===cur)return;cur=i;
+    root.querySelectorAll('.sx-item').forEach(function(it){var on=+it.dataset.i===i;it.classList.toggle('on',on);it.querySelector('.sx-head').setAttribute('aria-pressed',String(on));});
+    root.querySelectorAll('.sx-layer').forEach(function(ly){ly.classList.toggle('on',+ly.dataset.i===i);});
+    var t=document.getElementById('sxTag');if(t)t.textContent=SX[i][2];
+    var nm=document.getElementById('sxNum');if(nm)nm.textContent=pad(i+1);detail(i);placeInd();}
+  /* Wandernde Markierung: eine Messung, ein Schreibzugriff */
+  function placeInd(){var ind=root.querySelector('.sx-ind'),it=root.querySelector('.sx-item[data-i="'+cur+'"]');if(!ind||!it)return;var t=it.offsetTop,h=it.offsetHeight;if(!h)return;ind.style.transform='translateY('+t+'px)';ind.style.height=h+'px';ind.classList.add('ready');}
+  if(window.ResizeObserver){new ResizeObserver(function(){placeInd();}).observe(root.querySelector('.sx-list'));}
+  act(0);
+  /* Hover mit kurzer Absichtsverzögerung: schnelles Überfahren der Liste löst keine Bildwechsel-Kaskade aus */
+  var hv=null,list=root.querySelector('.sx-list');
+  list.addEventListener('pointerover',function(e){if(e.pointerType!=='mouse')return;var h=e.target.closest('.sx-head');if(!h)return;clearTimeout(hv);var i=+h.closest('.sx-item').dataset.i;hv=setTimeout(function(){act(i);},55);});
+  list.addEventListener('pointerleave',function(){clearTimeout(hv);});
+  list.addEventListener('click',function(e){var h=e.target.closest('.sx-head');if(!h)return;clearTimeout(hv);act(+h.closest('.sx-item').dataset.i);});
+  list.addEventListener('focusin',function(e){var h=e.target.closest('.sx-head');if(h)act(+h.closest('.sx-item').dataset.i);});
+  list.addEventListener('keydown',function(e){if(e.key!=='ArrowDown'&&e.key!=='ArrowUp')return;var h=e.target.closest('.sx-head');if(!h)return;e.preventDefault();var i=+h.closest('.sx-item').dataset.i+(e.key==='ArrowDown'?1:-1);i=(i+N)%N;root.querySelector('.sx-item[data-i="'+i+'"] .sx-head').focus();});
+  root.querySelectorAll('.sx-layer [data-illu]').forEach(function(e){paintOne(e);});
+}
+
+/* ---------------- V5: Bilder bei Bedarf zeichnen ---------------- */
+function paintOne(el){if(el.firstChild)return;var f=ILLU[el.getAttribute('data-illu')];if(f)el.innerHTML=f();}
+var lazyQ=[];
+function lazyIllus(){lazyQ=[];document.querySelectorAll('[data-page]:not([hidden]) [data-illu]').forEach(function(el){if(el.firstChild)return;var r=el.getBoundingClientRect();if(el.hasAttribute('data-eager')||r.top<innerHeight*1.6)paintOne(el);else lazyQ.push(el);});}
+function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(el.getBoundingClientRect().top<innerHeight*1.6){paintOne(el);return false;}return true;});}

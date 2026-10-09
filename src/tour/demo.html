@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>immoready-tour · Testseite</title>
+<style>
+  body{margin:0;font-family:system-ui,sans-serif;background:#f3ede6;color:#3b3a39}
+  .bar{padding:12px 16px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:#fcf8f5;border-bottom:1px solid #d3ccc4}
+  .bar button{min-height:40px;padding:8px 12px}
+  #log{font:12px/1.4 ui-monospace,monospace;white-space:pre-wrap;max-height:160px;overflow:auto;padding:8px 16px;background:#fff;border-bottom:1px solid #d3ccc4;margin:0}
+  immoready-tour{--irt-height:640px}
+</style>
+</head>
+<body>
+<div class="bar">
+  <strong>Testseite (nicht öffentlich)</strong>
+  <button type="button" data-st="1">Station Garten</button>
+  <button type="button" data-st="4">Station Sanitär</button>
+  <button type="button" id="toggle">Komponente entfernen / einsetzen</button>
+</div>
+<pre id="log" aria-live="polite"></pre>
+<immoready-tour id="t1"></immoready-tour>
+<immoready-tour id="t2" station="2"></immoready-tour>
+<script src="immoready-tour.js"></script>
+<script>
+  var log = document.getElementById('log'); window.EVENTS = [];
+  ['tour-ready', 'station-change', 'request-quote', 'request-contact', 'tour-error'].forEach(function (n) {
+    document.addEventListener(n, function (e) { var id = e.target.id; window.EVENTS.push({ id: id, name: n, detail: e.detail }); log.textContent = id + ' · ' + n + ' ' + JSON.stringify(e.detail) + '\n' + log.textContent; });
+  });
+  document.querySelectorAll('[data-st]').forEach(function (b) { b.onclick = function () { document.getElementById('t1').setAttribute('station', b.dataset.st); }; });
+  var t1 = document.getElementById('t1'), parent = t1.parentNode, next = t1.nextSibling;
+  document.getElementById('toggle').onclick = function () { if (t1.isConnected) t1.remove(); else parent.insertBefore(t1, next); };
+</script>
+</body>
+</html>
