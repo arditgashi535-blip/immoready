@@ -47,7 +47,9 @@ const PORTRAIT = {
       await p.waitForFunction(() => { const s = window.__JR.state(); return Math.abs(s.p - s.ps) < 0.0004; }, null, { timeout: 60000, polling: 250 });
       await p.waitForTimeout(2600);
       const png = path.join(TMP, `${s.still}${fmt.suffix}.png`);
-      await p.locator('#reise .jr-stage').screenshot({ path: png });
+      /* V17.1: Ausschnitt der Bühne statt Element-Screenshot (kein Warten auf «stabil» bei langsamer Software-Grafik) */
+      const bb = await p.evaluate(() => { const r = document.querySelector('#reise .jr-stage').getBoundingClientRect(); return { x: r.left, y: r.top, width: r.width, height: r.height }; });
+      await p.screenshot({ path: png, clip: bb, timeout: 120000 });
       const out = path.join(ROOT, 'assets/tour', `${s.still}${fmt.suffix}.webp`);
       execFileSync('python3', ['-c', `from PIL import Image;im=Image.open(${JSON.stringify(png)}).convert('RGB');im=im.resize((${fmt.w},${fmt.h}),Image.LANCZOS) if im.size!=(${fmt.w},${fmt.h}) else im;im.save(${JSON.stringify(out)},'WEBP',quality=82,method=6)`]);
       console.log(out.replace(ROOT + '/', ''), fs.statSync(out).size, 'Bytes');
