@@ -1846,4 +1846,17 @@ h1,h2,h3,h4,p,li,dd,dt,legend,label,.btn{overflow-wrap:break-word}
   /* Leistungskarten: Spaltenbreite in em – bei normaler Schrift 2 Spalten ab ca. 380 px, bei grosser Schrift automatisch 1 Spalte */
   .opts:not(.seg){grid-template-columns:repeat(auto-fill,minmax(min(100%,8.9em),1fr))}}
 a[href^="mailto:"],.ftr a,.aside-contact a,.copy-row a{overflow-wrap:anywhere}
+
+/* ===================== V17.1 · Release Candidate =====================
+   Kontaktleiste und kompakter Kopf deckend (vorher 97 % bzw. 90 % – Inhalte schienen durch), alle Bedienelemente ≥ 44 px */
+@media (max-width:760px){.mbar{background:var(--ivory)}}
+body.hdr-compact .hdr{background:var(--ivory)}
+.btn.sm{min-height:44px}
+.jr-nav button{min-height:44px}
+.copy-btn{min-height:44px;min-width:44px;padding:8px 12px}
+/* 320 px bei 200 % Text: Rasterspalten und Knöpfe dürfen schrumpfen und umbrechen */
+.vcard{grid-template-columns:minmax(0,1fr)}.vcard .vc a,.vq li{min-width:0;overflow-wrap:anywhere}
+.mbar{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.mbar a{min-width:0;white-space:normal;text-align:center;overflow-wrap:anywhere}
+.lnk{max-width:100%;flex-wrap:wrap;overflow-wrap:anywhere}.tbc{white-space:normal;max-width:100%}
+.btn{max-width:100%;overflow-wrap:anywhere}.btn>span{min-width:0;overflow-wrap:anywhere}
 </style>

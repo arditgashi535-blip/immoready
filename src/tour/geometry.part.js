@@ -473,14 +473,16 @@
     /* V17.1: Wange (verputzt) bis 6 cm über die Stufenkanten, darauf Staketengeländer aus Flachstahl (Abstand < 12 cm), Eichenhandlauf
        0,9 m über den Stufenkanten. Vorher eine 0,95 m hohe Brüstung, die durch einen Unterteilungsfehler waagrecht gezeichnet wurde. */
     BEV=0;MAT=IPU;(function(){var xa=-1.77,xb=-1.65,z0=5.02,z1=1.82,z2=1.72,y0=FLOOR,t0=FLOOR+nose(z0)+0.06,t1=FLOOR+nose(z1)+0.06,PW='#e2ddd4',xm=(xa+xb)/2;
-      withSub(0.3,function(){[[xa,-1],[xb,1]].forEach(function(w){var x=w[0];quadN([x,y0,z0],[x,t0,z0],[x,t1,z1],[x,y0,z1],[w[1],0,0],PW);quadN([x,y0,z1],[x,t1,z1],[x,t1,z2],[x,y0,z2],[w[1],0,0],PW);});
-        quadN([xa,t0,z0],[xb,t0,z0],[xb,t1,z1],[xa,t1,z1],[0,1,0],PW);quadN([xa,t1,z1],[xb,t1,z1],[xb,t1,z2],[xa,t1,z2],[0,1,0],PW);
+      /* Oberkante mit Knick am Podest (zk), damit sie überall 6 cm über den Stufenkanten liegt */
+      var zk=5.01-0.29*(1.94/0.176-1),tk=FLOOR+1.94+0.06,SEG=[[z0,t0,zk,tk],[zk,tk,z1,t1],[z1,t1,z2,t1]];
+      withSub(0.3,function(){SEG.forEach(function(g){[[xa,-1],[xb,1]].forEach(function(w){var x=w[0];quadN([x,y0,g[0]],[x,g[1],g[0]],[x,g[3],g[2]],[x,y0,g[2]],[w[1],0,0],PW);});
+        quadN([xa,g[1],g[0]],[xb,g[1],g[0]],[xb,g[3],g[2]],[xa,g[3],g[2]],[0,1,0],PW);});
         quadN([xa,y0,z0],[xb,y0,z0],[xb,t0,z0],[xa,t0,z0],[0,0,1],PW);quadN([xa,y0,z2],[xb,y0,z2],[xb,t1,z2],[xa,t1,z2],[0,0,-1],PW);},'all');
       WALLS.push([xa,xb,FLOOR,FLOOR+nose(z1)+0.95,z2,z0]);
       MAT=MET;var ST2='#3b3b3a';for(var zz=z0-0.06;zz>z1+0.02;zz-=0.115){var yb=FLOOR+nose(zz)+0.06;box(xm,yb,zz,0.012,0.84,0.03,ST2,0,0);}
       [[z0-0.03,0],[z1+0.03,0]].forEach(function(q){var yb=FLOOR+nose(q[0])+0.06;box(xm,yb,q[0],0.03,0.86,0.03,ST2,0,0);});
       /* Handlauf folgt der Steigung bis zum Podest (Knick bei zk), dann waagrecht */
-      var zk=5.01-0.29*(1.94/0.176-1);tube([xm,FLOOR+nose(z0-0.03)+0.9,z0-0.03],[xm,FLOOR+1.94+0.9,zk],0.012,6,ST2,0,0);tube([xm,FLOOR+1.94+0.9,zk],[xm,FLOOR+1.94+0.9,z1+0.03],0.012,6,ST2,0,0);
+      tube([xm,FLOOR+nose(z0-0.03)+0.9,z0-0.03],[xm,FLOOR+1.94+0.9,zk],0.012,6,ST2,0,0);tube([xm,FLOOR+1.94+0.9,zk],[xm,FLOOR+1.94+0.9,z1+0.03],0.012,6,ST2,0,0);
       MAT=HOLZ;tube([xm,FLOOR+nose(5.05)+0.935,5.05],[xm,FLOOR+1.94+0.935,zk],0.024,14,'#a47e57',0,0.3);tube([xm,FLOOR+1.94+0.935,zk],[xm,FLOOR+1.94+0.935,1.82],0.024,14,'#a47e57',0,0);})();
     tube([-2.9,FLOOR+1.0,4.9],[-2.9,FLOOR+2.85,1.7],0.018,8,'#8d8a86',0,0);
     /* Briefkastenanlage, Anschlagbrett, Leuchtband, Pflanze, Fussabtreter, Sockelleisten, Türzargen */

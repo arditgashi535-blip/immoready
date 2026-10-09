@@ -92,10 +92,12 @@ function route(){
   document.querySelectorAll('.nav a, .mnav a').forEach(function(a){var t=a.getAttribute('href').slice(1);if(t===key||(page==='leistung'&&t==='leistungen'))a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
   closeMenus();
   if(target){target.scrollIntoView();}
-  else if(current!==h){window.scrollTo(0,0);var mn=document.getElementById('main');mn.focus({preventScroll:true});}
+  else if(current!==h){window.scrollTo(0,0);/* V17.1: beim ersten Laden Fokus nicht verschieben – der Skip-Link bleibt erster Tabstopp */if(current!==null){var mn=document.getElementById('main');mn.focus({preventScroll:true});}}
   current=h; lazyIllus(); observeReveal(); collectPlx(); onFrame();
 }
 window.addEventListener('hashchange',route);
+/* V17.1: Skip-Link springt zum Inhalt der aktuellen Seite, ohne den Hash zu ändern (vorher führte #main über den Router zur Startseite) */
+(function(){var sk=document.querySelector('.skip');if(sk)sk.addEventListener('click',function(e){e.preventDefault();var mn=document.getElementById('main');mn.focus({preventScroll:true});mn.scrollIntoView({block:'start'});});})();
 
 /* ---------------- Navigation ---------------- */
 var ddBtn=document.getElementById('ddBtn'), ddP=document.getElementById('ddLeistungen');

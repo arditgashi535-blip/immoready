@@ -51,7 +51,7 @@ function validate(){var errs=[];function add(x){if(x)errs.push(x);}
   add(setErr('tel',tm));
   var es=$('errsum');
   errs.forEach(function(x){var el=$(x.id)||$('fs_'+x.id);var box=el&&(el.closest('.f')||el);if(box){box.classList.remove('shake');void box.offsetWidth;box.classList.add('shake');}});
-  if(errs.length){es.querySelector('ul').innerHTML=errs.map(function(x){return '<li><a href="#" data-f="'+x.id+'">'+esc(x.msg)+'</a></li>';}).join('');es.hidden=false;es.focus();}else es.hidden=true;
+  if(errs.length){es.querySelector('ul').innerHTML=errs.map(function(x){return '<li><a href="#" data-f="'+x.id+'">'+esc(x.msg)+'</a></li>';}).join('');es.hidden=false;/* V17.1: Fokus auf das erste fehlerhafte Feld (Übersicht bleibt sichtbar und verlinkt alle Fehler) */var f0=errs[0],el0=$(f0.id)||document.querySelector('#qf input[name="'+f0.id+'"]');if(el0){el0.focus({preventScroll:true});var bx=el0.closest('.f')||el0.closest('fieldset')||el0;bx.scrollIntoView({block:'center'});}else es.focus();}else es.hidden=true;
   return errs.length===0;}
 function renderFiles(){$('fileList').innerHTML=files.map(function(f,i){return '<li><span>'+esc(f.name)+' · '+(f.size/1048576).toFixed(1)+' MB</span><button type="button" data-rm="'+i+'">Entfernen</button></li>';}).join('');}
 function addFiles(list){var msgs=[];Array.prototype.forEach.call(list,function(f){
