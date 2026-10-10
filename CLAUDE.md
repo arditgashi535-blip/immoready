@@ -288,6 +288,8 @@ node tests/bench-frames.js <html> …  # Bildzeiten (Testumgebung)
 
 - Tests mit WebGL starten Chromium mit SwiftShader (Software-GPU, V15 ≈0,5–1,8 s je Bild); zeitkritische Prüfungen
   warten deshalb auf Bedingungen bzw. auf gezeichnete Bilder (`state().frames`) statt auf feste Zeiten.
+- Stand V17.1 (Branch `v17.1-release-candidate`): 356 bestehende Prüfungen + t20 43/43 = 399 (Details und ehrliche
+  Einordnung eines einmaligen Zeitausreissers in t11: `docs/TESTBERICHT-V17.1.md`, Leistung: `docs/PERFORMANCE-V17.1.md`).
 - Stand V17 (Branch `v17-final-realism`, Tag `v17-stand`; Sicherung des V16-Stands: Tag `v16-stand`):
   RISE 21/21, t15 10/10, t7 68/68, t9 18/18, t11 37/37, t12 14/14, t13 24/24, t14 28/28, t16 19/19, t17 18/18,
   t18 17/17, t19 82/82 (356 Prüfungen). Details: `docs/TESTBERICHT-V17.md` (frühere: V16, V15, V14, V13).

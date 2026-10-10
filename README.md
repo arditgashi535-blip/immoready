@@ -1,7 +1,7 @@
 # ImmoReady – Website-Relaunch (Vorschau)
 
 Eigenständige Vorschau der neuen ImmoReady-Website mit einem interaktiven 3D-Rundgang durch ein Schweizer
-Mehrfamilienhaus im Raum Zürich/Aargau in der blauen Stunde (V17 «Final Production Candidate»: Gebäude → Garten → Eingang →
+Mehrfamilienhaus im Raum Zürich/Aargau in der blauen Stunde (V17.1 «Final Realism & Mobile Release Candidate»: Gebäude → Garten → Eingang →
 Wohnung → Bad → Terrasse → Gesamtansicht) und dem Rundgang als Web Component `<immoready-tour>` für Wix.
 Die Szene ist eine **illustrative Visualisierung, kein Referenzobjekt** und im Rundgang so gekennzeichnet.
 Die öffentliche Website auf Wix bleibt bis zur Freigabe unverändert.
@@ -55,7 +55,7 @@ Nach Änderungen an der Geometrie: `npm run bake` (Licht vorab rechnen), danach 
 - `dist/` – Vorschau (eine Datei), Produktionsform mit getrennten Dateien (`dist/site/`), Komponente (`dist/component/`), iFrame-Alternative.
 - `model/` – GLB-Modell des Wohnblocks (14 Objekte, Geometrie V14; mit `npm run export:glb` aus der V15-Szene neu erzeugbar) und Exportskript.
 - `tools/render-stills.js` – Stationsbilder aus der Szene neu erzeugen (`npm run render:stills`).
-- `docs/` – Testberichte V13–V17, Vorher/Nachher- und Abnahmebilder (`docs/v14/` … `docs/v17/`).
+- `docs/` – Testberichte V13–V17.1, Performancebericht V17.1, 32 Abnahmebilder und Vorher/Nachher-Vergleich (`docs/v171/`).
 - `tools/abnahme-mobil.js` – Smartphone-Abnahmebilder 390 px (`node tools/abnahme-mobil.js dist/immoready-vorschau.html shots/v17-mobil`).
 - `tools/vergleich.js` + `tools/kameras-vergleich.json` – feste Kameras für Vorher/Nachher-Vergleiche (`node tools/vergleich.js <html> <ordner> alle`).
 - `wix/` – Velo-Code für das Custom Element und für die iFrame-Variante, Einbauanleitung.
