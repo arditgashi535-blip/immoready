@@ -1727,7 +1727,8 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
     /* ---- Bad x[3,5.4] z[-1,2.4] (V17): Bodenplatten 60×60 anthrazit, Wandplatten 60×30 weiss raumhoch – Fugen je Pixel ab der
        Raumecke x 3,072 / z −0,928 / Boden (Shader), Dusche bodeneben mit Glaswand ---- */
     MAT=BPL;withSub(0.25,function(){box(4.2,FLOOR-0.02,0.7,2.28,0.02,3.28,'#6f6d6a',0,0);},'up');
-    MAT=WPL;withSub(0.1,function(){box(3.066,FLOOR,0.7,0.012,CEIL-FLOOR,3.28,'#efeeea',0,0);box(4.2,FLOOR,-0.934,2.28,CEIL-FLOOR,0.012,'#efeeea',0,0);box(4.2,FLOOR,2.334,2.28,CEIL-FLOOR,0.012,'#efeeea',0,0);
+    MAT=WPL;withSub(0.1,function(){box(3.066,FLOOR,0.7,0.012,CEIL-FLOOR,3.28,'#efeeea',0,0);},'v');/* V17.1: Wand mit Spiegelschrank fein, übrige Badwände 20 cm */
+    withSub(0.2,function(){box(4.2,FLOOR,-0.934,2.28,CEIL-FLOOR,0.012,'#efeeea',0,0);box(4.2,FLOOR,2.334,2.28,CEIL-FLOOR,0.012,'#efeeea',0,0);
       box(XW-0.066,FLOOR,-0.17,0.012,CEIL-FLOOR,1.54,'#efeeea',0,0);box(XW-0.066,FLOOR,1.9,0.012,CEIL-FLOOR,0.88,'#efeeea',0,0);box(XW-0.066,FLOOR+2.05,1.025,0.012,CEIL-FLOOR-2.05,0.85,'#efeeea',0,0);},'v');
     MAT=IPU;withSub(0.3,function(){box(4.2,CEIL,0.7,2.28,0.04,3.28,CW,0,0);},'down');
     /* neutralwarmes Licht (≈ 3500 K) statt gelbbeiger Grundstimmung: zwei Deckenleuchten, Spiegelleuchte */
