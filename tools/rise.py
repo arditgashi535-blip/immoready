@@ -1,6 +1,7 @@
 """RISE: Laden, Prüfen und Erzeugen aus rise.json (einzige Quelle für Tour-Konfiguration und Inhalte).
 
 Aufruf:  python3 tools/rise.py            -> prüft rise.json (Schema + inhaltliche Regeln), Exit 1 bei Fehlern
+         python3 tools/rise.py --launch   -> zusätzlich: offene Punkte vor der Veröffentlichung (GmbH, Recht, Formular, Freigabe)
 Import:  from tools.rise import load, tour_config, tour_markup
 """
 import html, json, os, sys
@@ -97,7 +98,94 @@ def validate(d):
         errors.append('Leistungs-Prioritäten müssen 1..n lückenlos sein')
     if d['services'][0]['key'] != 'hauswartung':
         errors.append('Hauswartung muss die wichtigste Leistung bleiben (Priorität 1)')
+    errors += _company_rules(d)
     return errors
+
+
+UNSPEC = lambda v: isinstance(v, str) and v.startswith('[UNSPECIFIED')
+COMPANY_FIELDS = [('registeredName', 'Eingetragener Firmenname'), ('seat', 'Sitz'), ('address', 'Geschäftsadresse'),
+                  ('uid', 'UID (CHE-…)'), ('commercialRegister', 'Handelsregister (Kanton, Eintrag)'),
+                  ('representation', 'Zeichnungsberechtigte Person(en) und Funktion'), ('vat', 'MWST-Nummer oder «nicht MWST-pflichtig»')]
+
+
+def _company_rules(d):
+    """GmbH in Gründung: Die Seite darf die GmbH nicht als bestehend darstellen; nichts erfinden."""
+    e, c = [], d['firm']['company']
+    if c['status'] == 'in_gruendung':
+        if c['foundingConfirmed'] or c['goLiveApproved']:
+            e.append('GmbH in Gründung: foundingConfirmed und goLiveApproved müssen false bleiben, bis die Eintragung bestätigt ist')
+        public = json.dumps([d['tour'], d['services'], d['pages']], ensure_ascii=False)
+        if 'GmbH' in public:
+            e.append('GmbH in Gründung: «GmbH» darf in öffentlichen Texten (Rundgang, Leistungen, Seiten) noch nicht vorkommen')
+    else:
+        if not c['foundingConfirmed']:
+            e.append('Status «eingetragen» nur mit foundingConfirmed = true (Gründung vom Inhaber bestätigt)')
+        miss = [n for k, n in COMPANY_FIELDS if UNSPEC(c[k])]
+        if miss:
+            e.append('Status «eingetragen», aber offen: ' + ', '.join(miss))
+    if c['goLiveApproved'] and c['status'] != 'eingetragen':
+        e.append('Livegang-Freigabe ohne eingetragene GmbH ist nicht zulässig')
+    if not UNSPEC(c['registeredName']) and 'GmbH' not in c['registeredName']:
+        e.append('Firmenname einer GmbH muss die Rechtsform enthalten (z. B. «… GmbH»)')
+    return e
+
+
+def launch_check(d):
+    """Offene Punkte vor der Veröffentlichung (python3 tools/rise.py --launch). Leere Liste = bereit."""
+    c, o = d['firm']['company'], []
+    if c['status'] != 'eingetragen' or not c['foundingConfirmed']:
+        o.append('Gründung der GmbH nicht bestätigt (firm.company.status / foundingConfirmed)')
+    o += ['Unternehmensangabe fehlt: ' + n for k, n in COMPANY_FIELDS if UNSPEC(c[k])]
+    for k, n in (('imprint', 'Impressum: endgültiger Text'), ('privacy', 'Datenschutzerklärung: endgültiger Text'), ('hosting', 'Hosting/Auftragsbearbeiter')):
+        if UNSPEC(d['legal'].get(k, '[UNSPECIFIED]')):
+            o.append(n + ' (legal.%s)' % k)
+    if UNSPEC(d['wix'].get('formEndpoint', '[UNSPECIFIED]')):
+        o.append('Formular nicht angeschlossen (wix.formEndpoint) – Demo-Modus')
+    if c['status'] != 'eingetragen' or d['firm']['role'] == 'Inhaber':
+        o.append('Funktion von %s in der GmbH bestätigen und als Bezeichnung auf der Website setzen (firm.role, heute «%s»)' % (d['firm']['contactPerson'], d['firm']['role']))
+    if not c['goLiveApproved']:
+        o.append('Livegang nicht ausdrücklich freigegeben (firm.company.goLiveApproved)')
+    return o
+
+
+def _miss(t):
+    return '<span class="missing">%s</span>' % _e(t)
+
+
+def firm_markup(d):
+    """Unternehmensangaben für Impressum, Datenschutz, Kontakt und Footer – überall aus derselben Quelle.
+    In Gründung: öffentlich nur die Marke ohne Rechtsform; der GmbH-Entwurf erscheint nur mit «Prüfhinweise anzeigen»."""
+    f, c, k = d['firm'], d['firm']['company'], d['contact']
+    tel, mail = k['phone'].replace(' ', ''), k['email']
+    reach = '<p>Telefon: <a href="tel:%s">%s</a><br>E-Mail: <a href="mailto:%s">%s</a></p>' % (tel, _e(k['phone']), mail, _e(mail).replace('@', '<wbr>@'))
+    val = lambda key, label: _miss(label + ' – offen') if UNSPEC(c[key]) else _e(c[key])
+    addr = lambda: _miss('Geschäftsadresse – offen') if UNSPEC(c['address']) else '<br>'.join(_e(x.strip()) for x in c['address'].split(','))
+    if c['status'] == 'eingetragen':
+        name = _e(c['registeredName'])
+        imprint = ('<h2>Verantwortlich für den Inhalt</h2><p>%s<br>%s<br>Schweiz</p>%s<h2>Unternehmensangaben</h2>'
+                   '<p>Rechtsform: Gesellschaft mit beschränkter Haftung (GmbH)<br>Sitz: %s<br>Handelsregister: %s<br>UID: %s<br>'
+                   'Vertretungsberechtigt: %s<br>MWST: %s</p>') % (name, addr(), reach, val('seat', 'Sitz'), val('commercialRegister', 'Handelsregister'),
+                                                                 val('uid', 'UID'), val('representation', 'Vertretung'), val('vat', 'MWST'))
+        resp = '%s, %s, Schweiz' % (name, addr().replace('<br>', ', '))
+        foot = name
+    else:
+        rows = ''.join('<div><dt>%s</dt><dd>%s</dd></div>' % (_e(n), _miss('offen') if UNSPEC(c[key]) else _e(c[key])) for key, n in COMPANY_FIELDS)
+        imprint = ('<h2>Verantwortlich für den Inhalt</h2><p>%s<br>%s: %s<br>%s<br>Schweiz</p>%s'
+                   '<h2>Unternehmensangaben</h2><p>%s</p>'
+                   '<div class="review-only placeholder-box co-draft" data-company="in_gruendung" style="margin:24px 0">'
+                   '<p><b>Intern · Entwurf für den späteren Auftritt als GmbH – nicht öffentlich</b></p>'
+                   '<p>Status: GmbH in Gründung. Die Website nennt öffentlich noch keine Rechtsform. Vor der Veröffentlichung müssen die '
+                   'folgenden Angaben bestätigt und in <code>rise.json → firm.company</code> eingetragen sein; Impressum, Datenschutz, '
+                   'Kontakt und Footer übernehmen sie automatisch.</p>'
+                   '<dl class="co-list"><div><dt>Rechtsform (geplant)</dt><dd>Gesellschaft mit beschränkter Haftung (GmbH)</dd></div>%s</dl>'
+                   '<p class="muted">Prüfung vor dem Livegang: <code>python3 tools/rise.py --launch</code></p></div>') % (
+            _e(f['brand']), _e(f['role']), _e(f['contactPerson']), addr(), reach,
+            _miss('Unternehmensangaben werden vor der Veröffentlichung ergänzt'), rows)
+        resp = '%s, %s, %s, Schweiz' % (_e(f['brand']), _e(f['contactPerson']), addr().replace('<br>', ', '))
+        foot = '%s · %s' % (_e(f['brand']), _e(f['contactPerson']))
+    privacy = '<p>%s · <a href="mailto:%s">%s</a> · %s</p>' % (resp, mail, _e(mail).replace('@', '<wbr>@'), _e(k['phone']))
+    address_note = '' if not UNSPEC(c['address']) else '<p class="review-only" style="margin-top:16px">%s</p>' % _miss('Geschäftsadresse: nach Bestätigung ergänzen')
+    return {'imprint': imprint, 'privacy': privacy, 'footer': foot, 'address_note': address_note}
 
 
 def tour_config(d):
@@ -254,5 +342,14 @@ if __name__ == '__main__':
         for e in errs:
             print('  -', e)
         sys.exit(1)
+    if '--launch' in sys.argv:
+        open_points = launch_check(data)
+        if open_points:
+            print('Nicht bereit für die Veröffentlichung – %d offene Punkte:' % len(open_points))
+            for o in open_points:
+                print('  -', o)
+            sys.exit(1)
+        print('Bereit für die Veröffentlichung (alle Unternehmensangaben bestätigt, Livegang freigegeben).')
+        sys.exit(0)
     print('rise.json gültig: %d Stationen, %d Keyframes, %d Türen, %d Leistungen' % (
         len(data['tour']['stations']), len(data['tour']['keyframes']), len(data['tour']['doors']), len(data['services'])))

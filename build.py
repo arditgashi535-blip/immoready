@@ -15,9 +15,19 @@ import base64, json, os, re, shutil, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 os.chdir(HERE)
 sys.path.insert(0, HERE)
-from tools.rise import load, tour_config, tour_markup  # noqa: E402
+from tools.rise import load, tour_config, tour_markup, firm_markup, launch_check  # noqa: E402
 
 RISE = load()  # bricht bei Schemafehlern ab
+# Veröffentlichungsstand nur nach bestätigter GmbH-Eintragung und ausdrücklicher Freigabe (docs/VEROEFFENTLICHUNG.md).
+# Ohne --release entsteht immer die private Vorschau (noindex, Prüfhinweise, Demo-Hinweis).
+if '--release' in sys.argv:
+    _open = launch_check(RISE)
+    if _open:
+        print('Release-Build nicht freigegeben – %d offene Punkte:' % len(_open))
+        for _o in _open:
+            print('  -', _o)
+        sys.exit(1)
+    print('Hinweis: Freigabe vorhanden. Vor dem Hochladen Vorschau-Werkzeuge (Demo-Hinweis, Prüfhinweise, Umsetzungsmappe) entfernen – siehe docs/VEROEFFENTLICHUNG.md.')
 CFG = tour_config(RISE)
 STATIONS = RISE['tour']['stations']
 
@@ -74,13 +84,29 @@ PARTS = ['p1.html', 'p2.html', 'p3a.html', 'p3b.html', 'p3c.html', 'p3e.html', '
 html = ''.join(read('src/' + p) for p in PARTS[:2]) + '<script>window.IR_RISE={{CFG}};</script>' + ''.join(read('src/' + p) for p in PARTS[2:])
 html = html.replace('<!--{{RISE_TOUR}} (erzeugt aus rise.json durch build.py)-->', tour_markup(RISE, lambda i, s, portrait: PORTRAIT_DATA[i] if portrait else STILL_DATA[i]))
 html = html.replace('/*{{TOUR_CORE}}*/', CORE)
+# Unternehmensangaben (GmbH in Gründung bzw. eingetragen) überall aus rise.json → firm.company
+FIRM = firm_markup(RISE)
+CO = RISE['firm']['company']
+LIVE_OK = CO['goLiveApproved'] and CO['status'] == 'eingetragen'
+# Bis zur Freigabe: Suchmaschinen ausschliessen (ersetzt keinen Zugriffsschutz – siehe docs/VEROEFFENTLICHUNG.md)
+ROBOTS = '' if LIVE_OK else '<meta name="robots" content="noindex,nofollow,noarchive">'
+
+
+def firm(h):
+    h = h.replace('<!--{{FIRM_IMPRINT}} (Unternehmensangaben aus rise.json → firm.company, erzeugt durch build.py)-->', FIRM['imprint'])
+    h = h.replace('<!--{{FIRM_PRIVACY}}-->', FIRM['privacy']).replace('<!--{{FIRM_ADDRESS_NOTE}}-->', FIRM['address_note'])
+    h = h.replace('<!--{{FIRM_FOOTER}}-->', FIRM['footer']).replace('{{FIRM_ROLE}}', RISE['firm']['role'])
+    return h
+
+
+html = firm(html)
 html = html.replace('{{LOGOO}}', b64('assets/logo_orig.png', 'image/png')).replace('{{FAV}}', b64('assets/fav.png', 'image/png'))
 html = html.replace('window.IR_RISE={{CFG}};', 'window.IR_RISE=' + CFG_JS + ';', 1)
 assert '{{' not in html, 'Platzhalter übrig: ' + html[html.index('{{'):html.index('{{') + 40]
 # Texturen und Lichtdaten ans Ende: Text, Standbild und Bedienung sind vorher vollständig geladen
 html += ASSET_JS
 write('dist/immoready-relaunch.html', html)
-write('dist/immoready-vorschau.html', '<!doctype html><html lang="de-CH"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body>' + html + '</body></html>')
+write('dist/immoready-vorschau.html', '<!doctype html><html lang="de-CH"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">' + ROBOTS + '</head><body>' + html + '</body></html>')
 print('Seite:', len(html), 'Zeichen')
 
 # ---------------- iFrame-Einbettung (Alternative) ----------------
@@ -148,7 +174,7 @@ def build_site():
     h = ''.join(read('src/' + p) for p in PARTS[:2]) + '<script>window.IR_RISE={{CFG}};</script>' + ''.join(read('src/' + p) for p in PARTS[2:])
     h = h.replace('<!--{{RISE_TOUR}} (erzeugt aus rise.json durch build.py)-->',
                   tour_markup(RISE, lambda i, s, portrait: 'assets/tour/' + os.path.basename(PORTRAIT_FILES[i] if portrait else STILL_FILES[i])))
-    h = h.replace('/*{{TOUR_CORE}}*/', CORE).replace('{{LOGOO}}', 'assets/logo_orig.png').replace('{{FAV}}', 'assets/fav.png')
+    h = firm(h.replace('/*{{TOUR_CORE}}*/', CORE)).replace('{{LOGOO}}', 'assets/logo_orig.png').replace('{{FAV}}', 'assets/fav.png')
     h = h.replace('window.IR_RISE={{CFG}};', 'window.IR_RISE=' + CFG_JS + ';', 1)
     i = h.index('var PH=')
     j = h.index('};', i)
@@ -173,7 +199,9 @@ def build_site():
     tex['laub'] = tex['laub'][0]
     body += '<script>window.IR_TEX=%s;window.IR_BAKE=%s;</script>' % (json.dumps(tex), json.dumps('assets/bake/licht.json' if BAKE else None))
     write(out + 'index.html', '<!doctype html><html lang="de-CH"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'
-          + head + '<link rel="stylesheet" href="site.css"></head><body>' + body + '</body></html>')
+          + ROBOTS + head + '<link rel="stylesheet" href="site.css"></head><body>' + body + '</body></html>')
+    if not LIVE_OK:
+        write(out + 'robots.txt', 'User-agent: *\nDisallow: /\n')
     for f in sorted(set(STILL_FILES + PORTRAIT_FILES)):
         shutil.copy(f, out + 'assets/tour/')
     for f in TEX_FILES:

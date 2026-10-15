@@ -1892,4 +1892,8 @@ body.hdr-compact .hdr{background:var(--ivory)}
 /* Smartphone quer / niedrige Bildschirme: Stationsbild höchstens 60 % der sichtbaren Höhe, damit Titel und Aktion
    im ersten Bildschirm beginnen (vh als Rückfall, svh wo unterstützt) */
 @media (max-height:540px) and (min-width:701px){.jr-static .jr-stage{max-height:60vh;max-height:60svh;aspect-ratio:auto;height:60vh;height:60svh}}
+/* Impressum-Entwurf GmbH (nur mit Prüfhinweisen): Angaben als Liste, auf dem Handy untereinander */
+.co-list{margin:16px 0;display:grid;gap:0}.co-list>div{display:grid;grid-template-columns:minmax(0,14em) minmax(0,1fr);gap:4px 16px;padding:10px 0;border-top:1px solid var(--line)}
+.co-list dt{font-weight:600}.co-list dd{margin:0}
+@media (max-width:560px){.co-list>div{grid-template-columns:minmax(0,1fr)}}
 </style>

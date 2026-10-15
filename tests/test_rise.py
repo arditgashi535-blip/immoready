@@ -4,7 +4,7 @@ import copy, json, os, re, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-from tools.rise import validate, tour_config  # noqa: E402
+from tools.rise import validate, tour_config, launch_check, firm_markup  # noqa: E402
 
 base = json.load(open(os.path.join(ROOT, 'rise.json'), encoding='utf-8'))
 results = []
@@ -36,6 +36,25 @@ check('Schluss ohne allgemeine Offerte → Fehler', lambda d: d['tour']['station
 check('Scan-Kante länger als 1400 ms → Fehler', lambda d: d['tour']['introScan'].__setitem__('durationMs', 2000), True)
 check('Tür ohne Winkel und ohne Schiebeweg → Fehler', lambda d: d['tour']['doors'][2].pop('slideM'), True)
 check('Ereignis request-contact fehlt → Fehler', lambda d: d['events'].pop('request-contact'), True)
+
+# GmbH in Gründung: nichts als bestehend darstellen, nichts erfinden, Veröffentlichung gesperrt
+co = lambda d: d['firm']['company']
+check('GmbH in Gründung mit Livegang-Freigabe → Fehler', lambda d: co(d).__setitem__('goLiveApproved', True), True)
+check('«eingetragen» ohne bestätigte Gründung → Fehler', lambda d: co(d).__setitem__('status', 'eingetragen'), True)
+check('«eingetragen» mit offenen Registerangaben → Fehler', lambda d: (co(d).__setitem__('status', 'eingetragen'), co(d).__setitem__('foundingConfirmed', True)), True)
+check('Firmenname ohne «GmbH» → Fehler', lambda d: co(d).__setitem__('registeredName', 'ImmoReady'), True)
+check('UID im falschen Format → Fehler', lambda d: co(d).__setitem__('uid', 'CHE-12345'), True)
+check('«GmbH» in öffentlichem Rundgangtext während der Gründung → Fehler', lambda d: d['tour']['stations'][0].__setitem__('text', 'ImmoReady GmbH betreut Ihre Liegenschaft.'), True)
+lc = launch_check(base)
+results.append(('PASS ' if lc and any('Gründung' in x for x in lc) and any('Livegang' in x for x in lc) else 'FAIL ') + 'Startsperre: --launch meldet %d offene Punkte (Gründung, Registerangaben, Freigabe)' % len(lc))
+fx = json.loads(json.dumps(base))  # reine Testdaten, erscheinen nirgends auf der Seite
+fx['firm']['company'].update(status='eingetragen', foundingConfirmed=True, goLiveApproved=True, registeredName='Testfirma Muster GmbH', seat='Testort',
+                             address='Teststrasse 1, 9999 Testort', uid='CHE-000.000.000', commercialRegister='Testregister', representation='Test Person, Geschäftsführung', vat='Test-MWST')
+fx['firm']['role'] = 'Testfunktion'
+fm = firm_markup(fx)
+results.append(('PASS ' if not validate(fx) and 'Testfirma Muster GmbH' in fm['imprint'] and 'CHE-000.000.000' in fm['imprint'] and 'missing' not in fm['imprint'] and 'review-only' not in fm['imprint'] and fm['footer'] == 'Testfirma Muster GmbH' else 'FAIL ') + 'nach Eintragung: Impressum, Datenschutz und Footer vollständig aus firm.company (Testdaten)')
+fb = firm_markup(base)
+results.append(('PASS ' if 'GmbH' not in fb['imprint'].split('review-only')[0] and 'GmbH' not in fb['privacy'] and 'GmbH' not in fb['footer'] and 'data-company="in_gruendung"' in fb['imprint'] else 'FAIL ') + 'in Gründung: öffentlicher Teil ohne «GmbH», Entwurf nur als interner Prüfhinweis')
 
 # Gebaute Seite enthält genau die Konfiguration aus rise.json
 page = open(os.path.join(ROOT, 'dist/immoready-vorschau.html'), encoding='utf-8').read()

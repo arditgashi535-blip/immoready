@@ -45,12 +45,15 @@ Browseremulation für Smartphone/Tablet. **Kein echtes Smartphone, kein Safari, 
 | Formular – Übermittlung | Erfolg erst nach bestätigter Annahme (200, ok, ID); Lade-, Netzwerk-, Upload-, Server- und Prüffehler; Doppelklick gesperrt | t21 gegen **simulierten** Endpunkt | ✓ (simuliert) | **nicht angeschlossen**: Wix-Sammlung, Backend, Automation und Veröffentlichung fehlen → Demo-Modus aktiv |
 | Formular – Backend | serverseitige Prüfung, CORS nur immoready.ch, Speichern, Upload-Adresse | t21 mit Platzhalter-Modulen | ✓ (Logik) | in Wix nicht ausgeführt |
 | Produktionsform | `dist/site/` über HTTP ohne fehlgeschlagene Anfragen und Konsolenfehler (Desktop 3D, Mobil) | t19, t21 | ✓ | Hosting-Adresse offen |
+| Unternehmensangaben | Impressum, Datenschutz, Kontakt, Footer aus `rise.json → firm.company`; öffentlich keine «GmbH»; Entwurf nur mit Prüfhinweisen; nichts erfunden | test_rise (8 Regeln), t23 | ✓ | Registerangaben nach Eintragung |
+| Zugriff / Indexierung | Vorschau privat (Artefakt), `noindex,nofollow,noarchive`, `robots.txt` sperrt; Release-Build und `--launch` verweigern bis zur Freigabe | t23 | ✓ | Zugriffsschutz bei einem allfälligen Testhosting (Passwort) |
 | Sichtprüfung Szene | Fassade, Garten, Eingang, Treppe, Lift, Wohnung, Küche, Bad, WC, Waschtisch, Armatur, Spiegel | 20 Szenenbilder, selbst geprüft | ✓ | – |
 | Sichtprüfung Seite | Startseite mobil, Menü, alle 6 Stationen, Leistungen, Sanitär, Formular leer/Fehler, Footer + Kontaktleiste, 320, quer, Tablet, Desktop; ganze Seiten | 13 + 18 Sichtbereiche, 6 ganze Seiten, selbst geprüft | ✓ | – |
 
 ## Verbleibende externe Blocker (nur diese)
 
+0. **GmbH-Eintragung bestätigen** und Registerangaben liefern (Firmenname, Sitz, Adresse, UID, Handelsregister, Vertretung, MWST, Funktion) – danach ausdrückliche Livegang-Freigabe.
 1. **Freigabe** für Änderungen an der Wix-Site: Sammlung `Offertanfragen`, `http-functions.js`, Automation, Veröffentlichung.
 2. **Hosting** der Komponente/Bilder (`rise.json → wix.elementHosting/assetsHosting`) und Pfad der Kontaktseite (`pages.contactPath`).
 3. **Echte Geräte**: iPhone (Safari), Android (Chrome), Safari macOS.
-4. **Impressum**: Adresse, Rechtsform, UID (`rise.json → legal`).
+4. **Impressum/Datenschutz**: endgültige Texte nach der Eintragung fachlich prüfen lassen (`rise.json → legal`).

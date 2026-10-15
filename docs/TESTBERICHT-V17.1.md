@@ -19,6 +19,22 @@ laufendes Bild der Software-GPU, ≈0,7–0,8 s je Bild, fiel in das 1-s-Messfen
 37/37 bestanden. Im vorherigen Gesamtlauf am fast identischen Stand bestand die Prüfung ebenfalls. Kein Code-Fehler
 gefunden; auf echter GPU ist ein Bild um Grössenordnungen kürzer.
 
+## GmbH in Gründung und Veröffentlichungssperre (15. Oktober 2026)
+
+**Gesamtlauf am finalen Build, ohne Wiederholung:** `sh tests/alle.sh` → **465 bestanden, 0 fehlgeschlagen**
+(RISE 30 inkl. 9 neuer Regeln, t22 22, **t23 14 neu**, übrige wie unten).
+
+- Unternehmensangaben nur noch in `rise.json → firm.company` (Status «in_gruendung», alle Registerangaben `[UNSPECIFIED]`);
+  Impressum, Datenschutz, Kontakt, Footer und die Bezeichnung «Inhaber» werden daraus erzeugt.
+- Öffentliche Ansicht: auf keiner der 16 Seiten «GmbH» (390 und 1280 px geprüft); Impressum nennt Marke und Ansprechperson,
+  keine Rechtsform. Der GmbH-Entwurf erscheint nur mit «Prüfhinweise anzeigen», mit 7 offenen Angaben, ohne erfundene Werte.
+- Regeln: Livegang-Freigabe während der Gründung, «eingetragen» ohne Bestätigung oder mit offenen Angaben, Firmenname ohne
+  «GmbH», falsches UID-Format und «GmbH» in öffentlichen Rundgangtexten werden als Fehler erkannt.
+- `python3 tools/rise.py --launch` und `python3 build.py --release` verweigern mit 14 offenen Punkten.
+- Vorschau und `dist/site/` mit `noindex,nofollow,noarchive`, `dist/site/robots.txt` sperrt alles (kein Zugriffsschutz –
+  die Vorschau liegt privat im Claude-Artefakt; siehe `docs/VEROEFFENTLICHUNG.md`).
+- Bildnachweis jetzt ausformuliert (Canva-Symbolbilder, eigene 3D-Visualisierung); Canva-Lizenzprüfung bleibt offen.
+
 ## Handy-Durchgang (Fertigstellung, 15. Oktober 2026)
 
 **Gesamtlauf am finalen Build, ohne Wiederholung:** `sh tests/alle.sh` → **442 bestanden, 0 fehlgeschlagen** (npm test

@@ -147,7 +147,7 @@
       <aside class="vcard reveal" aria-label="Kontakt Ardit Gashi">
         <span class="mono muted">Ihr Ansprechpartner</span>
         <b class="vn">Ardit Gashi</b>
-        <span class="muted">Inhaber ImmoReady · Zürich &amp; Aargau</span>
+        <span class="muted">{{FIRM_ROLE}} ImmoReady · Zürich &amp; Aargau</span>
         <ul class="vq"><li><i data-icon="check"></i>Fachmann Betriebsunterhalt EFZ</li><li><i data-icon="check"></i>Facility Services Specialist WSF</li></ul>
         <div class="vc"><a href="tel:+41763404401"><i data-icon="phone"></i>076 340 44 01</a><a href="mailto:info.immoready@gmail.com"><i data-icon="mail"></i>info.immoready<wbr>@gmail.com</a></div>
         <p class="review-only vnote">Platz für ein echtes Porträt – wird erst mit Foto ergänzt.</p>
@@ -341,13 +341,13 @@
       <aside class="vcard" aria-label="Kontakt Ardit Gashi">
         <span class="mono muted">Ihr Ansprechpartner</span>
         <b class="vn">Ardit Gashi</b>
-        <span class="muted">Inhaber ImmoReady · Zürich &amp; Aargau</span>
+        <span class="muted">{{FIRM_ROLE}} ImmoReady · Zürich &amp; Aargau</span>
         <ul class="vq"><li><i data-icon="check"></i>Fachmann Betriebsunterhalt EFZ</li><li><i data-icon="check"></i>Facility Services Specialist WSF</li></ul>
         <div class="vc"><a href="tel:+41763404401"><i data-icon="phone"></i>076 340 44 01</a><a href="mailto:info.immoready@gmail.com"><i data-icon="mail"></i>info.immoready<wbr>@gmail.com</a></div>
         <p class="review-only vnote">Platz für ein echtes Porträt – wird erst mit Foto ergänzt.</p>
       </aside>
       <div>
-        <p class="mono eyebrow">Ardit Gashi · Inhaber</p>
+        <p class="mono eyebrow">Ardit Gashi · {{FIRM_ROLE}}</p>
         <h2 class="h2" style="font-size:clamp(1.8rem,3.4vw,2.8rem)">Wer Liegenschaften betreut, muss Technik, Menschen und Abläufe verstehen.</h2>
         <div class="prose" style="margin-top:24px">
           <p>Ardit Gashi hat seine Grundbildung als Fachmann Betriebsunterhalt EFZ abgeschlossen und sich zum Facility Services Specialist WSF weitergebildet.</p>
@@ -426,7 +426,7 @@
         <div class="prose k-l">
           <p class="mono eyebrow">Einsatzgebiet</p>
           <p>Kantone Zürich und Aargau.</p>
-          <p class="review-only" style="margin-top:16px"><span class="missing">Firmenadresse: nach Bestätigung ergänzen</span></p>
+          <!--{{FIRM_ADDRESS_NOTE}}-->
         </div>
         <div class="prose k-r">
           <p class="mono eyebrow">Termin vereinbaren</p>
@@ -444,15 +444,12 @@
     <p class="crumbs mono" style="color:var(--stone)"><a href="#start">Start</a><span>/</span><span>Impressum</span></p>
     <h1 class="h2" style="margin:12px 0 10px">Impressum</h1>
     <p class="review-only placeholder-box" style="margin:18px 0">Entwurf. Gelb markierte Angaben fehlen und müssen vor der Veröffentlichung bestätigt werden. Keine rechtliche Prüfung – bitte bei Bedarf fachlich prüfen lassen.</p>
-    <h2>Verantwortlich für den Inhalt</h2>
-    <p>ImmoReady<br>Inhaber: Ardit Gashi<br><span class="missing">Strasse, Nr.</span><br><span class="missing">PLZ Ort</span><br>Schweiz</p>
-    <p>Telefon: <a href="tel:+41763404401">+41 76 340 44 01</a><br>E-Mail: <a href="mailto:info.immoready@gmail.com">info.immoready<wbr>@gmail.com</a></p>
-    <h2>Unternehmensangaben</h2>
-    <p>Rechtsform: <span class="missing">z. B. Einzelunternehmen oder GmbH – bestätigen</span><br>Handelsregister: <span class="missing">falls eingetragen</span><br>UID: <span class="missing">CHE-…, falls vorhanden</span><br>MWST-Nr.: <span class="missing">falls mehrwertsteuerpflichtig</span></p>
+    <!--{{FIRM_IMPRINT}} (Unternehmensangaben aus rise.json → firm.company, erzeugt durch build.py)-->
     <h2>Haftung für Inhalte und Links</h2>
     <p>Die Inhalte dieser Website werden mit Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität übernehmen wir keine Gewähr. Für Inhalte externer Websites, auf die wir verlinken, sind die jeweiligen Betreiber verantwortlich.</p>
     <h2>Bildnachweis</h2>
-    <p><span class="missing">Nach Einsetzen der echten Fotos ergänzen</span></p>
+    <p>Logo: ImmoReady. Symbolbilder: mit Canva erstellt (KI-generiert) – sie zeigen keine realen Objekte, Kundenliegenschaften oder Mitarbeitenden. 3D-Rundgang: illustrative Visualisierung, eigene Erstellung, kein Referenzobjekt.</p>
+    <p class="review-only placeholder-box" style="margin-top:16px">Offen: Nutzungsbedingungen der Canva-Bilder prüfen (rise.json → legal.canvaImageLicense). Werden echte Fotos eingesetzt, hier die Urheber nennen.</p>
   </div></section>
 </div>
 
@@ -464,7 +461,7 @@
     <p class="review-only placeholder-box" style="margin:18px 0">Entwurf auf Basis der geplanten Funktionen (Wix-Hosting, Anfrageformular mit Foto-Upload, Terminbuchung, E-Mail-Benachrichtigungen, Weiterleitung an eine Automatisierung). Vor Veröffentlichung mit den tatsächlich aktivierten Funktionen abgleichen und fachlich prüfen lassen. Die heutige Datenschutzseite ist eine nicht veröffentlichungsfähige Wix-Vorlage.</p>
     <p class="muted">Stand: <span class="missing">Datum bei Veröffentlichung</span></p>
     <h2>1. Verantwortliche Stelle</h2>
-    <p>ImmoReady, Ardit Gashi, <span class="missing">Adresse</span>, Schweiz · <a href="mailto:info.immoready@gmail.com">info.immoready<wbr>@gmail.com</a> · +41 76 340 44 01</p>
+    <!--{{FIRM_PRIVACY}}-->
     <h2>2. Welche Daten wir bearbeiten</h2>
     <ul>
       <li><b>Anfragen über das Formular:</b> Name, Firma (freiwillig), E-Mail, Telefonnummer (freiwillig), bevorzugter Kontaktweg, Angaben zum Objekt (Postleitzahl, Ort, Beschreibung, Objektart und weitere freiwillige Angaben) sowie hochgeladene Fotos.</li>
@@ -507,7 +504,7 @@
       <div><h4>Rechtliches</h4><ul><li><a href="#impressum">Impressum</a></li><li><a href="#datenschutz">Datenschutz</a></li></ul>
         <p class="review-only" style="margin-top:16px;font-size:.82rem;color:var(--stone-d)">Social-Media-Links erst mit echten Profiladressen einblenden.</p></div>
     </div>
-    <div class="base"><span>© <span id="yr">2026</span> ImmoReady · Ardit Gashi</span><span>Zürich · Aargau</span></div>
+    <div class="base"><span>© <span id="yr">2026</span> <!--{{FIRM_FOOTER}}--></span><span>Zürich · Aargau</span></div>
   </div>
 </footer>
 

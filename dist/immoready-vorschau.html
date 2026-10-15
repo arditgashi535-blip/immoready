@@ -1,4 +1,4 @@
-<!doctype html><html lang="de-CH"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body><title>ImmoReady Relaunch</title>
+<!doctype html><html lang="de-CH"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow,noarchive"></head><body><title>ImmoReady Relaunch</title>
 <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAEYElEQVR4nNVay27jRhCsaj4AHwIsko2BzSkBgnxS9kf9JfmABXIJEmCDHIK1NhbVlcOQQ1qiJJI9luGyYMumZtw9Xf2YnmH3dYdlIMiFH10DnU4qCFo4vC4hgkvqtZNA44toOo/tClDm7Mzav37/7cs/f1R1A6Hr9t99+OXdh58Ph52hOhqSF5uaznM889LFBxC2gADu/9t9ffy3Tgocuq57At6CBQD0gpL9CyArSNCqRQyhhA8gyw/yQCa9ZoyQ2TJ13PGPU7UXm9BWinoNFKgbMqiEBS5Imxb1alBSgHIhBTgbxS9CM+Ly6OeqMLRGAUITyjpBwAkQTPHodMTztRdhZqirXkQS0uHpaYgF0w/fJpEJgDimsCvmIPnl8fHvz5/TEElN03x/fx9xmTJRaAkkWdP++enTw8ND27YA9vv9+/fvf/34MTLtagUy6c3hRHU4F/SVuU5Skob80LZt0zTpUdM0c+F2hRuUDqPX0GsyvInEn4RwKZFWN7mgMJGJl6MnB2BBnL2A7QqIEInegRNDMJalExLoeWJOcksqUrTGFFj+6eei5rWPI16NZuIMLpu/XRhWrtrb7sSCCKZstHxUwbVPiFBI5hRI6DQTzxOMNBv3a0U0KRxGBfhFemTyuLu7x7l06zwAwN0LzrZdAZM5RbhQgbSB3WaG812FnL9KeUJxC9xwLwOgSBidYpWD5pp0+ZBTbLeA000UaerMRYf1NY7jPIcG/lh6xS0WoVAWUWkbvFIWSjAzWkiHeDGXhFnVDsToxOFibrsFiD4lERXS8qdibpElEtO0sg03gwiFMoO3TZKlD1EoUAuV2I7Eg26RPHC7RuIpAgrQAUoUHJhuZa4gBVKJAwlD+ke7Ekcik1cEOiJe2unnPegGAV6hmCuLcF9IEHEglBrU1+gw3dDkvsTQGdvCpXIWuOGx0hRhBTg2SNZq8Mp9IYqiWwopJ2caPBPij/pZ5/rvyxWLlBKpUa2bnmecIO4DHJujk1VbWNlN9/jbEGyrDG9Pnt0MAQWYvsa2yvAA0FkD8Dk2//eMYmG0b4guLiiej9uON5+JAwrIAAecrJBL+5SN7VwU7UHm0Bntr7yEBVYIFHeDoAIzV3CGfebl3NRvhc2iKxgcP438Giu1uRrh3GIHq4mX6cy9iTwAAGAuZmjGocWCizF+2PSM2SBS1UVqIQEkXIDDAYESK6ECDwsm0Cu3VUwSjHDRTLWhNlW1YALo5yq8wU3SQYKPBtwajkrcViHd5PThmKaCamA/++EjqmhxJ+wcYrdVSB26+x9++vb+RzDdJmDTfKPDweZvf5RH6JgVcMHqu3cNLbNZcsnPSZ/IkvrSpADKPdIhLUAhyaWp1149oDdgUDiciUvdVlknx7DiBYrqFQosvD+2BONBTnjCN19Or7BAgbUfM24fo/x1w+gGmFnbtnVdAyDQtk1wQq64vV6C/V3X7Xa7PFVVVXd3d/nphoro1gqksm/8XTo9uF+lxv8GYxfj2HeQTwAAAABJRU5ErkJggg==">
 <meta name="description" content="Hauswartung, Sanitär, Gartenunterhalt, Reinigung, Räumung und Vermarktung für Liegenschaften in Zürich und Aargau.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1892,6 +1892,10 @@ body.hdr-compact .hdr{background:var(--ivory)}
 /* Smartphone quer / niedrige Bildschirme: Stationsbild höchstens 60 % der sichtbaren Höhe, damit Titel und Aktion
    im ersten Bildschirm beginnen (vh als Rückfall, svh wo unterstützt) */
 @media (max-height:540px) and (min-width:701px){.jr-static .jr-stage{max-height:60vh;max-height:60svh;aspect-ratio:auto;height:60vh;height:60svh}}
+/* Impressum-Entwurf GmbH (nur mit Prüfhinweisen): Angaben als Liste, auf dem Handy untereinander */
+.co-list{margin:16px 0;display:grid;gap:0}.co-list>div{display:grid;grid-template-columns:minmax(0,14em) minmax(0,1fr);gap:4px 16px;padding:10px 0;border-top:1px solid var(--line)}
+.co-list dt{font-weight:600}.co-list dd{margin:0}
+@media (max-width:560px){.co-list>div{grid-template-columns:minmax(0,1fr)}}
 </style>
 
 <a class="skip" href="#main">Zum Inhalt springen</a>
@@ -2361,7 +2365,7 @@ body.hdr-compact .hdr{background:var(--ivory)}
         <div class="prose k-l">
           <p class="mono eyebrow">Einsatzgebiet</p>
           <p>Kantone Zürich und Aargau.</p>
-          <p class="review-only" style="margin-top:16px"><span class="missing">Firmenadresse: nach Bestätigung ergänzen</span></p>
+          <p class="review-only" style="margin-top:16px"><span class="missing">Geschäftsadresse: nach Bestätigung ergänzen</span></p>
         </div>
         <div class="prose k-r">
           <p class="mono eyebrow">Termin vereinbaren</p>
@@ -2379,15 +2383,12 @@ body.hdr-compact .hdr{background:var(--ivory)}
     <p class="crumbs mono" style="color:var(--stone)"><a href="#start">Start</a><span>/</span><span>Impressum</span></p>
     <h1 class="h2" style="margin:12px 0 10px">Impressum</h1>
     <p class="review-only placeholder-box" style="margin:18px 0">Entwurf. Gelb markierte Angaben fehlen und müssen vor der Veröffentlichung bestätigt werden. Keine rechtliche Prüfung – bitte bei Bedarf fachlich prüfen lassen.</p>
-    <h2>Verantwortlich für den Inhalt</h2>
-    <p>ImmoReady<br>Inhaber: Ardit Gashi<br><span class="missing">Strasse, Nr.</span><br><span class="missing">PLZ Ort</span><br>Schweiz</p>
-    <p>Telefon: <a href="tel:+41763404401">+41 76 340 44 01</a><br>E-Mail: <a href="mailto:info.immoready@gmail.com">info.immoready<wbr>@gmail.com</a></p>
-    <h2>Unternehmensangaben</h2>
-    <p>Rechtsform: <span class="missing">z. B. Einzelunternehmen oder GmbH – bestätigen</span><br>Handelsregister: <span class="missing">falls eingetragen</span><br>UID: <span class="missing">CHE-…, falls vorhanden</span><br>MWST-Nr.: <span class="missing">falls mehrwertsteuerpflichtig</span></p>
+    <h2>Verantwortlich für den Inhalt</h2><p>ImmoReady<br>Inhaber: Ardit Gashi<br><span class="missing">Geschäftsadresse – offen</span><br>Schweiz</p><p>Telefon: <a href="tel:+41763404401">+41 76 340 44 01</a><br>E-Mail: <a href="mailto:info.immoready@gmail.com">info.immoready<wbr>@gmail.com</a></p><h2>Unternehmensangaben</h2><p><span class="missing">Unternehmensangaben werden vor der Veröffentlichung ergänzt</span></p><div class="review-only placeholder-box co-draft" data-company="in_gruendung" style="margin:24px 0"><p><b>Intern · Entwurf für den späteren Auftritt als GmbH – nicht öffentlich</b></p><p>Status: GmbH in Gründung. Die Website nennt öffentlich noch keine Rechtsform. Vor der Veröffentlichung müssen die folgenden Angaben bestätigt und in <code>rise.json → firm.company</code> eingetragen sein; Impressum, Datenschutz, Kontakt und Footer übernehmen sie automatisch.</p><dl class="co-list"><div><dt>Rechtsform (geplant)</dt><dd>Gesellschaft mit beschränkter Haftung (GmbH)</dd></div><div><dt>Eingetragener Firmenname</dt><dd><span class="missing">offen</span></dd></div><div><dt>Sitz</dt><dd><span class="missing">offen</span></dd></div><div><dt>Geschäftsadresse</dt><dd><span class="missing">offen</span></dd></div><div><dt>UID (CHE-…)</dt><dd><span class="missing">offen</span></dd></div><div><dt>Handelsregister (Kanton, Eintrag)</dt><dd><span class="missing">offen</span></dd></div><div><dt>Zeichnungsberechtigte Person(en) und Funktion</dt><dd><span class="missing">offen</span></dd></div><div><dt>MWST-Nummer oder «nicht MWST-pflichtig»</dt><dd><span class="missing">offen</span></dd></div></dl><p class="muted">Prüfung vor dem Livegang: <code>python3 tools/rise.py --launch</code></p></div>
     <h2>Haftung für Inhalte und Links</h2>
     <p>Die Inhalte dieser Website werden mit Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität übernehmen wir keine Gewähr. Für Inhalte externer Websites, auf die wir verlinken, sind die jeweiligen Betreiber verantwortlich.</p>
     <h2>Bildnachweis</h2>
-    <p><span class="missing">Nach Einsetzen der echten Fotos ergänzen</span></p>
+    <p>Logo: ImmoReady. Symbolbilder: mit Canva erstellt (KI-generiert) – sie zeigen keine realen Objekte, Kundenliegenschaften oder Mitarbeitenden. 3D-Rundgang: illustrative Visualisierung, eigene Erstellung, kein Referenzobjekt.</p>
+    <p class="review-only placeholder-box" style="margin-top:16px">Offen: Nutzungsbedingungen der Canva-Bilder prüfen (rise.json → legal.canvaImageLicense). Werden echte Fotos eingesetzt, hier die Urheber nennen.</p>
   </div></section>
 </div>
 
@@ -2399,7 +2400,7 @@ body.hdr-compact .hdr{background:var(--ivory)}
     <p class="review-only placeholder-box" style="margin:18px 0">Entwurf auf Basis der geplanten Funktionen (Wix-Hosting, Anfrageformular mit Foto-Upload, Terminbuchung, E-Mail-Benachrichtigungen, Weiterleitung an eine Automatisierung). Vor Veröffentlichung mit den tatsächlich aktivierten Funktionen abgleichen und fachlich prüfen lassen. Die heutige Datenschutzseite ist eine nicht veröffentlichungsfähige Wix-Vorlage.</p>
     <p class="muted">Stand: <span class="missing">Datum bei Veröffentlichung</span></p>
     <h2>1. Verantwortliche Stelle</h2>
-    <p>ImmoReady, Ardit Gashi, <span class="missing">Adresse</span>, Schweiz · <a href="mailto:info.immoready@gmail.com">info.immoready<wbr>@gmail.com</a> · +41 76 340 44 01</p>
+    <p>ImmoReady, Ardit Gashi, <span class="missing">Geschäftsadresse – offen</span>, Schweiz · <a href="mailto:info.immoready@gmail.com">info.immoready<wbr>@gmail.com</a> · +41 76 340 44 01</p>
     <h2>2. Welche Daten wir bearbeiten</h2>
     <ul>
       <li><b>Anfragen über das Formular:</b> Name, Firma (freiwillig), E-Mail, Telefonnummer (freiwillig), bevorzugter Kontaktweg, Angaben zum Objekt (Postleitzahl, Ort, Beschreibung, Objektart und weitere freiwillige Angaben) sowie hochgeladene Fotos.</li>
@@ -5275,7 +5276,7 @@ h+=tbl(['Thema','Befund','Empfehlung'],[
  ['Screenshots Website','Ausser dem Logo noch nicht gesehen (Desktop/Mobil-Ansicht, Schriften, Navigation). Der Wix-Bildserver ist aus meiner Umgebung gesperrt.','Bitte Screenshots senden; danach Schriften, Bildsprache und Seitenaufbau abgleichen.'],
  ['Inhalte','Startseite «Willkommen bei ImmoReady», Claim «Aufbereiten. Vermarkten. Erfolgreich vermitteln.», Aussagen «keine versteckten Kosten, keine Vorauszahlung, volle Transparenz».','Neuer Claim «Ihre Immobilie. Bereit für mehr.». Die Aussagen zu Kosten/Vorauszahlung nur übernehmen, wenn sie verbindlich gelten.'],
  ['Buchungen (Wix Bookings)','8 kostenlose Termine: Beratungsgespräch, Offerte Aufbereitung, Hauswartung, Verkauf &amp; Vermittlung, Immobilienbewertung, Leerstand-Management, 360° Rundgang, Drohnenfotografie.','Alle Services und Buchungs-URLs bleiben erhalten und werden von den Leistungsseiten verlinkt.'],
- ['Kontakt','076 340 44 01, info.immoready@gmail.com. Keine Adresse, keine Rechtsform, keine UID.','Telefon als antippbarer Link +41763404401. Adresse/Rechtsform für Impressum bestätigen.'],
+ ['Kontakt','076 340 44 01, info.immoready@gmail.com. Keine Adresse, keine Rechtsform, keine UID.','Telefon als antippbarer Link +41763404401. GmbH in Gründung: Adresse und Registerangaben erst nach der Eintragung (rise.json → firm.company).'],
  ['Social Media','Footer verlinkt facebook.com/wix, instagram.com/wix, x.com/wix, tiktok.com/@wix – das sind die Standardprofile von Wix, nicht Ihre.','Sofort entfernen oder durch echte Profile ersetzen.'],
  ['Hero-Bild','Wix-Stockbild (11062b_…).','Durch echtes Foto einer gepflegten Liegenschaft ersetzen.'],
  ['Rechtliche Seiten','/blank (Datenschutz), /blank-1 (Barrierefreiheit), /blank-2 (AGB), /blank-3 (Rückerstattung) – Mustertexte.','Neue Seiten /datenschutz und /impressum; AGB und Rückerstattung erst mit echten Inhalten; alte URLs weiterleiten.'],
@@ -5344,7 +5345,7 @@ h+='<h2 id="u-fragen">8. Offene Punkte – was ich noch von Ihnen brauche</h2><o
 ['<b>Screenshots</b> der heutigen Website (Desktop und Smartphone), damit Schriften, Navigation und Seitenaufbau genau abgeglichen werden können.',
  '<b>Logo als Vektordatei</b> (SVG/PDF) für maximale Schärfe – und falls vorhanden eine waagrechte Logo-Variante für die Navigation.',
  '<b>Fotos:</b> echte Aufnahmen gepflegter Liegenschaften, Arbeitsbilder und ein Porträt. Die Vorschau enthält Illustrationen als Platzhalter.',
- '<b>Impressum:</b> Geschäftsadresse, Rechtsform (Einzelunternehmen oder GmbH), UID/Handelsregister, MWST-Nummer falls vorhanden.',
+ '<b>Unternehmensangaben (GmbH in Gründung):</b> eingetragener Firmenname, Sitz, Geschäftsadresse, UID, Handelsregister, zeichnungsberechtigte Person(en) und Funktion, MWST – erst nach bestätigter Eintragung in rise.json → firm.company eintragen; Prüfung: python3 tools/rise.py --launch.',
  '<b>Sanitär:</b> Welche der fünf markierten Arbeiten führen Sie bzw. Ihr Techniker selbst aus? Gibt es Einschränkungen (z. B. Arbeiten, die eine konzessionierte Fachfirma erfordern)?',
  '<b>Social Media:</b> Echte Profiladressen – oder sollen die Links ganz weg?',
  '<b>WhatsApp:</b> Darf 076 340 44 01 geschäftlich über WhatsApp genutzt werden?',

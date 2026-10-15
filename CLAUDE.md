@@ -18,7 +18,13 @@ Inhaber ausdrücklich freigibt.
 - **Sprache:** Schweizer Hochdeutsch, «ss» statt «ß», Sie-Anrede, kurze konkrete Texte.
 - **Nichts erfinden:** keine Bewertungen, Preise, Garantien, Fachbewilligungen, Notdienst- oder
   24/7-Versprechen, Referenzen, Kundenlogos, Teammitglieder oder Firmengeschichte. ImmoReady nicht automatisch
-  «GmbH» nennen. Bestätigte Qualifikationen: Fachmann Betriebsunterhalt EFZ, Facility Services Specialist WSF.
+  «GmbH» nennen.
+- **GmbH in Gründung:** Die Website wird für den späteren Auftritt als GmbH vorbereitet, darf die GmbH aber öffentlich nicht
+  als gegründet darstellen. Alle Unternehmensangaben nur in `rise.json → firm.company` (`status`, Firmenname, Sitz, Adresse,
+  UID, Handelsregister, Vertretung, MWST, `foundingConfirmed`, `goLiveApproved`); Impressum, Datenschutz, Kontakt und Footer
+  werden daraus erzeugt (`firm_markup`). Keine Adresse, UID, Registerdaten oder Rollen erfinden. Veröffentlichung erst nach
+  bestätigter Gründung und ausdrücklicher Freigabe: `python3 tools/rise.py --launch` / `build.py --release` sperren bis dahin.
+  Vorschau nur privat (Claude-Artefakt privat; `noindex` + `robots.txt` sind kein Zugriffsschutz). Details: `docs/VEROEFFENTLICHUNG.md`. Bestätigte Qualifikationen: Fachmann Betriebsunterhalt EFZ, Facility Services Specialist WSF.
 - **Kontakt:** 076 340 44 01 · info.immoready@gmail.com · Zürich und Aargau.
 - **Bilder:** KI-Bilder (Canva) und die 3D-Szene sind Illustrationen und werden als solche gekennzeichnet
   («Symbolbild»; Rundgang: «Illustrative Visualisierung · kein Referenzobjekt» aus `rise.json → tour.scene.label`).
@@ -279,7 +285,7 @@ Ausgaben in `dist/`:
 python3 tools/rise.py             # rise.json prüfen
 python3 build.py                  # baut dist/ (prüft rise.json zuerst)
 npm install && npx playwright install chromium
-npm test                          # Build, RISE, Velo (t15), t7 Seite, t9 Interaktionen, t11 Rundgang, t14 V13/V14, t16 V14, t17 V15, t18 V16, t19 V17, t20 V17.1, t21 Fertigstellung, t22 Handy
+npm test                          # Build, RISE, Velo (t15), t7 Seite, t9 Interaktionen, t11 Rundgang, t14 V13/V14, t16 V14, t17 V15, t18 V16, t19 V17, t20 V17.1, t21 Fertigstellung, t22 Handy, t23 GmbH/Startsperre
 npm run abnahme                   # 32 Abnahmebilder + Übersicht/Vergleich → docs/v171/
 npm run bake                      # Build → Licht vorab rechnen → Build (nach Geometrieänderungen Pflicht)
 npm run perf                      # Ladeleistung gedrosselt (Server: python3 -m http.server 8702)
@@ -307,7 +313,8 @@ node tests/bench-frames.js <html> …  # Bildzeiten (Testumgebung)
 
 - Formular an Wix Forms anbinden (Benachrichtigung an info.immoready@gmail.com; Bestätigung erst nach dem
   Speichern).
-- Impressumsangaben (Adresse, Rechtsform, UID) – in `rise.json` als `[UNSPECIFIED]` markiert.
+- GmbH-Angaben nach der Eintragung (Firmenname, Sitz, Adresse, UID, Handelsregister, Vertretung, MWST, Funktion von Ardit Gashi) –
+  `rise.json → firm.company`, offene Punkte: `npm run launch:check`.
 - Markenfarben vom Inhaber bestätigen lassen (`design_tokens.confirmed: false`); Logo als Vektordatei fehlt.
 - Sanitär-Leistungsumfang bestätigen lassen.
 - Echte Fotos und Porträt einsetzen; Nutzungsbedingungen der Canva-Bilder prüfen.

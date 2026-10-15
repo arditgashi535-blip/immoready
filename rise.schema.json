@@ -113,10 +113,7 @@
         "contactPerson",
         "qualifications",
         "area",
-        "legalName",
-        "legalForm",
-        "address",
-        "uid"
+        "company"
       ],
       "properties": {
         "brand": {
@@ -145,16 +142,24 @@
           },
           "uniqueItems": true
         },
-        "legalForm": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/unspecified"
-            },
-            {
-              "type": "string",
-              "minLength": 2
-            }
-          ]
+        "company": {
+          "type": "object",
+          "required": ["status", "plannedLegalForm", "registeredName", "seat", "address", "uid", "commercialRegister", "representation", "vat", "foundingConfirmed", "goLiveApproved"],
+          "additionalProperties": false,
+          "properties": {
+            "status": { "enum": ["in_gruendung", "eingetragen"] },
+            "statusNote": { "type": "string" },
+            "plannedLegalForm": { "const": "GmbH" },
+            "registeredName": { "type": "string", "minLength": 2 },
+            "seat": { "type": "string", "minLength": 2 },
+            "address": { "type": "string", "minLength": 2 },
+            "uid": { "anyOf": [ { "$ref": "#/$defs/unspecified" }, { "type": "string", "pattern": "^CHE-\\d{3}\\.\\d{3}\\.\\d{3}$" } ] },
+            "commercialRegister": { "type": "string", "minLength": 2 },
+            "representation": { "type": "string", "minLength": 2 },
+            "vat": { "type": "string", "minLength": 2 },
+            "foundingConfirmed": { "type": "boolean" },
+            "goLiveApproved": { "type": "boolean" }
+          }
         }
       }
     },
