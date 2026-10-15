@@ -558,8 +558,8 @@ function txt(id,type,attrs){return '<input type="'+(type||'text')+'" id="'+id+'"
 var OPT=' <small>(optional)</small>';
 function buildForm(){
   var h='<form id="qf" class="form" novalidate aria-labelledby="qfTitle"><h2 class="sr" id="qfTitle">Offertanfrage</h2>';
-  h+='<div class="demo-flag" role="note" style="margin-bottom:18px"><b>Vorschau – Formular nicht verbunden</b><span>Eingaben werden geprüft, aber nicht gesendet und nicht gespeichert.</span></div>';
-  h+='<div class="failbox" id="failbox" role="alert" hidden><b>Ihre Anfrage konnte nicht gesendet werden.</b><br>Ihre Eingaben sind erhalten. Bitte versuchen Sie es erneut oder rufen Sie uns an: 076 340 44 01.</div>';
+  if(!FORM_EP())h+='<div class="demo-flag" role="note" style="margin-bottom:18px"><b>Vorschau – Formular nicht verbunden</b><span>Eingaben werden geprüft, aber nicht gesendet und nicht gespeichert.</span></div>';
+  h+='<div class="failbox" id="failbox" role="alert" hidden><b>Ihre Anfrage konnte nicht gesendet werden.</b><br><span id="failWhy"></span>Ihre Eingaben sind erhalten. Bitte versuchen Sie es erneut oder rufen Sie uns an: 076 340 44 01.</div>';
   h+='<div class="errsum" id="errsum" tabindex="-1" hidden><b>Bitte prüfen Sie folgende Angaben:</b><ul></ul></div>';
   h+='<div class="fgroup"><h3><span>01</span>Ihr Anliegen</h3>';
   h+='<fieldset id="fs_leistung" aria-describedby="leistung_e" style="margin:0"><legend class="lbl" style="font-size:.95rem">Welche Leistung benötigen Sie?</legend>'+radios('leistung',LEIST)+'<span class="err" id="leistung_e" aria-live="polite"></span></fieldset>';
@@ -581,6 +581,24 @@ function buildForm(){
   var root=document.getElementById('formRoot');root.innerHTML=h;paintArrows(root);wireForm();
 }
 var files=[];
+/* V17.1: Übermittlung an die Velo-HTTP-Funktionen (wix/backend/http-functions.js). Endpunkt aus rise.json → wix.formEndpoint;
+   ohne Endpunkt bleibt der Demo-Modus. Erfolg erst nach bestätigter Annahme (HTTP 200 mit ok und Referenz). */
+function FORM_EP(){var c=window.IR_RISE||{};return typeof c.formEndpoint==='string'&&/^https:\/\//.test(c.formEndpoint)?c.formEndpoint.replace(/\/$/,''):'';}
+function xerr(code,msg){var e=new Error(msg||code);e.code=code;return e;}
+function fetchT(url,opt,ms){return new Promise(function(res,rej){var done=false,t=setTimeout(function(){if(!done){done=true;rej(xerr('timeout'));}},ms);
+  fetch(url,opt).then(function(r){if(!done){done=true;clearTimeout(t);res(r);}},function(){if(!done){done=true;clearTimeout(t);rej(xerr('network'));}});});}
+function payload(){return {version:1,quelle:'website',leistung:val('leistung'),auftrag:val('auftrag')||'',ort:val('ort'),beschreibung:val('beschreibung'),name:val('name'),email:val('email'),tel:val('tel')};}
+function sendQuote(ep){
+  /* 1. Fotos einzeln hochladen (Upload-Adresse vom Server, kein Schlüssel im Browser), 2. Anfrage übermitteln */
+  var refs=[],chain=Promise.resolve();
+  files.forEach(function(f){chain=chain.then(function(){
+    return fetchT(ep+'/offerteUpload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:f.name,mime:f.type||'image/jpeg',size:f.size})},15000)
+      .then(function(r){if(!r.ok)throw xerr('upload');return r.json();})
+      .then(function(u){if(!u||!u.uploadUrl)throw xerr('upload');return fetchT(u.uploadUrl+(u.uploadUrl.indexOf('?')<0?'?':'&')+'filename='+encodeURIComponent(f.name),{method:'PUT',headers:{'Content-Type':f.type||'image/jpeg'},body:f},60000).then(function(r){if(!r.ok)throw xerr('upload');return r.json().catch(function(){return {};});}).then(function(m){refs.push({name:f.name,ref:(m&&(m.fileUrl||(m.file&&m.file.url)))||u.fileRef||''});});})
+      .catch(function(e){throw e.code==='timeout'||e.code==='network'?e:xerr('upload');});});});
+  return chain.then(function(){var b=payload();b.fotos=refs;return fetchT(ep+'/offerte',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)},20000);})
+    .then(function(r){return r.json().catch(function(){return {};}).then(function(j){if(r.status===400&&j&&j.fields)throw Object.assign(xerr('invalid'),{fields:j.fields});if(!r.ok||!j||j.ok!==true||!j.id)throw xerr('server');return j;});});}
+var FAILTXT={network:'Keine Verbindung zum Server – bitte prüfen Sie Ihre Internetverbindung. ',timeout:'Der Server hat nicht rechtzeitig geantwortet. ',upload:'Ein Foto konnte nicht hochgeladen werden. Sie können es entfernen und ohne Foto senden. ',server:'Der Server hat die Anfrage nicht bestätigt. ',invalid:'Der Server hat Angaben beanstandet – bitte prüfen Sie die markierten Felder. '};
 function $(id){return document.getElementById(id);}
 function val(name){var f=$('qf');var el=f.elements[name];if(!el)return '';if(el instanceof RadioNodeList){var o='';Array.prototype.forEach.call(el,function(x){if(x.checked)o=x.value;});return o;}if(el.type==='checkbox')return el.checked;return (el.value||'').trim();}
 function setRadio(name,v){var el=$('qf')&&$('qf').querySelector('input[name="'+name+'"][value="'+v+'"]');if(el)el.checked=true;}
@@ -629,6 +647,12 @@ function wireForm(){var f=$('qf');
   f.addEventListener('submit',function(e){e.preventDefault();if(busy)return;$('failbox').hidden=true;
     if(!validate())return;
     if($('website').value)return;
+    var ep=FORM_EP();
+    if(ep){setBusy(true);sendQuote(ep).then(function(j){setBusy(false);var r=$('result');
+        r.innerHTML='<p class="ok">Vielen Dank für Ihre Anfrage.</p><p>Wir haben sie erhalten und melden uns bei Ihnen, um die nächsten Schritte zu besprechen.</p><p class="muted">Referenz: '+esc(String(j.id))+'</p><div style="display:flex;flex-wrap:wrap;gap:12px"><button type="button" class="btn inkb" id="newReq">Neue Anfrage</button></div>';
+        f.hidden=true;r.hidden=false;r.focus();$('newReq').onclick=function(){f.reset();files=[];renderFiles();r.hidden=true;f.hidden=false;};})
+      .catch(function(e){setBusy(false);var code=e&&e.code||'server';if(code==='invalid'&&e.fields){Object.keys(e.fields).forEach(function(k){setErr(k,String(e.fields[k]));});}
+        $('failWhy').textContent=FAILTXT[code]||FAILTXT.server;$('failbox').hidden=false;$('failbox').scrollIntoView({block:'center'});});return;}
     /* Demo: zeigt den Lade- und Fehlerzustand, wie er bei einer echten, fehlgeschlagenen Übermittlung erscheint */
     if($('simFail').checked){setBusy(true);setTimeout(function(){setBusy(false);$('failbox').hidden=false;$('failbox').scrollIntoView({block:'center'});},700);return;}
     var r=$('result');
@@ -2312,7 +2336,7 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
     function windOn(now) { return !!(TX.lb && extra && extra.fol.nm && !RMQ.matches && insideAmt(camNow(ps).e) < 0.5 && now - lastInput < WIND.idleMs); }
     function poke() { lastInput = win.performance.now(); if (running) request(); }
     function step(now) {
-      raf = 0; if (!running) return; var need = dirty, more = false; dirty = false; var d = p - ps; var raw = lastT ? now - lastT : 0, dt = lastT ? Math.min(100, raw) : 16; lastT = now;
+      raf = 0; if (!running) return; if (!show()) { lastT = 0; return; } /* V17.1: kein Bild mehr, wenn die Szene inzwischen unsichtbar ist */ var need = dirty, more = false; dirty = false; var d = p - ps; var raw = lastT ? now - lastT : 0, dt = lastT ? Math.min(100, raw) : 16; lastT = now;
       /* Texturen: das erste 3D-Bild höchstens 1,5 s auf die Materialtexturen warten lassen (bis dahin bleibt das Standbild) */
       if (!ready && TX.state === 'loading' && Date.now() - TX.t0 < 1500) { dirty = true; cont(); return; }
       /* zeitbasierte Glättung: unabhängig von der Bildrate, kein langes Hinterherlaufen */
@@ -2353,8 +2377,13 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
     /* request(): von aussen (Grösse, Kamera, Sichtbarkeit, Texturen …) → nächstes Bild sicher zeichnen.
        Die Fortsetzung innerhalb von step() (Glättung, Wind) plant ohne diese Markierung. */
     var dirty = true;
-    function request() { dirty = true; if (!raf && running) raf = win.requestAnimationFrame(step); }
-    function cont() { if (!raf && running) raf = win.requestAnimationFrame(step); }
+    /* V17.1: ausserhalb des Sichtbereichs bzw. bei verstecktem Tab wird nichts geplant – die Markierung bleibt und das
+       nächste Bild entsteht, sobald IntersectionObserver/visibilitychange die Szene wieder sichtbar melden */
+    /* zusätzlich synchron die Lage im Fenster prüfen: unabhängig davon, wann der IntersectionObserver meldet (bei langsamer
+       Grafik kann das mehrere Bilder dauern) */
+    function show() { if (!visible || doc.hidden) return false; var r = root.getBoundingClientRect(), vh = win.innerHeight || doc.documentElement.clientHeight; return r.bottom > 0 && r.top < vh && r.width > 0; }
+    function request() { dirty = true; if (!raf && running && show()) raf = win.requestAnimationFrame(step); }
+    function cont() { if (!raf && running && show()) raf = win.requestAnimationFrame(step); }
 
     /* ---------- HTML-Einblendungen und Ereignisse aus dem Fortschritt ---------- */
     function stationOf(q) { for (var i = 0; i < ST.length; i++) if (q < ST[i].b || i === ST.length - 1) return i; return 0; }
@@ -2418,8 +2447,8 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
       var weak = (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) || (navigator.deviceMemory && navigator.deviceMemory <= 4);
       dpr = Math.min(win.devicePixelRatio || 1, weak ? 1 : 1.5); resize(); running = true; ps = p; expoCur = -1; lastInput = win.performance.now();
       if (win.ResizeObserver) { ro = new win.ResizeObserver(function () { resize(); request(); }); ro.observe(stage); }
-      if (win.IntersectionObserver) { io = new win.IntersectionObserver(function (es) { visible = es[0].isIntersecting; if (visible) request(); }); io.observe(root); }
-      on(doc, 'visibilitychange', function () { if (!doc.hidden) request(); });
+      if (win.IntersectionObserver) { io = new win.IntersectionObserver(function (es) { visible = es[0].isIntersecting; if (visible) request(); else if (windTimer) { win.clearTimeout(windTimer); windTimer = 0; } }); io.observe(root); }
+      on(doc, 'visibilitychange', function () { if (!doc.hidden) request(); else if (windTimer) { win.clearTimeout(windTimer); windTimer = 0; } });
       on(canvas, 'webglcontextlost', function (e) { e.preventDefault(); if (!destroyed) fail('WEBGL_CONTEXT_LOST'); });
       /* Scan nur beim ersten Start auf der Gesamtansicht und ohne «Bewegung reduzieren» */
       if (scan.count === 0 && !RMQ.matches && p < ST[0].b) { scan.count = 1; scan.state = 'wait'; scan.start = win.performance.now() + SCAN_DELAY; sweep = -8; }
@@ -2512,7 +2541,7 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
     });
     /* Eingaben halten den Wind kurz am Leben (danach steht die Szene still) */
     ['pointermove', 'pointerdown', 'wheel', 'keydown', 'touchstart'].forEach(function (ev) { on(root, ev, function () { if (running && win.performance.now() - lastInput > 250) poke(); }, { passive: true }); });
-    if (reqMode === 'scroll') on(win, 'scroll', function () { if (!scrollTick) { scrollTick = true; win.requestAnimationFrame(function () { scrollTick = false; if (mode === 'live') setProgress(scrollProg()); }); } }, { passive: true });
+    if (reqMode === 'scroll') on(win, 'scroll', function () { /* V17.1: ausserhalb des Sichtbereichs ohne Bildanforderung (Fortschritt bleibt am Rand) */ if (!show()) { if (mode === 'live' && !scrollTick) setProgress(scrollProg()); return; } if (!scrollTick) { scrollTick = true; win.requestAnimationFrame(function () { scrollTick = false; if (mode === 'live') setProgress(scrollProg()); }); } }, { passive: true });
     function prefChange() { if (mode !== 'static' && (SMALL.matches || (RMQ.matches && reqMode === 'scroll'))) { stopGL(); setStatic(); } }
     onMQ(RMQ, prefChange); onMQ(SMALL, prefChange);
 
