@@ -19,6 +19,35 @@ laufendes Bild der Software-GPU, ≈0,7–0,8 s je Bild, fiel in das 1-s-Messfen
 37/37 bestanden. Im vorherigen Gesamtlauf am fast identischen Stand bestand die Prüfung ebenfalls. Kein Code-Fehler
 gefunden; auf echter GPU ist ein Bild um Grössenordnungen kürzer.
 
+## Handy-Durchgang (Fertigstellung, 15. Oktober 2026)
+
+**Gesamtlauf am finalen Build, ohne Wiederholung:** `sh tests/alle.sh` → **442 bestanden, 0 fehlgeschlagen** (npm test
+exit 0, t12 exit 0, t13 exit 0). Enthalten: RISE, t15, t7, t9, t11, t14, t16–t19 (318), t20 (43), t21 (21), **t22 Handy (22, neu)**,
+t12 (14), t13 (24). Kein Einzel-Retry nötig; t11 bestand im Gesamtlauf.
+
+| Befund (Handy) | Ursache | Korrektur | Prüfung |
+|---|---|---|---|
+| `body` hatte `overflow-x:hidden` – Überbreite wurde versteckt statt behoben | Altlast aus V8 | entfernt; alle Ursachen einzeln behoben (siehe unten) | t22 «keine pauschale Überlaufsperre»; eigene Messung 15 Grössen × 17 Seiten inkl. 200 %: 0 Fälle |
+| bei 200 % Text breiter als der Bildschirm: Leistungsumfang (`.scope`), Ablauf (`.steps`), Offertformular, Leistungskarten, Abschlusstitel | einspaltige Raster mit `1fr` (Mindestbreite = längstes Wort), Formularspuren nach Grundbreite der Eingabefelder, Flex-Titel, Schriftuntergrenze 3 rem | `minmax(0,1fr)`, `.f/.fgroup` ohne Mindestbreite, Titel als Raster, `min(3rem,13vw)` | Messung 200 % (320/360/390): 0 Fälle |
+| Lange Wörter mitten im Wort ohne Trennstrich («Leerstandsmanageme/nt», «Datenschutzerklä/rung», «Immobilienpräsen/tation») | `overflow-wrap:anywhere`; `hyphens:auto` in Chromium/Linux ohne Wörterbuch | weiche Trennstellen zur Laufzeit (Wörterbuch, nur sichtbarer Text), Überschriften `break-word` | t22: 4 Breiten × 16 Seiten ohne Wortbruch |
+| Leistungsübersicht 320–430 px: Beschreibung in 48-px-Spalte (706 px hoch), «..» am Satzende | dritte Zelle rutschte in die Nummernspalte; Punkt doppelt angehängt | einspaltig untereinander; Punkt nur einmal | t22 |
+| Kontaktseite bei 320 px dreispaltig, Einsatzgebiet/Termin zweispaltig | Inline-Spalten überschrieben die mobile Regel | Klassen mit Umbruch < 760 px | t22 |
+| Rundgang mobil: 250–350 px leere dunkle Fläche unter kurzen Stationen | alle Stationen im selben Rasterfeld, Höhe = längste Station | nur aktive Station belegt Platz | t22 (alle 6 Stationen ≤ 14 px) |
+| «Offerte anfragen» dreifach direkt untereinander (Station, Überspringen-Zeile, Kontaktleiste) | Pill in der Überspringen-Zeile | < 760 px ausgeblendet; «Tour überspringen» bleibt | t22 |
+| Station mit 32 px Seitenrand statt 16 px | doppelte Innenabstände | einheitlich 16 px | t22 |
+| Smartphone quer (844×390): 3D-Bühne klebt, Stationsleiste über Titel, Texte abgeschnitten | Bildmodus nur nach Breite (≤ 700 px) | auch bei Höhe ≤ 540 px Bildmodus mit normalem Scrollen, Bild ≤ 60 % Höhe | Sichtprüfung h16/h17, Textabschnitt-Messung |
+| Menü offen → Gerät gedreht/Fenster breit: Seite blieb gesperrt | Sperre nur beim Schliessen aufgehoben | Menü schliesst, wenn der Menüknopf verschwindet | t22 |
+| Anker konnten unter dem klebenden Kopf landen | kein Abstand | `scroll-margin` aus gemessener Kopfhöhe (nicht `scroll-padding`: das liess die Seite beim Fokus auf den Menüknopf springen – im Durchgang gefunden und korrigiert) | t22 (Anker, Skip-Link, Menü-Scrollposition) |
+| Stationsleiste: Weiterscrollen schwer erkennbar | harte Kante | weich ausblendende Ränder | Sichtprüfung |
+
+Neu geprüft (t22): Leistungs-Vorauswahl aus jeder Station – Gebäude/Offerte ohne Vorauswahl, Garten → Gartenunterhalt,
+Eingang → Hauswartung, Wohnung → Reinigung / Räumung / Leerstand (je nach Wahl), Bad → Sanitär.
+
+Bekannte Grenzen: E-Mail-Adresse darf bei 320 px an «@» umbrechen (`<wbr>`, kein Zeichen im kopierten Text). Ganzseiten-
+Aufnahmen zeigen die fixierte Kontaktleiste an der Stelle des ersten Bildschirms (Aufnahmeeffekt, nicht im Browser).
+Abnahmebilder: `docs/v171/handy-uebersicht.jpg` (18 Sichtbereiche), `docs/v171/handy-ganze-seiten.jpg`, Einzelbilder
+`docs/v171/handy/`; Seitenbilder 21–33 der Abnahme neu (`docs/v171/abnahme-33-bilder.jpg`).
+
 ## Während des Durchgangs gefundene und behobene Fehler
 
 | Befund | Ursache | Korrektur | Prüfung |
@@ -32,7 +61,7 @@ gefunden; auf echter GPU ist ein Bild um Grössenordnungen kürzer.
 | Wohnung: Holzkiste unter dem Esstisch | Sitzbank als Vollkörper | Bank mit Beinen und Zarge | Sichtprüfung 11 |
 | Kontaktleiste und kompakter Kopf durchscheinend (Text schimmerte durch) | 97 % bzw. 90 % Deckkraft | deckend | t20 alle 13 Breiten |
 | Touchziele 40–42 px («Betreuung anfragen», «Offerte anfragen» im Kopf, Stationsknöpfe Desktop, «Kopieren» 70×30) | Mindesthöhe fehlte | ≥ 44 px | t20 alle 13 Breiten × 17 Seiten |
-| 320 px bei 200 % Text: seitliches Scrollen (bis 428 px) | Segmentwahl, Überzeilen, Personenkarte, Formularfuss ohne Umbruch | schrumpfende Spalten, Umbruch | t20 «320 px bei 200 %» |
+| 320 px bei 200 % Text: seitliches Scrollen (bis 428 px) | Segmentwahl, Überzeilen, Personenkarte, Formularfuss ohne Umbruch | schrumpfende Spalten, Umbruch | t20 «320 px bei 200 %» – *Nachtrag: weitere Fälle waren durch `overflow-x:hidden` verdeckt, siehe Handy-Durchgang* |
 | Nach Formularfehler Fokus auf der Fehlerübersicht | Vorgabe verlangt erstes Fehlerfeld | Fokus auf erstes Fehlerfeld, Übersicht bleibt | t20 Formular 320/390 |
 | Skip-Link nicht erster Tabstopp; auf Unterseiten führte er zur Startseite | Router setzte beim Laden Fokus; `#main` lief durch den Router | Fokus erst bei Seitenwechsel; Klick abgefangen | t20 «Skip-Link (#kontakt)» |
 | Stationsbild-Werkzeug brach bei langsamer Grafik ab | Element-Screenshot wartete auf «stabil» | Bildausschnitt statt Element | `npm run render:stills` |

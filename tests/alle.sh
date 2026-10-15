@@ -1,5 +1,5 @@
 #!/bin/sh
-# Zusammenhängender Gesamtlauf: npm test (Build, RISE, t15, t7, t9, t11, t14, t16–t21) und t12/t13 mit lokalen Servern.
+# Zusammenhängender Gesamtlauf: npm test (Build, RISE, t15, t7, t9, t11, t14, t16–t22) und t12/t13 mit lokalen Servern.
 # Ausgabe: shots/testlauf.log · Exitcode ≠ 0, sobald irgendeine Prüfung fehlschlägt.
 cd "$(dirname "$0")/.." || exit 2
 mkdir -p shots; LOG=shots/testlauf.log; : > "$LOG"

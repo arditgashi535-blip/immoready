@@ -95,6 +95,14 @@ Ausgaben in `dist/`:
 - **Seite:** Kontaktleiste und kompakter Kopf deckend, alle Bedienelemente ≥ 44 px (`.btn.sm`, Stationsknöpfe, «Kopieren»),
   320 px bei 200 % Text ohne Überlauf (Segmentwahl, Überzeilen, Personenkarte, Formularfuss), Fokus nach Fehlern auf dem
   ersten fehlerhaften Feld, Skip-Link bleibt beim Laden erster Tabstopp und führt zum Inhalt der aktuellen Seite.
+- **Handy-Durchgang (Fertigstellung):** keine pauschale Überlaufsperre mehr (`body` ohne `overflow-x:hidden`; Überbreite an
+  der Ursache behoben: einspaltige Raster `minmax(0,1fr)`, Formularspuren, Leistungskarten, Abschlusstitel). Lange Komposita
+  bekommen weiche Trennstellen zur Laufzeit (`HY` in `p3b`, Wörterbuch, nur sichtbarer Text, MutationObserver) – neue lange
+  Begriffe dort ergänzen. Bildmodus: nur aktive Station belegt Platz; «Offerte anfragen» in der Überspringen-Zeile < 760 px
+  ausgeblendet (steht in Station und Kontaktleiste). Niedrige Bildschirme (`max-height:540px`, Smartphone quer) → Bildmodus
+  mit normalem Scrollen (`SMALL` im Kern). Anker/Fokus: `scroll-margin` aus gemessener Kopfhöhe `--hdrh` (nicht
+  `scroll-padding`, sonst springt die Seite beim Fokus im Kopf). Menü schliesst bei Wechsel auf Desktopbreite. Prüfung:
+  `tests/t22-mobil.js`; Abnahmebilder: `node tools/abnahme-handy.js` + `python3 tools/abnahme-handy-collage.py` → `docs/v171/handy*`.
 - Tests neu: `tests/t20-v171.js`. Abnahme: `npm run abnahme` (32 Bilder, `tools/kameras-vergleich.json → abnahme_final`,
   Vergleich mit dem Ausgangsstand: `node tools/abnahme-final.js <V17-Datei> shots/v171-vorher szene`). Wix: zusätzlich
   `wix/velo-offertseite.js` (Vorauswahl der Leistung).
@@ -271,7 +279,7 @@ Ausgaben in `dist/`:
 python3 tools/rise.py             # rise.json prüfen
 python3 build.py                  # baut dist/ (prüft rise.json zuerst)
 npm install && npx playwright install chromium
-npm test                          # Build, RISE, Velo (t15), t7 Seite, t9 Interaktionen, t11 Rundgang, t14 V13/V14, t16 V14, t17 V15, t18 V16, t19 V17, t20 V17.1
+npm test                          # Build, RISE, Velo (t15), t7 Seite, t9 Interaktionen, t11 Rundgang, t14 V13/V14, t16 V14, t17 V15, t18 V16, t19 V17, t20 V17.1, t21 Fertigstellung, t22 Handy
 npm run abnahme                   # 32 Abnahmebilder + Übersicht/Vergleich → docs/v171/
 npm run bake                      # Build → Licht vorab rechnen → Build (nach Geometrieänderungen Pflicht)
 npm run perf                      # Ladeleistung gedrosselt (Server: python3 -m http.server 8702)

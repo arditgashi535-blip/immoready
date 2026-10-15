@@ -352,6 +352,30 @@ var MAP={house:'hero',facade:'hero',facade2:'hero',sale:'hero',stair:'treppe',st
 Object.keys(MAP).forEach(function(k){ILLU[k]=function(){return photo(MAP[k]);};});
 
 function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+/* V17.1 mobil: weiche Trennstellen für lange Komposita. Ohne sie bricht der Browser auf schmalen Bildschirmen mitten im Wort
+   ohne Trennstrich («Leerstandsmanageme|nt»); hyphens:auto ist nicht in jedem Browser für Deutsch verfügbar.
+   Nur sichtbarer Text (keine Attribute, Titel, Formularwerte); dynamisch erzeugte Inhalte über MutationObserver. */
+var HY=(function(){var W={'Leerstandsmanagement':'Leer-stands-manage-ment','Immobilienpräsentation':'Immobilien-präsen-tation','Immobilienfotografie':'Immobilien-foto-grafie',
+ 'Immobilienbewertung':'Immobilien-bewertung','Immobilienverwaltungen':'Immobilien-verwaltungen','Immobilienverwaltung':'Immobilien-verwaltung','Immobilienservice':'Immobilien-service',
+ 'Liegenschaftsbetreuung':'Liegenschafts-betreuung','Wohnliegenschaften':'Wohn-liegen-schaften','Liegenschaften':'Liegen-schaften','Liegenschaft':'Liegen-schaft',
+ 'Datenschutzerklärung':'Datenschutz-erklärung','Datenschutzseite':'Datenschutz-seite','Ansprechpartner':'Ansprech-partner','Unternehmensangaben':'Unternehmens-angaben',
+ 'Stockwerkeigentümergemeinschaften':'Stockwerk-eigentümer-gemein-schaften','Stockwerkeigentümer':'Stockwerk-eigentümer','Eigentümerschaften':'Eigentümer-schaften',
+ 'Gartenunterhalt':'Garten-unterhalt','Betriebsunterhalt':'Betriebs-unterhalt','Beratungsgespräch':'Beratungs-gespräch','Offertbesprechung':'Offert-besprechung',
+ 'Einsatzgebiet':'Einsatz-gebiet','Leistungsumfang':'Leistungs-umfang','Drohnenaufnahmen':'Drohnen-aufnahmen','Drohnenfotografie':'Drohnen-fotografie',
+ 'Gemeinschaftsflächen':'Gemeinschafts-flächen','Verantwortliche':'Verant-wortliche','Verantwortlich':'Verant-wortlich','Aufbewahrungspflichten':'Aufbewahrungs-pflichten',
+ 'Aufbewahrung':'Auf-bewahrung','Öffentlichkeitsbeauftragten':'Öffentlichkeits-beauftragten','Browserinformationen':'Browser-informationen','Anfragebearbeitung':'Anfrage-bearbeitung',
+ 'Benachrichtigungen':'Benach-richtigungen','Terminbuchungen':'Termin-buchungen','Terminbuchung':'Termin-buchung','Anfrageformular':'Anfrage-formular','Veröffentlichung':'Veröffent-lichung',
+ 'mehrwertsteuerpflichtig':'mehrwertsteuer-pflichtig','Grundreinigung':'Grund-reinigung','Hauswartung':'Haus-wartung','Vermarktung':'Ver-marktung','Vermittlung':'Ver-mittlung',
+ 'Koordinationsaufwand':'Koordinations-aufwand','Wohnungsabnahme':'Wohnungs-abnahme','Unterhaltsarbeiten':'Unterhalts-arbeiten','Gesamtansicht':'Gesamt-ansicht',
+ 'Unterhaltsreinigung':'Unterhalts-reinigung','Treppenhausreinigung':'Treppenhaus-reinigung','Kompletträumung':'Komplett-räumung','Mehrfamilienhäuser':'Mehrfamilien-häuser',
+ 'Umzugsreinigung':'Umzugs-reinigung','Kontrollrundgänge':'Kontroll-rundgänge','Gemeinschaftliche':'Gemeinschaft-liche','Zusammenarbeit':'Zusammen-arbeit','Aufbereitung':'Auf-bereitung','Kontaktdaten':'Kontakt-daten','Offertanfrage':'Offert-anfrage'};
+ var re=new RegExp(Object.keys(W).sort(function(a,b){return b.length-a.length;}).join('|'),'g'),SK=/^(SCRIPT|STYLE|TEXTAREA|INPUT|SELECT|OPTION|TITLE|CODE|PRE)$/;
+ function txt(n){var t=n.data;if(t.length<11)return;var u=t.replace(re,function(w){return W[w].replace(/-/g,'­');});if(u!==t)n.data=u;}
+ function run(root){if(!root)return;if(root.nodeType===3){if(!SK.test(root.parentNode&&root.parentNode.nodeName||''))txt(root);return;}if(root.nodeType!==1||SK.test(root.nodeName))return;
+  var tw=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:function(n){var p=n.parentNode;return p&&SK.test(p.nodeName)?2:1;}}),n;while((n=tw.nextNode()))txt(n);}
+ run(document.body);
+ if(window.MutationObserver)new MutationObserver(function(ms){ms.forEach(function(m){m.addedNodes.forEach(run);});}).observe(document.body,{childList:true,subtree:true});
+ return run;})();
 
 /* ---------------- Leistungsseite rendern ---------------- */
 var SICON={hauswartung:'house',sanitaer:'drop',gartenunterhalt:'leaf',reinigung:'clean',raeumung:'box',leerstand:'key',verkauf:'tag',fotografie:'camera'};
@@ -397,12 +421,13 @@ function renderService(key){
 }
 function renderOverview(){
   var h='<div class="related" style="grid-template-columns:1fr">';
-  ORDER.forEach(function(k){var d=S[k];h+='<a href="#'+k+'" style="grid-template-columns:5rem minmax(0,1fr) minmax(0,1.4fr);display:grid;gap:8px 24px;align-items:baseline;padding:26px 0;border-left:0"><span class="mono muted">'+d.nr+'</span><b style="font-size:clamp(1.3rem,2.4vw,1.9rem);font-stretch:108%;font-family:var(--f-display)">'+esc(d.name)+'</b><span class="muted">'+esc(d.intro.split('. ')[0])+'.</span></a>';});
+  ORDER.forEach(function(k){var d=S[k];h+='<a href="#'+k+'" style="grid-template-columns:5rem minmax(0,1fr) minmax(0,1.4fr);display:grid;gap:8px 24px;align-items:baseline;padding:26px 0;border-left:0"><span class="mono muted">'+d.nr+'</span><b style="font-size:clamp(1.3rem,2.4vw,1.9rem);font-stretch:108%;font-family:var(--f-display)">'+esc(d.name)+'</b><span class="muted">'+esc(d.intro.split('. ')[0].replace(/\.+$/,''))+'.</span></a>';});
   h+='</div>';
   var el=document.getElementById('overviewList');el.innerHTML=h;
 }
 var mq=window.matchMedia('(max-width:700px)');
-function fixOverview(){document.querySelectorAll('#overviewList a').forEach(function(a){a.style.gridTemplateColumns=mq.matches?'3rem minmax(0,1fr)':'5rem minmax(0,1fr) minmax(0,1.4fr)';});}
+/* V17.1: schmal einspaltig – Nummer, Titel, Beschreibung untereinander in voller Breite (vorher rutschte die Beschreibung in die 3-rem-Nummernspalte) */
+function fixOverview(){document.querySelectorAll('#overviewList a').forEach(function(a){a.style.gridTemplateColumns=mq.matches?'minmax(0,1fr)':'5rem minmax(0,1fr) minmax(0,1.4fr)';a.style.rowGap=mq.matches?'6px':'';});}
 
 /* ---------------- Seitentitel ---------------- */
 var META={
@@ -465,6 +490,9 @@ document.addEventListener('click',function(e){if(!e.target.closest('.dd'))setDd(
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){var wasDd=ddP.classList.contains('open'), wasM=mnav.dataset.open==='true';closeMenus();if(wasDd)ddBtn.focus();if(wasM)burger.focus();}});
 burger.addEventListener('click',function(){mnav.dataset.open='true';burger.setAttribute('aria-expanded','true');document.body.style.overflow='hidden';document.getElementById('mclose').focus();});
 document.getElementById('mclose').addEventListener('click',function(){closeMenus();burger.focus();});
+/* V17.1: wird das Fenster bei offenem Menü so breit, dass der Menüknopf verschwindet (Drehen, Fenstergrösse), Menü schliessen –
+   sonst blieb die Seite gesperrt */
+window.addEventListener('resize',function(){if(mnav.dataset.open==='true'&&!burger.getClientRects().length)closeMenus();});
 mnav.addEventListener('click',function(e){if(e.target.closest('a'))closeMenus();});
 
 /* Vorauswahl aus Links */
@@ -512,6 +540,8 @@ function onFrame(){ticking=false;var y=window.scrollY;checkReveal();checkLazy();
     if(el.classList.contains('hero-logo'))el.style.transform='translateY(calc(-50% + '+d.toFixed(1)+'px))';else el.style.transform='translateY('+d.toFixed(1)+'px) scale(1.08)';});}
 window.addEventListener('scroll',function(){if(!ticking){ticking=true;requestAnimationFrame(onFrame);}},{passive:true});
 window.addEventListener('resize',function(){requestAnimationFrame(onFrame);});
+/* V17.1: Kopfhöhe für scroll-padding-top messen (wächst mit grösserer Schrift) */
+(function(){var hd=document.querySelector('.hdr');if(!hd)return;function m(){document.documentElement.style.setProperty('--hdrh',Math.ceil(hd.getBoundingClientRect().height)+'px');}m();if(window.ResizeObserver)new ResizeObserver(m).observe(hd);else window.addEventListener('resize',m);})();
 
 /* Vorher-nachher */
 document.addEventListener('input',function(e){if(e.target.matches('.ba input[type=range]'))e.target.closest('.ba').style.setProperty('--pos',e.target.value+'%');});
@@ -795,7 +825,7 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
     var SERVICES = C.services || [];
     var emit = typeof opts.emit === 'function' ? opts.emit : function () {};
     var win = root.ownerDocument.defaultView || window, doc = root.ownerDocument;
-    var RMQ = win.matchMedia('(prefers-reduced-motion: reduce)'), SMALL = win.matchMedia('(max-width:700px)');
+    var RMQ = win.matchMedia('(prefers-reduced-motion: reduce)'), SMALL = win.matchMedia('(max-width:700px), (max-height:540px)'); /* V17.1: auch niedrige Bildschirme (Smartphone quer) – Bildmodus mit normalem Scrollen statt klebender 3D-Bühne */
     var reqMode = opts.mode === 'scroll' ? 'scroll' : 'steps';
 
     /* ---------- Aufräumen ---------- */

@@ -25,7 +25,7 @@
     var SERVICES = C.services || [];
     var emit = typeof opts.emit === 'function' ? opts.emit : function () {};
     var win = root.ownerDocument.defaultView || window, doc = root.ownerDocument;
-    var RMQ = win.matchMedia('(prefers-reduced-motion: reduce)'), SMALL = win.matchMedia('(max-width:700px)');
+    var RMQ = win.matchMedia('(prefers-reduced-motion: reduce)'), SMALL = win.matchMedia('(max-width:700px), (max-height:540px)'); /* V17.1: auch niedrige Bildschirme (Smartphone quer) – Bildmodus mit normalem Scrollen statt klebender 3D-Bühne */
     var reqMode = opts.mode === 'scroll' ? 'scroll' : 'steps';
 
     /* ---------- Aufräumen ---------- */

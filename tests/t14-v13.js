@@ -55,7 +55,7 @@ const RISE = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../rise.json'),
   ok(await p.evaluate(() => { const s = getComputedStyle(document.activeElement); return s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) >= 2; }), 'Sichtbarer Tastaturfokus');
   // 5 · Schluss: allgemeine Offerte und Kontakt
   await at(0.995, 300); await p.waitForFunction(() => document.querySelector('.jr-st.on').dataset.k === 'zurueck', null, { timeout: 10000, polling: 200 }).catch(() => {});
-  ok(await p.evaluate(() => document.querySelector('.jr-st.on').dataset.k === 'zurueck' && /Eine Immobilie\. Viele Aufgaben\. Ein Ansprechpartner\./.test(document.querySelector('.jr-st.on h2').textContent.replace(/\s+/g, ' ').trim())), 'Abschluss: «Eine Immobilie. Viele Aufgaben. Ein Ansprechpartner.»');
+  ok(await p.evaluate(() => document.querySelector('.jr-st.on').dataset.k === 'zurueck' && /Eine Immobilie\. Viele Aufgaben\. Ein Ansprechpartner\./.test(document.querySelector('.jr-st.on h2').textContent.replace(/\u00ad/g, '').replace(/\s+/g, ' ').trim())), 'Abschluss: «Eine Immobilie. Viele Aufgaben. Ein Ansprechpartner.»');
   await p.click('.jr-st.on a[data-contact]'); await p.waitForTimeout(500);
   ok(await p.evaluate(() => location.hash === '#kontakt' && window.__ctc.length === 1 && window.__ctc[0].station === 'zurueck'), '«Kontakt aufnehmen» → Kontaktseite, Ereignis request-contact');
   await p.goBack(); await p.waitForTimeout(800); await at(0.995, 900);

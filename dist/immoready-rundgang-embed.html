@@ -34,7 +34,7 @@
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--ivory);color:var(--ink);font-family:var(--f-body);font-size:1.0625rem;line-height:1.6;font-stretch:100%;overflow-x:hidden}
+body{margin:0;background:var(--ivory);color:var(--ink);font-family:var(--f-body);font-size:1.0625rem;line-height:1.6;font-stretch:100%}
 img,svg{max-width:100%;display:block}
 a{color:inherit}
 button,input,select,textarea{font:inherit;color:inherit}
@@ -164,7 +164,7 @@ body:not(.review) .unconfirmed{display:none!important}
 .path .go .arr{width:18px;transition:transform .25s var(--ease)}
 .path:hover .go .arr{transform:translateX(5px)}
 .path:hover{background:linear-gradient(var(--paper),var(--paper)) no-repeat;}
-@media (max-width:760px){.paths{grid-template-columns:1fr}.path+.path{border-left:0;padding-left:0}}
+@media (max-width:760px){.paths{grid-template-columns:minmax(0,1fr)}.path+.path{border-left:0;padding-left:0}}
 
 /* ---------- Leistungswelten ---------- */
 .worlds{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:clamp(16px,2vw,28px);margin-top:clamp(40px,6vw,72px)}
@@ -187,7 +187,7 @@ body:not(.review) .unconfirmed{display:none!important}
 .world .tag{justify-self:start;background:var(--lime);color:var(--ink);padding:3px 8px}
 @media (max-width:900px){
   .world,.world.w-a,.world.w-b,.world.w-c{grid-column:1/-1;grid-row:auto}
-  .world.w-d{grid-template-columns:1fr}
+  .world.w-d{grid-template-columns:minmax(0,1fr)}
   .world.w-a .fig,.world.w-d .fig{min-height:0;aspect-ratio:16/10;flex:none}
 }
 
@@ -207,7 +207,7 @@ body:not(.review) .unconfirmed{display:none!important}
 .sani{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(24px,5vw,80px);align-items:center}
 .sani .fig{aspect-ratio:1/1}
 .sani blockquote{margin:0;font-size:clamp(1.1rem,1.5vw,1.25rem);max-width:44ch;border-left:2px solid var(--ink);padding-left:18px}
-@media (max-width:860px){.sani{grid-template-columns:1fr}.sani .fig{aspect-ratio:16/11}}
+@media (max-width:860px){.sani{grid-template-columns:minmax(0,1fr)}.sani .fig{aspect-ratio:16/11}}
 
 /* ---------- Person ---------- */
 .person{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,7fr);gap:clamp(24px,5vw,80px)}
@@ -217,9 +217,9 @@ body:not(.review) .unconfirmed{display:none!important}
 .quals div{padding:18px 0;border-top:1px solid var(--line-d)}
 .quals dt{color:var(--stone-d);margin-bottom:6px}
 .quals dd{margin:0;font-weight:600;font-size:1.06rem}
-@media (max-width:860px){.person{grid-template-columns:1fr}.portrait{aspect-ratio:16/10}.quals{grid-template-columns:1fr}}
+@media (max-width:860px){.person{grid-template-columns:minmax(0,1fr)}.portrait{aspect-ratio:16/10}.quals{grid-template-columns:minmax(0,1fr)}}
 body:not(.review) .portrait{display:none}
-body:not(.review) .person{grid-template-columns:1fr}
+body:not(.review) .person{grid-template-columns:minmax(0,1fr)}
 
 /* ---------- Ablauf ---------- */
 .steps{list-style:none;padding:0;margin:clamp(36px,5vw,64px) 0 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line)}
@@ -228,7 +228,7 @@ body:not(.review) .person{grid-template-columns:1fr}
 .steps .n{font-family:var(--f-display);font-size:3.2rem;font-weight:300;font-stretch:120%;line-height:1;color:var(--stone)}
 .steps b{font-size:1.12rem;font-weight:700}
 @media (max-width:860px){.steps{grid-template-columns:1fr 1fr}.steps li:nth-child(3){padding-left:0;border-left:0}.steps li:nth-child(n+3){border-top:1px solid var(--line)}}
-@media (max-width:520px){.steps{grid-template-columns:1fr}.steps li,.steps li+li{padding-left:0;border-left:0;border-top:1px solid var(--line)}.steps li:first-child{border-top:0}}
+@media (max-width:520px){.steps{grid-template-columns:minmax(0,1fr)}.steps li,.steps li+li{padding-left:0;border-left:0;border-top:1px solid var(--line)}.steps li:first-child{border-top:0}}
 
 /* ---------- Region ---------- */
 .region{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:24px;align-items:end}
@@ -252,7 +252,7 @@ body:not(.review) .person{grid-template-columns:1fr}
 .dark .faq,.dark .faq details{border-color:var(--line-d)}
 .dark .faq details p{color:var(--stone-d)}
 .faqwrap{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:clamp(24px,5vw,80px)}
-@media (max-width:860px){.faqwrap{grid-template-columns:1fr}}
+@media (max-width:860px){.faqwrap{grid-template-columns:minmax(0,1fr)}}
 
 /* ---------- Abschluss ---------- */
 .closing{text-align:left}
@@ -270,7 +270,7 @@ body:not(.review) .person{grid-template-columns:1fr}
 .ftr a{text-decoration:none}.ftr a:hover{color:var(--lime)}
 .ftr .base{margin-top:48px;padding-top:20px;border-top:1px solid var(--line-d);display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-between;color:var(--stone-d);font-size:.85rem}
 @media (max-width:860px){.ftr .cols{grid-template-columns:1fr 1fr}}
-@media (max-width:480px){.ftr .cols{grid-template-columns:1fr}}
+@media (max-width:480px){.ftr .cols{grid-template-columns:minmax(0,1fr)}}
 
 /* ---------- Mobile Kontaktleiste ---------- */
 .mbar{display:none}
@@ -291,14 +291,14 @@ body:not(.review) .person{grid-template-columns:1fr}
 .phead .fig{aspect-ratio:4/3}
 .crumbs{color:var(--stone-d);display:flex;flex-wrap:wrap;gap:8px}
 .crumbs a{text-decoration:none}.crumbs a:hover{color:var(--lime)}
-@media (max-width:860px){.phead .wrap{grid-template-columns:1fr}.phead .fig{aspect-ratio:16/10}}
+@media (max-width:860px){.phead .wrap{grid-template-columns:minmax(0,1fr)}.phead .fig{aspect-ratio:16/10}}
 .scope{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 clamp(24px,4vw,64px);margin-top:40px}
 .scope div{padding:22px 0;border-top:1px solid var(--line)}
 .scope b{display:block;font-size:1.12rem;margin-bottom:6px;font-weight:680}
 .scope p{color:var(--stone)}
-@media (max-width:760px){.scope{grid-template-columns:1fr}}
+@media (max-width:760px){.scope{grid-template-columns:minmax(0,1fr)}}
 .side-l{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:clamp(24px,5vw,80px)}
-@media (max-width:860px){.side-l{grid-template-columns:1fr}}
+@media (max-width:860px){.side-l{grid-template-columns:minmax(0,1fr)}}
 .aud{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:10px}
 .aud li{border:1px solid currentColor;padding:9px 14px;font-weight:500}
 .note{border-left:3px solid var(--ink);padding:14px 18px;background:var(--paper);max-width:70ch}
@@ -309,11 +309,11 @@ body:not(.review) .person{grid-template-columns:1fr}
 .related a{padding:22px 18px 22px 0;text-decoration:none;display:grid;gap:6px;border-bottom:1px solid var(--line)}
 .related a+a{padding-left:18px;border-left:1px solid var(--line)}
 .related a:hover b{text-decoration:underline}
-@media (max-width:760px){.related{grid-template-columns:1fr}.related a+a{padding-left:0;border-left:0}}
+@media (max-width:760px){.related{grid-template-columns:minmax(0,1fr)}.related a+a{padding-left:0;border-left:0}}
 
 /* ---------- Formular ---------- */
 .formwrap{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:clamp(24px,5vw,80px);align-items:start}
-@media (max-width:900px){.formwrap{grid-template-columns:1fr}}
+@media (max-width:900px){.formwrap{grid-template-columns:minmax(0,1fr)}}
 .aside-contact{display:grid;gap:22px;position:sticky;top:100px}
 @media (max-width:900px){.aside-contact{position:static}}
 .copy-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
@@ -493,7 +493,7 @@ body.hdr-compact .hdr .wrap{min-height:60px}
 .feature h3{font-size:clamp(1.9rem,3.4vw,3rem);font-weight:300;font-stretch:118%;line-height:1.04}
 .feature h3 b{font-weight:720}
 .feature .checks li{padding:12px 0}
-@media (max-width:900px){.feature{grid-template-columns:1fr}.feature .fig{min-height:0;aspect-ratio:16/10}}
+@media (max-width:900px){.feature{grid-template-columns:minmax(0,1fr)}.feature .fig{min-height:0;aspect-ratio:16/10}}
 
 /* Überschriften im Logo-Stil */
 .h2{font-weight:300;font-stretch:120%;letter-spacing:-.01em}
@@ -633,7 +633,7 @@ body.hdr-compact .logo img{height:56px}
 .hero-photo figcaption{z-index:2}
 .hero-photo::after{content:"";position:absolute;inset:0;border:1px solid rgba(59,58,57,.08);border-radius:4px;pointer-events:none}
 @media (max-width:900px){
-  .hero .wrap{grid-template-columns:1fr;padding-top:28px}
+  .hero .wrap{grid-template-columns:minmax(0,1fr);padding-top:28px}
   .hero .copy{padding-left:22px}
   .hero .bars{width:14px;height:96px}.hero .bars i{width:4px;height:78px}.hero .bars i+i{left:9px;top:14px}
   .hero-photo{aspect-ratio:4/3}
@@ -675,7 +675,7 @@ body.hdr-compact .logo img{height:56px}
 .sani-band{background:var(--paper)}
 .sani-band .sani{grid-template-columns:minmax(0,6fr) minmax(0,5fr)}
 .sani-band .fig{box-shadow:var(--shadow)}
-@media (max-width:860px){.sani-band .sani{grid-template-columns:1fr}}
+@media (max-width:860px){.sani-band .sani{grid-template-columns:minmax(0,1fr)}}
 
 /* Ansprechpartner */
 .brandpic{aspect-ratio:4/5;border-radius:4px;overflow:hidden;position:relative;box-shadow:var(--shadow)}
@@ -686,7 +686,7 @@ body.hdr-compact .logo img{height:56px}
 .quals.two dd{font-size:1.2rem;font-stretch:108%}
 @media (max-width:860px){.brandpic{aspect-ratio:16/10}}
 body:not(.review) .person{grid-template-columns:minmax(0,4fr) minmax(0,7fr)}
-@media (max-width:860px){body:not(.review) .person{grid-template-columns:1fr}}
+@media (max-width:860px){body:not(.review) .person{grid-template-columns:minmax(0,1fr)}}
 
 /* Abschluss mit Formular */
 .closing .cgrid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(28px,5vw,80px);align-items:start;margin-top:40px}
@@ -694,7 +694,7 @@ body:not(.review) .person{grid-template-columns:minmax(0,4fr) minmax(0,7fr)}
 .closing .form{box-shadow:0 40px 80px -40px rgba(0,0,0,.6);color:var(--ink)}
 .closing .contactline a{color:var(--ivory)}
 .closing .contactline a:hover{color:var(--lime)}
-@media (max-width:900px){.closing .cgrid{grid-template-columns:1fr}}
+@media (max-width:900px){.closing .cgrid{grid-template-columns:minmax(0,1fr)}}
 .closing .demo-flag{margin-bottom:16px}
 
 /* Footer hell mit Logo */
@@ -853,7 +853,7 @@ body.hdr-compact .logo img{height:68px}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 @keyframes drawLine{from{transform:scaleY(0)}to{transform:none}}
 @media (max-width:900px){
-  .hx-grid{grid-template-columns:1fr;min-height:0}
+  .hx-grid{grid-template-columns:minmax(0,1fr);min-height:0}
   .hx-copy{padding:32px var(--gut) 36px;order:1}
   .hx-media{order:2;aspect-ratio:4/3.2;margin:0 var(--gut);border-radius:4px}
   .hx-scroll{display:none}
@@ -877,7 +877,7 @@ body.hdr-compact .logo img{height:68px}
 .entry-a .arr{width:20px;transition:transform var(--t-s) var(--e-out)}
 .entry-a:hover{background:linear-gradient(90deg,rgba(220,197,168,.16),transparent)}
 .entry-a:hover .arr{transform:translateX(6px)}
-@media (max-width:900px){.intro-grid .eyebrow,.statement,.entry{grid-column:1/-1}.entry{grid-template-columns:1fr}.entry-a+.entry-a{border-left:0;padding-left:0}}
+@media (max-width:900px){.intro-grid .eyebrow,.statement,.entry{grid-column:1/-1}.entry{grid-template-columns:minmax(0,1fr)}.entry-a+.entry-a{border-left:0;padding-left:0}}
 
 /* --- Highlight A: Hauswartung --- */
 .hw{padding-top:clamp(40px,5vw,72px)}
@@ -912,7 +912,7 @@ body.hdr-compact .logo img{height:68px}
 .sani2 .num{color:var(--stone-d)}.sani2 .num span{color:var(--lime)}
 .sani2 .lead{color:#E9E4DD}
 .sani2 .fine{margin-top:24px;font-size:.9rem;color:var(--stone-d);max-width:46ch}
-@media (max-width:900px){.sani2-grid{grid-template-columns:1fr;min-height:0}.sani2-media{aspect-ratio:16/11}.sani2-copy{padding:44px var(--gut) 56px}}
+@media (max-width:900px){.sani2-grid{grid-template-columns:minmax(0,1fr);min-height:0}.sani2-media{aspect-ratio:16/11}.sani2-copy{padding:44px var(--gut) 56px}}
 
 /* --- Highlight B: Leistungsübersicht --- */
 .sx-top{display:grid;gap:0;margin-bottom:clamp(36px,5vw,64px)}
@@ -943,7 +943,7 @@ body.hdr-compact .logo img{height:68px}
 .sx-layer .illu{width:100%;height:100%}
 .sx-tag{position:absolute;right:16px;top:16px;z-index:3;background:rgba(252,248,245,.92);padding:8px 12px;font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink);font-weight:600}
 @media (max-width:900px){
-  .sx-grid{grid-template-columns:1fr}
+  .sx-grid{grid-template-columns:minmax(0,1fr)}
   .sx-stage{display:none}
   .sx-mimg{display:block}
   .sx-inner{padding-left:0}
@@ -964,7 +964,7 @@ body.hdr-compact .logo img{height:68px}
 
 /* --- Highlight C: Finale --- */
 .finale{background:radial-gradient(ellipse 60% 70% at 90% 10%,#47423E 0%,var(--graphite) 65%);color:var(--ivory);padding-top:clamp(96px,12vw,180px)}
-.finale-title{font-weight:300;font-stretch:122%;font-size:clamp(3rem,10.5vw,10rem);line-height:.92;letter-spacing:-.035em;color:#D9D3CB;margin:0}
+.finale-title{font-weight:300;font-stretch:122%;font-size:clamp(min(3rem,13vw),10.5vw,10rem);line-height:.92;letter-spacing:-.035em;color:#D9D3CB;margin:0}
 .finale-title b{font-weight:760;color:var(--ivory)}
 .finale-title .ln>span{transition:transform 800ms var(--e-out)}
 .js .finale-title.pre .ln>span{transform:translateY(105%)}
@@ -974,7 +974,7 @@ body.hdr-compact .logo img{height:68px}
 .finale-tel::after,.finale-mail::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:var(--lime);transform:scaleX(0);transform-origin:left;transition:transform 300ms var(--e-out)}
 .finale-tel:hover::after,.finale-mail:hover::after{transform:scaleX(1)}
 .finale .cgrid{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:clamp(28px,5vw,80px);margin-top:clamp(40px,5vw,64px)}
-@media (max-width:900px){.finale .cgrid{grid-template-columns:1fr}.finale-title{font-stretch:108%}}
+@media (max-width:900px){.finale .cgrid{grid-template-columns:minmax(0,1fr)}.finale-title{font-stretch:108%}}
 .finale .form{box-shadow:0 40px 80px -40px rgba(0,0,0,.6)}
 
 /* --- Formular verfeinert --- */
@@ -1197,7 +1197,7 @@ body.in-finale .mbar{transform:translateY(calc(100% + 2px))}
   .sx-cb .acts{display:flex;flex-wrap:wrap;gap:4px 18px;align-items:center;padding-top:4px}
   .sx-cb .acts .btn{display:none}
   /* Hauswartung als Hauptleistung: grosse Karte mit Bild und Aktion */
-  .sx-card:first-child{grid-template-columns:1fr;gap:16px;padding-top:4px}
+  .sx-card:first-child{grid-template-columns:minmax(0,1fr);gap:16px;padding-top:4px}
   .sx-card:first-child .sx-cimg{aspect-ratio:16/10}
   .sx-card:first-child .sx-cimg .ph-tag{display:block}
   .sx-card:first-child h3{font-size:1.45rem}
@@ -1505,7 +1505,7 @@ body.hdr-compact .hdr .wrap>.logo{transform:translateY(18px) scale(.75)}
 
 /* ---------- Smartphone: stabile Darstellung, sichtbare Schaltflächen ---------- */
 @media (max-width:900px){
-  .hx-grid{grid-template-columns:1fr;min-height:0}
+  .hx-grid{grid-template-columns:minmax(0,1fr);min-height:0}
   .hx-stage{order:0;margin:0;max-height:none;aspect-ratio:5/4}
   .hx-copy{order:1}
   .hs-lbl{opacity:1;transform:translate(0,-50%);font-size:.72rem;padding:4px 8px}
@@ -1605,7 +1605,7 @@ body.hdr-compact .hdr .wrap>.logo{transform:translateY(18px) scale(.75)}
 .jr-static .jr-stage{position:relative;inset:auto;aspect-ratio:16/10;max-height:72vh}
 .jr-static .jr-stage::after{background:linear-gradient(0deg,rgba(37,35,33,.55),rgba(37,35,33,0) 40%)}
 .jr-static .jr-canvas,.jr-static .jr-tech{display:none}
-.jr-static .jr-ui{align-items:start;padding-top:26px;padding-bottom:30px;grid-template-columns:1fr;gap:22px;height:auto}
+.jr-static .jr-ui{align-items:start;padding-top:26px;padding-bottom:30px;grid-template-columns:minmax(0,1fr);gap:22px;height:auto}
 .js .jr-static .jr-st{grid-row:1;align-self:start;transition:opacity 260ms var(--ease-out),transform 320ms var(--ease-out),visibility 0s 260ms}
 .jr-static .jr-nav{grid-column:1;grid-row:2;display:block}
 .jr-static .jr-nav ol{grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
@@ -1613,7 +1613,7 @@ body.hdr-compact .hdr .wrap>.logo{transform:translateY(18px) scale(.75)}
 .jr-static .jr-nav button.on{border-color:var(--lime);background:rgba(220,197,168,.12)}
 .jr-static .jr-skip{position:static;grid-row:3}
 @media (min-width:701px){.jr-static .jr-stage{max-height:none}}
-@media (max-width:980px){.jr-live .jr-ui{grid-template-columns:1fr}.jr-live .jr-nav{position:absolute;right:var(--gut);top:110px}.jr-live .jr-nav .jr-l{display:none}}
+@media (max-width:980px){.jr-live .jr-ui{grid-template-columns:minmax(0,1fr)}.jr-live .jr-nav{position:absolute;right:var(--gut);top:110px}.jr-live .jr-nav .jr-l{display:none}}
 @media (max-width:700px){
   .jr .hx-title{font-size:clamp(2.3rem,10vw,3.2rem)}
   .jr-t{font-size:clamp(1.9rem,8vw,2.6rem)}
@@ -1837,7 +1837,7 @@ body.hdr-compact .hdr .wrap>.logo{transform:translateY(18px) scale(.75)}
 .jr-static .jr-ui{grid-template-columns:minmax(0,1fr)}
 .jr-ui>*,.wrap>*,.ftr .wrap *,.formwrap>*,.sx *,.grid12>*{min-width:0}
 h1,h2,h3,h4,p,li,dd,dt,legend,label,.btn{overflow-wrap:break-word}
-@media (max-width:760px){h1,h2,h3,.display,.hx-title,.jr-big,.jr-t{overflow-wrap:anywhere;-webkit-hyphens:auto;hyphens:auto}
+@media (max-width:760px){h1,h2,h3,.display,.hx-title,.jr-big,.jr-t{overflow-wrap:break-word;-webkit-hyphens:auto;hyphens:auto}
   main,footer,.mnav,.sec{overflow-wrap:anywhere}
   .hw-list li{grid-template-columns:3rem minmax(0,1fr)}
   .aud li{min-width:0;max-width:100%}
@@ -1862,6 +1862,36 @@ body.hdr-compact .hdr{background:var(--ivory)}
 .opts.seg{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.opts.seg .opt span{min-width:0;overflow-wrap:anywhere;text-align:center}
 .eyebrow,p.mono{white-space:normal;overflow-wrap:anywhere;max-width:100%}
 .fnav{flex-wrap:wrap}.fnav>*,.fnav label{min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+/* V17.1 mobil: Bildmodus – nur die aktive Station belegt Platz (vorher bestimmte die längste Station die Höhe, darunter
+   blieb bei kurzen Stationen eine leere Fläche). Unter 760 px steht «Offerte anfragen» bereits in der Station und in der
+   Kontaktleiste – in der Überspringen-Zeile bleibt nur «Tour überspringen». */
+.jr-static .jr-st:not(.on){display:none}
+@media (max-width:760px){.jr-skip .jr-skip-o{display:none}
+  /* einheitlicher Seitenrand 16 px wie in allen Abschnitten (vorher Station 32 px durch doppelte Innenabstände) */
+  .jr-static .jr-st{padding-left:0;padding-right:0}.jr-static .jr-skip a,.jr-static .jr-skip button{padding-left:0;padding-right:0}}
+/* Kontaktseite: Einsatzgebiet | Termin nebeneinander, schmal untereinander (vorher Inline-Spalten, auch bei 320 px zweispaltig) */
+.k-l{grid-column:1/span 6}.k-r{grid-column:7/span 6}
+@media (max-width:760px){.k-l,.k-r{grid-column:1/-1}.k-r{margin-top:24px}}
+/* V17.1 mobil: Anker, Skip-Link und fokussierte Felder landen nicht unter dem klebenden Kopf bzw. der Kontaktleiste.
+   --hdrh setzt p3b aus der gemessenen Kopfhöhe (Rückfall 90 px).
+   Als scroll-margin nur auf Inhalten, nicht als scroll-padding am Dokument: sonst verschob schon der Fokus auf ein Element im
+   klebenden Kopf (Menüknopf nach dem Schliessen) die Seite. */
+#main,main *,footer *{scroll-margin-top:calc(var(--hdrh,90px) + 12px)}
+@media (max-width:760px){#main,main *,footer *{scroll-margin-bottom:calc(64px + env(safe-area-inset-bottom,0px))}}
+/* Offertseite gestapelt: Formular nimmt die Spaltenbreite ein (vorher «align-items:start» → Breite nach längstem Wort, bei 200 % Text breiter als der Bildschirm) */
+@media (max-width:900px){.formwrap>*{align-self:stretch;min-width:0}}
+/* Formularfelder: Spur ohne Mindestbreite – Eingabefelder haben eine eigene Grundbreite (ca. 20 Zeichen), die bei 200 % Text
+   breiter als der Bildschirm war */
+.f,.fgroup{grid-template-columns:minmax(0,1fr)}
+/* Stationsleiste mobil: weich ausblendende Ränder zeigen, dass die Leiste seitlich weitergeht (Einrasten, aktive Station mittig bleiben) */
+@media (max-width:760px){.jr-static .jr-nav{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 calc(100% - 28px),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 calc(100% - 28px),transparent 100%)}}
+/* Leistungskarten mobil: Titel als Raster statt Flex (Text darf schmaler als das längste Wort werden und umbrechen),
+   Bildspalte höchstens ein Viertel der Kartenbreite – bei 200 % Text bleibt mehr Platz für den Titel */
+@media (max-width:760px){.sx-cb h3{display:grid;grid-template-columns:20px minmax(0,1fr)}
+  .sx-card:not(:first-child){grid-template-columns:min(104px,25%) minmax(0,1fr)}}
+/* Smartphone quer / niedrige Bildschirme: Stationsbild höchstens 60 % der sichtbaren Höhe, damit Titel und Aktion
+   im ersten Bildschirm beginnen (vh als Rückfall, svh wo unterstützt) */
+@media (max-height:540px) and (min-width:701px){.jr-static .jr-stage{max-height:60vh;max-height:60svh;aspect-ratio:auto;height:60vh;height:60svh}}
 </style>
 
 <a class="skip" href="#main">Zum Inhalt springen</a>
@@ -2054,7 +2084,7 @@ body.hdr-compact .hdr{background:var(--ivory)}
         <b class="vn">Ardit Gashi</b>
         <span class="muted">Inhaber ImmoReady · Zürich &amp; Aargau</span>
         <ul class="vq"><li><i data-icon="check"></i>Fachmann Betriebsunterhalt EFZ</li><li><i data-icon="check"></i>Facility Services Specialist WSF</li></ul>
-        <div class="vc"><a href="tel:+41763404401"><i data-icon="phone"></i>076 340 44 01</a><a href="mailto:info.immoready@gmail.com"><i data-icon="mail"></i>info.immoready@gmail.com</a></div>
+        <div class="vc"><a href="tel:+41763404401"><i data-icon="phone"></i>076 340 44 01</a><a href="mailto:info.immoready@gmail.com"><i data-icon="mail"></i>info.immoready<wbr>@gmail.com</a></div>
         <p class="review-only vnote">Platz für ein echtes Porträt – wird erst mit Foto ergänzt.</p>
       </aside>
       <div>
@@ -2150,7 +2180,7 @@ body.hdr-compact .hdr{background:var(--ivory)}
       <div class="finale-bar reveal">
         <a class="btn sand big fcta" href="#offerte" data-toform data-primary>Offerte anfragen <span class="fcta-c" aria-hidden="true"><i class="a"></i></span></a>
         <a class="finale-tel" href="tel:+41763404401">076 340 44 01</a>
-        <a class="finale-mail" href="mailto:info.immoready@gmail.com">info.immoready@gmail.com</a>
+        <a class="finale-mail" href="mailto:info.immoready@gmail.com">info.immoready<wbr>@gmail.com</a>
       </div>
       <div class="cgrid">
         <div class="reveal" style="display:grid;gap:18px;align-content:start">
@@ -2186,7 +2216,7 @@ body.hdr-compact .hdr{background:var(--ivory)}
     <div class="wrap">
       <div>
         <p class="crumbs mono"><a href="#start">Start</a><span>/</span><span>Für Verwaltungen</span></p>
-        <h1>Ein Ansprechpartner. <b>Weniger Koordinations&shy;aufwand.</b></h1>
+        <h1>Ein Ansprechpartner. <b>Weniger Koordi&shy;nations&shy;aufwand.</b></h1>
         <p class="lead" style="color:#DAD8D0">Für Immobilienverwaltungen, Eigentümerschaften und Stockwerkeigentümer&shy;gemeinschaften mit kleinen und mittleren Wohnliegenschaften in Zürich und Aargau.</p>
         <div style="margin-top:30px;display:flex;flex-wrap:wrap;gap:12px">
           <a class="btn" href="#offerte" data-pre="hauswartung" data-mode="laufend" data-kunde="verwaltung">Liegenschaftsbetreuung besprechen <i class="a"></i></a>
@@ -2248,7 +2278,7 @@ body.hdr-compact .hdr{background:var(--ivory)}
         <b class="vn">Ardit Gashi</b>
         <span class="muted">Inhaber ImmoReady · Zürich &amp; Aargau</span>
         <ul class="vq"><li><i data-icon="check"></i>Fachmann Betriebsunterhalt EFZ</li><li><i data-icon="check"></i>Facility Services Specialist WSF</li></ul>
-        <div class="vc"><a href="tel:+41763404401"><i data-icon="phone"></i>076 340 44 01</a><a href="mailto:info.immoready@gmail.com"><i data-icon="mail"></i>info.immoready@gmail.com</a></div>
+        <div class="vc"><a href="tel:+41763404401"><i data-icon="phone"></i>076 340 44 01</a><a href="mailto:info.immoready@gmail.com"><i data-icon="mail"></i>info.immoready<wbr>@gmail.com</a></div>
         <p class="review-only vnote">Platz für ein echtes Porträt – wird erst mit Foto ergänzt.</p>
       </aside>
       <div>
@@ -2293,7 +2323,7 @@ body.hdr-compact .hdr{background:var(--ivory)}
         <div>
           <p class="mono muted" style="margin-bottom:8px">Lieber direkt?</p>
           <div class="copy-row"><a href="tel:+41763404401" style="font-size:1.3rem;font-weight:650;text-decoration:none">076 340 44 01</a><button class="copy-btn" type="button" data-copy="+41 76 340 44 01">Kopieren</button></div>
-          <div class="copy-row" style="margin-top:6px"><a href="mailto:info.immoready@gmail.com" style="font-weight:600">info.immoready@gmail.com</a><button class="copy-btn" type="button" data-copy="info.immoready@gmail.com">Kopieren</button></div>
+          <div class="copy-row" style="margin-top:6px"><a href="mailto:info.immoready@gmail.com" style="font-weight:600">info.immoready<wbr>@gmail.com</a><button class="copy-btn" type="button" data-copy="info.immoready@gmail.com">Kopieren</button></div>
         </div>
         <hr class="rule">
         <div>
@@ -2322,18 +2352,18 @@ body.hdr-compact .hdr{background:var(--ivory)}
   </section>
   <section class="sec">
     <div class="wrap">
-      <div class="related" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+      <div class="related">
         <a href="tel:+41763404401"><span class="mono muted">Telefon</span><b style="font-size:1.4rem">076 340 44 01</b><span class="muted">+41 76 340 44 01</span></a>
-        <a href="mailto:info.immoready@gmail.com"><span class="mono muted">E-Mail</span><b style="font-size:1.2rem;overflow-wrap:anywhere">info.immoready@gmail.com</b><span class="muted">Für Anfragen und Unterlagen</span></a>
+        <a href="mailto:info.immoready@gmail.com"><span class="mono muted">E-Mail</span><b style="font-size:1.2rem">info.immoready<wbr>@gmail.com</b><span class="muted">Für Anfragen und Unterlagen</span></a>
         <a href="#offerte"><span class="mono muted">Formular</span><b style="font-size:1.4rem">Offerte anfragen →</b><span class="muted">Mit Foto-Upload, rund zwei Minuten</span></a>
       </div>
       <div class="grid12" style="margin-top:64px">
-        <div style="grid-column:1/span 6;min-width:0" class="prose">
+        <div class="prose k-l">
           <p class="mono eyebrow">Einsatzgebiet</p>
           <p>Kantone Zürich und Aargau.</p>
           <p class="review-only" style="margin-top:16px"><span class="missing">Firmenadresse: nach Bestätigung ergänzen</span></p>
         </div>
-        <div style="grid-column:7/span 6;min-width:0" class="prose">
+        <div class="prose k-r">
           <p class="mono eyebrow">Termin vereinbaren</p>
           <p>Für ein Beratungsgespräch oder eine Offertbesprechung können Sie direkt online einen Termin wählen.</p>
           <p style="margin-top:14px"><a class="lnk" href="https://www.immoready.ch/book-online" target="_blank" rel="noopener">Zur Terminbuchung ↗</a></p>
@@ -2351,7 +2381,7 @@ body.hdr-compact .hdr{background:var(--ivory)}
     <p class="review-only placeholder-box" style="margin:18px 0">Entwurf. Gelb markierte Angaben fehlen und müssen vor der Veröffentlichung bestätigt werden. Keine rechtliche Prüfung – bitte bei Bedarf fachlich prüfen lassen.</p>
     <h2>Verantwortlich für den Inhalt</h2>
     <p>ImmoReady<br>Inhaber: Ardit Gashi<br><span class="missing">Strasse, Nr.</span><br><span class="missing">PLZ Ort</span><br>Schweiz</p>
-    <p>Telefon: <a href="tel:+41763404401">+41 76 340 44 01</a><br>E-Mail: <a href="mailto:info.immoready@gmail.com">info.immoready@gmail.com</a></p>
+    <p>Telefon: <a href="tel:+41763404401">+41 76 340 44 01</a><br>E-Mail: <a href="mailto:info.immoready@gmail.com">info.immoready<wbr>@gmail.com</a></p>
     <h2>Unternehmensangaben</h2>
     <p>Rechtsform: <span class="missing">z. B. Einzelunternehmen oder GmbH – bestätigen</span><br>Handelsregister: <span class="missing">falls eingetragen</span><br>UID: <span class="missing">CHE-…, falls vorhanden</span><br>MWST-Nr.: <span class="missing">falls mehrwertsteuerpflichtig</span></p>
     <h2>Haftung für Inhalte und Links</h2>
@@ -2369,7 +2399,7 @@ body.hdr-compact .hdr{background:var(--ivory)}
     <p class="review-only placeholder-box" style="margin:18px 0">Entwurf auf Basis der geplanten Funktionen (Wix-Hosting, Anfrageformular mit Foto-Upload, Terminbuchung, E-Mail-Benachrichtigungen, Weiterleitung an eine Automatisierung). Vor Veröffentlichung mit den tatsächlich aktivierten Funktionen abgleichen und fachlich prüfen lassen. Die heutige Datenschutzseite ist eine nicht veröffentlichungsfähige Wix-Vorlage.</p>
     <p class="muted">Stand: <span class="missing">Datum bei Veröffentlichung</span></p>
     <h2>1. Verantwortliche Stelle</h2>
-    <p>ImmoReady, Ardit Gashi, <span class="missing">Adresse</span>, Schweiz · <a href="mailto:info.immoready@gmail.com">info.immoready@gmail.com</a> · +41 76 340 44 01</p>
+    <p>ImmoReady, Ardit Gashi, <span class="missing">Adresse</span>, Schweiz · <a href="mailto:info.immoready@gmail.com">info.immoready<wbr>@gmail.com</a> · +41 76 340 44 01</p>
     <h2>2. Welche Daten wir bearbeiten</h2>
     <ul>
       <li><b>Anfragen über das Formular:</b> Name, Firma (freiwillig), E-Mail, Telefonnummer (freiwillig), bevorzugter Kontaktweg, Angaben zum Objekt (Postleitzahl, Ort, Beschreibung, Objektart und weitere freiwillige Angaben) sowie hochgeladene Fotos.</li>
@@ -2405,7 +2435,7 @@ body.hdr-compact .hdr{background:var(--ivory)}
       <div style="display:grid;gap:14px;align-content:start">
         <a href="#start" aria-label="ImmoReady – zur Startseite" style="justify-self:start"><img class="flogo" data-logo alt="ImmoReady – einfach bereit" width="762" height="578"></a>
         <p style="max-width:34ch">Betreuung, Unterhalt, Aufbereitung und Präsentation von Immobilien in Zürich und Aargau.</p>
-        <p><a href="tel:+41763404401">076 340 44 01</a><br><a href="mailto:info.immoready@gmail.com">info.immoready@gmail.com</a></p>
+        <p><a href="tel:+41763404401">076 340 44 01</a><br><a href="mailto:info.immoready@gmail.com">info.immoready<wbr>@gmail.com</a></p>
       </div>
       <div><h4>Leistungen</h4><ul><li><a href="#hauswartung">Hauswartung</a></li><li><a href="#sanitaer">Sanitär &amp; Unterhalt</a></li><li><a href="#gartenunterhalt">Gartenunterhalt</a></li><li><a href="#reinigung">Reinigung</a></li><li><a href="#raeumung">Räumung &amp; Aufbereitung</a></li><li><a href="#leerstand">Leerstandsmanagement</a></li><li><a href="#verkauf">Vermarktung &amp; Vermittlung</a></li><li><a href="#fotografie">Immobilienpräsentation</a></li></ul></div>
       <div><h4>ImmoReady</h4><ul><li><a href="#verwaltungen">Für Verwaltungen</a></li><li><a href="#ueber">Über ImmoReady</a></li><li><a href="#kontakt">Kontakt</a></li><li><a href="#offerte">Offerte anfragen</a></li><li><a href="https://www.immoready.ch/book-online" target="_blank" rel="noopener">Termin buchen ↗</a></li></ul></div>
@@ -2774,6 +2804,30 @@ var MAP={house:'hero',facade:'hero',facade2:'hero',sale:'hero',stair:'treppe',st
 Object.keys(MAP).forEach(function(k){ILLU[k]=function(){return photo(MAP[k]);};});
 
 function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+/* V17.1 mobil: weiche Trennstellen für lange Komposita. Ohne sie bricht der Browser auf schmalen Bildschirmen mitten im Wort
+   ohne Trennstrich («Leerstandsmanageme|nt»); hyphens:auto ist nicht in jedem Browser für Deutsch verfügbar.
+   Nur sichtbarer Text (keine Attribute, Titel, Formularwerte); dynamisch erzeugte Inhalte über MutationObserver. */
+var HY=(function(){var W={'Leerstandsmanagement':'Leer-stands-manage-ment','Immobilienpräsentation':'Immobilien-präsen-tation','Immobilienfotografie':'Immobilien-foto-grafie',
+ 'Immobilienbewertung':'Immobilien-bewertung','Immobilienverwaltungen':'Immobilien-verwaltungen','Immobilienverwaltung':'Immobilien-verwaltung','Immobilienservice':'Immobilien-service',
+ 'Liegenschaftsbetreuung':'Liegenschafts-betreuung','Wohnliegenschaften':'Wohn-liegen-schaften','Liegenschaften':'Liegen-schaften','Liegenschaft':'Liegen-schaft',
+ 'Datenschutzerklärung':'Datenschutz-erklärung','Datenschutzseite':'Datenschutz-seite','Ansprechpartner':'Ansprech-partner','Unternehmensangaben':'Unternehmens-angaben',
+ 'Stockwerkeigentümergemeinschaften':'Stockwerk-eigentümer-gemein-schaften','Stockwerkeigentümer':'Stockwerk-eigentümer','Eigentümerschaften':'Eigentümer-schaften',
+ 'Gartenunterhalt':'Garten-unterhalt','Betriebsunterhalt':'Betriebs-unterhalt','Beratungsgespräch':'Beratungs-gespräch','Offertbesprechung':'Offert-besprechung',
+ 'Einsatzgebiet':'Einsatz-gebiet','Leistungsumfang':'Leistungs-umfang','Drohnenaufnahmen':'Drohnen-aufnahmen','Drohnenfotografie':'Drohnen-fotografie',
+ 'Gemeinschaftsflächen':'Gemeinschafts-flächen','Verantwortliche':'Verant-wortliche','Verantwortlich':'Verant-wortlich','Aufbewahrungspflichten':'Aufbewahrungs-pflichten',
+ 'Aufbewahrung':'Auf-bewahrung','Öffentlichkeitsbeauftragten':'Öffentlichkeits-beauftragten','Browserinformationen':'Browser-informationen','Anfragebearbeitung':'Anfrage-bearbeitung',
+ 'Benachrichtigungen':'Benach-richtigungen','Terminbuchungen':'Termin-buchungen','Terminbuchung':'Termin-buchung','Anfrageformular':'Anfrage-formular','Veröffentlichung':'Veröffent-lichung',
+ 'mehrwertsteuerpflichtig':'mehrwertsteuer-pflichtig','Grundreinigung':'Grund-reinigung','Hauswartung':'Haus-wartung','Vermarktung':'Ver-marktung','Vermittlung':'Ver-mittlung',
+ 'Koordinationsaufwand':'Koordinations-aufwand','Wohnungsabnahme':'Wohnungs-abnahme','Unterhaltsarbeiten':'Unterhalts-arbeiten','Gesamtansicht':'Gesamt-ansicht',
+ 'Unterhaltsreinigung':'Unterhalts-reinigung','Treppenhausreinigung':'Treppenhaus-reinigung','Kompletträumung':'Komplett-räumung','Mehrfamilienhäuser':'Mehrfamilien-häuser',
+ 'Umzugsreinigung':'Umzugs-reinigung','Kontrollrundgänge':'Kontroll-rundgänge','Gemeinschaftliche':'Gemeinschaft-liche','Zusammenarbeit':'Zusammen-arbeit','Aufbereitung':'Auf-bereitung','Kontaktdaten':'Kontakt-daten','Offertanfrage':'Offert-anfrage'};
+ var re=new RegExp(Object.keys(W).sort(function(a,b){return b.length-a.length;}).join('|'),'g'),SK=/^(SCRIPT|STYLE|TEXTAREA|INPUT|SELECT|OPTION|TITLE|CODE|PRE)$/;
+ function txt(n){var t=n.data;if(t.length<11)return;var u=t.replace(re,function(w){return W[w].replace(/-/g,'­');});if(u!==t)n.data=u;}
+ function run(root){if(!root)return;if(root.nodeType===3){if(!SK.test(root.parentNode&&root.parentNode.nodeName||''))txt(root);return;}if(root.nodeType!==1||SK.test(root.nodeName))return;
+  var tw=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:function(n){var p=n.parentNode;return p&&SK.test(p.nodeName)?2:1;}}),n;while((n=tw.nextNode()))txt(n);}
+ run(document.body);
+ if(window.MutationObserver)new MutationObserver(function(ms){ms.forEach(function(m){m.addedNodes.forEach(run);});}).observe(document.body,{childList:true,subtree:true});
+ return run;})();
 
 /* ---------------- Leistungsseite rendern ---------------- */
 var SICON={hauswartung:'house',sanitaer:'drop',gartenunterhalt:'leaf',reinigung:'clean',raeumung:'box',leerstand:'key',verkauf:'tag',fotografie:'camera'};
@@ -2819,12 +2873,13 @@ function renderService(key){
 }
 function renderOverview(){
   var h='<div class="related" style="grid-template-columns:1fr">';
-  ORDER.forEach(function(k){var d=S[k];h+='<a href="#'+k+'" style="grid-template-columns:5rem minmax(0,1fr) minmax(0,1.4fr);display:grid;gap:8px 24px;align-items:baseline;padding:26px 0;border-left:0"><span class="mono muted">'+d.nr+'</span><b style="font-size:clamp(1.3rem,2.4vw,1.9rem);font-stretch:108%;font-family:var(--f-display)">'+esc(d.name)+'</b><span class="muted">'+esc(d.intro.split('. ')[0])+'.</span></a>';});
+  ORDER.forEach(function(k){var d=S[k];h+='<a href="#'+k+'" style="grid-template-columns:5rem minmax(0,1fr) minmax(0,1.4fr);display:grid;gap:8px 24px;align-items:baseline;padding:26px 0;border-left:0"><span class="mono muted">'+d.nr+'</span><b style="font-size:clamp(1.3rem,2.4vw,1.9rem);font-stretch:108%;font-family:var(--f-display)">'+esc(d.name)+'</b><span class="muted">'+esc(d.intro.split('. ')[0].replace(/\.+$/,''))+'.</span></a>';});
   h+='</div>';
   var el=document.getElementById('overviewList');el.innerHTML=h;
 }
 var mq=window.matchMedia('(max-width:700px)');
-function fixOverview(){document.querySelectorAll('#overviewList a').forEach(function(a){a.style.gridTemplateColumns=mq.matches?'3rem minmax(0,1fr)':'5rem minmax(0,1fr) minmax(0,1.4fr)';});}
+/* V17.1: schmal einspaltig – Nummer, Titel, Beschreibung untereinander in voller Breite (vorher rutschte die Beschreibung in die 3-rem-Nummernspalte) */
+function fixOverview(){document.querySelectorAll('#overviewList a').forEach(function(a){a.style.gridTemplateColumns=mq.matches?'minmax(0,1fr)':'5rem minmax(0,1fr) minmax(0,1.4fr)';a.style.rowGap=mq.matches?'6px':'';});}
 
 /* ---------------- Seitentitel ---------------- */
 var META={
@@ -2887,6 +2942,9 @@ document.addEventListener('click',function(e){if(!e.target.closest('.dd'))setDd(
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){var wasDd=ddP.classList.contains('open'), wasM=mnav.dataset.open==='true';closeMenus();if(wasDd)ddBtn.focus();if(wasM)burger.focus();}});
 burger.addEventListener('click',function(){mnav.dataset.open='true';burger.setAttribute('aria-expanded','true');document.body.style.overflow='hidden';document.getElementById('mclose').focus();});
 document.getElementById('mclose').addEventListener('click',function(){closeMenus();burger.focus();});
+/* V17.1: wird das Fenster bei offenem Menü so breit, dass der Menüknopf verschwindet (Drehen, Fenstergrösse), Menü schliessen –
+   sonst blieb die Seite gesperrt */
+window.addEventListener('resize',function(){if(mnav.dataset.open==='true'&&!burger.getClientRects().length)closeMenus();});
 mnav.addEventListener('click',function(e){if(e.target.closest('a'))closeMenus();});
 
 /* Vorauswahl aus Links */
@@ -2934,6 +2992,8 @@ function onFrame(){ticking=false;var y=window.scrollY;checkReveal();checkLazy();
     if(el.classList.contains('hero-logo'))el.style.transform='translateY(calc(-50% + '+d.toFixed(1)+'px))';else el.style.transform='translateY('+d.toFixed(1)+'px) scale(1.08)';});}
 window.addEventListener('scroll',function(){if(!ticking){ticking=true;requestAnimationFrame(onFrame);}},{passive:true});
 window.addEventListener('resize',function(){requestAnimationFrame(onFrame);});
+/* V17.1: Kopfhöhe für scroll-padding-top messen (wächst mit grösserer Schrift) */
+(function(){var hd=document.querySelector('.hdr');if(!hd)return;function m(){document.documentElement.style.setProperty('--hdrh',Math.ceil(hd.getBoundingClientRect().height)+'px');}m();if(window.ResizeObserver)new ResizeObserver(m).observe(hd);else window.addEventListener('resize',m);})();
 
 /* Vorher-nachher */
 document.addEventListener('input',function(e){if(e.target.matches('.ba input[type=range]'))e.target.closest('.ba').style.setProperty('--pos',e.target.value+'%');});
@@ -3217,7 +3277,7 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
     var SERVICES = C.services || [];
     var emit = typeof opts.emit === 'function' ? opts.emit : function () {};
     var win = root.ownerDocument.defaultView || window, doc = root.ownerDocument;
-    var RMQ = win.matchMedia('(prefers-reduced-motion: reduce)'), SMALL = win.matchMedia('(max-width:700px)');
+    var RMQ = win.matchMedia('(prefers-reduced-motion: reduce)'), SMALL = win.matchMedia('(max-width:700px), (max-height:540px)'); /* V17.1: auch niedrige Bildschirme (Smartphone quer) – Bildmodus mit normalem Scrollen statt klebender 3D-Bühne */
     var reqMode = opts.mode === 'scroll' ? 'scroll' : 'steps';
 
     /* ---------- Aufräumen ---------- */
