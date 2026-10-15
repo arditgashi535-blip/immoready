@@ -16,7 +16,7 @@ const HIDE = '.jr-ui,.jr-tag,.jr-tech,.jr-hot{display:none!important}.jr-stage::
     const p = await b.newPage({ viewport: { width: 1440, height: 900 } });
     await p.addInitScript(() => { window.IR_FORCE_HQ = true; });
     await p.goto('file://' + file);
-    await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 180000 });
+    await p.evaluate(() => { const r = document.getElementById('reise'); if (r) r.scrollIntoView({ block: 'start', behavior: 'instant' }); }); await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 180000 });
     await p.addStyleTag({ content: HIDE });
     for (const c of K) {
       await p.evaluate(c => { window.__JR.setScale(1, true); window.__JR.jump(c.q); window.__JR.setCamera({ e: c.e, t: c.t, f: c.f }); }, c);
@@ -49,7 +49,7 @@ const HIDE = '.jr-ui,.jr-tag,.jr-tech,.jr-hot{display:none!important}.jr-stage::
     await p.evaluate(() => scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' })); await shot(p, '30-kontaktleiste-footer-390'); await p.close();
     p = await b.newPage({ viewport: { width: 768, height: 1024 }, isMobile: true, hasTouch: true, deviceScaleFactor: 1 }); await p.goto('file://' + file); await p.waitForTimeout(1500); await shot(p, '31-tablet-768'); await p.close();
     p = await b.newPage({ viewport: { width: 1440, height: 900 } }); await p.goto('file://' + file);
-    await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 180000 }).catch(() => {}); await shot(p, '32-desktop-1440'); await p.close();
+    await p.evaluate(() => { const r = document.getElementById('reise'); if (r) r.scrollIntoView({ block: 'start', behavior: 'instant' }); }); await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 180000 }).catch(() => {}); await shot(p, '32-desktop-1440'); await p.close();
   }
   await b.close();
 })();

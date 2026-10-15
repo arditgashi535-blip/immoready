@@ -134,7 +134,7 @@ var S={
   steps:[['Objekt schildern','Adresse, Anzahl Wohnungen und was heute gut oder weniger gut läuft.'],['Besichtigen','Wir sehen uns die Liegenschaft an und klären die Anforderungen.'],['Offerte erhalten','Mit Leistungsumfang und Intervallen für Ihr Objekt.'],['Betreuung starten','Mit festem Ansprechpartner und klaren Abläufen.']],
   faq:[['Wie oft kommen Sie vorbei?','Das legen wir gemeinsam fest – abhängig von Grösse, Nutzung und Anforderungen der Liegenschaft. Die vereinbarten Einsätze stehen in der Offerte.'],
    ['Können einzelne Leistungen später angepasst werden?','Ja. Der Leistungsumfang wird für jedes Objekt individuell vereinbart und kann bei Bedarf angepasst werden.'],
-   ['Wer ist mein Ansprechpartner?','Ardit Gashi, Inhaber von ImmoReady, ist Ihr direkter Kontakt – telefonisch und per E-Mail.']],
+   ['Wer ist mein Ansprechpartner?','Ardit Gashi ist Ihr direkter Kontakt bei ImmoReady – telefonisch und per E-Mail.']],
   cta:'Hauswartung besprechen',mode:'laufend',book:['Offertbesprechung Hauswartung buchen','kostenlose-offerte-hauswartung'],
   seo:['Hauswartung Zürich & Aargau | ImmoReady','Hauswartung für Mehrfamilienhäuser und STWEG in Zürich und Aargau: Kontrollrundgänge, Treppenhaus, Aussenpflege, kleiner Unterhalt. Jetzt Offerte anfragen.'],
   rel:['gartenunterhalt','reinigung','leerstand']},
@@ -344,11 +344,13 @@ ILLU.keys2=function(){var w=U('w');
 ILLU.sale=function(){var s=ILLU.house();return s.replace('Illustration einer gepflegten Wohnliegenschaft','Wohnliegenschaft für Verkauf und Vermittlung');};
 
 /* ---- V6: Bildserie, mit Canva KI generiert (Symbolbilder) ---- */
-var PH={"hero": "assets/img/hero.jpg", "treppe": "assets/img/treppe.jpg", "sanitaer": "assets/img/sanitaer.jpg", "garten": "assets/img/garten.jpg", "raum": "assets/img/raum.jpg", "eingang": "assets/img/eingang.jpg", "luft": "assets/img/luft.jpg"};
+var PH={"hero": "assets/img/hero.jpg", "treppe": "assets/img/treppe.jpg", "sanitaer": "assets/img/sanitaer.jpg", "garten": "assets/img/garten.jpg", "raum": "assets/img/raum.jpg", "eingang": "assets/img/eingang.jpg", "luft": "assets/img/luft.jpg", "hauswartung": "assets/img/hauswartung.jpg", "reinigung": "assets/img/reinigung.jpg", "karriere": "assets/img/karriere.jpg"};var PHSLOT={"alt": {}, "pos": {}, "tag": {"hero": "Symbolbild (KI)", "hauswartung": "Symbolbild (KI)", "sanitaer": "Symbolbild (KI)", "garten": "Symbolbild (KI)", "reinigung": "Symbolbild (KI)", "eingang": "Symbolbild (KI)", "luft": "Symbolbild (KI)", "karriere": "Symbolbild (KI)"}, "src": {"hero": "hero", "hauswartung": "treppe", "sanitaer": "sanitaer", "garten": "garten", "reinigung": "raum", "eingang": "eingang", "luft": "luft", "karriere": "treppe"}};
 var PHALT={"hero": "Moderne Wohnliegenschaft mit gepflegter Aussenanlage im Abendlicht", "treppe": "Helles, sauberes Treppenhaus mit Stahlgeländer", "sanitaer": "Moderne Waschtischarmatur aus gebürstetem Stahl", "garten": "Präzise geschnittene Hecke, Rasen und Lavendelbeet", "raum": "Heller, leerer und gereinigter Wohnraum mit Parkett", "eingang": "Gepflegter Hauseingang mit Vordach und Olivenbäumen", "luft": "Luftaufnahme einer Wohnüberbauung im Abendlicht"};
 var PHPOS={"hero": "50% 50%", "treppe": "40% 50%", "sanitaer": "38% 50%", "garten": "40% 55%", "raum": "50% 55%", "eingang": "50% 45%", "luft": "55% 50%"};
-function photo(k){return '<img class="ph" src="'+PH[k]+'" alt="'+PHALT[k]+' (Symbolbild)" decoding="async" style="object-position:'+PHPOS[k]+'"><span class="ph-tag">Symbolbild</span>';}
-var MAP={house:'hero',facade:'hero',facade2:'hero',sale:'hero',stair:'treppe',stair2:'treppe',faucet:'sanitaer',faucet2:'sanitaer',garden:'garten',garden2:'garten',clean:'raum',clean2:'raum',room:'raum',entrance:'eingang',entrance2:'eingang',keys:'eingang',keys2:'eingang',drone:'luft',aerial:'luft'};
+/* Bildflächen aus rise.json → assets.photos (build.py setzt PHSLOT): echtes Foto oder gekennzeichnetes Übergangsbild */
+var PHS=(typeof PHSLOT!=='undefined')?PHSLOT:{alt:{},pos:{},tag:{},src:{}};
+function photo(k){var o=PHS.src[k]||k,t=(k in PHS.tag)?PHS.tag[k]:'Symbolbild',a=PHS.alt[k]||PHALT[o];return '<img class="ph" src="'+PH[k]+'" alt="'+a+(t?' ('+t+')':'')+'" decoding="async" style="object-position:'+(PHS.pos[k]||PHPOS[o])+'" data-slot="'+k+'">'+(t?'<span class="ph-tag">'+t+'</span>':'');}
+var MAP={house:'hero',facade:'hero',facade2:'hero',sale:'hero',stair:'hauswartung',stair2:'hauswartung',faucet:'sanitaer',faucet2:'sanitaer',garden:'garten',garden2:'garten',clean:'reinigung',clean2:'reinigung',room:'reinigung',entrance:'eingang',entrance2:'eingang',keys:'eingang',keys2:'eingang',drone:'luft',aerial:'luft',career:'karriere'};
 Object.keys(MAP).forEach(function(k){ILLU[k]=function(){return photo(MAP[k]);};});
 
 function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
@@ -368,7 +370,7 @@ var HY=(function(){var W={'Leerstandsmanagement':'Leer-stands-manage-ment','Immo
  'mehrwertsteuerpflichtig':'mehrwertsteuer-pflichtig','Grundreinigung':'Grund-reinigung','Hauswartung':'Haus-wartung','Vermarktung':'Ver-marktung','Vermittlung':'Ver-mittlung',
  'Koordinationsaufwand':'Koordinations-aufwand','Wohnungsabnahme':'Wohnungs-abnahme','Unterhaltsarbeiten':'Unterhalts-arbeiten','Gesamtansicht':'Gesamt-ansicht',
  'Unterhaltsreinigung':'Unterhalts-reinigung','Treppenhausreinigung':'Treppenhaus-reinigung','Kompletträumung':'Komplett-räumung','Mehrfamilienhäuser':'Mehrfamilien-häuser',
- 'Umzugsreinigung':'Umzugs-reinigung','Kontrollrundgänge':'Kontroll-rundgänge','Gemeinschaftliche':'Gemeinschaft-liche','Zusammenarbeit':'Zusammen-arbeit','Aufbereitung':'Auf-bereitung','Kontaktdaten':'Kontakt-daten','Offertanfrage':'Offert-anfrage'};
+ 'Umzugsreinigung':'Umzugs-reinigung','Kontrollrundgänge':'Kontroll-rundgänge','Gemeinschaftliche':'Gemeinschaft-liche','Zusammenarbeit':'Zusammen-arbeit','Aufbereitung':'Auf-bereitung','Familienbetrieb':'Familien-betrieb','Initiativbewerbung':'Initiativ-bewerbung','Leistungsübersicht':'Leistungs-übersicht','Kontaktdaten':'Kontakt-daten','Offertanfrage':'Offert-anfrage'};
  var re=new RegExp(Object.keys(W).sort(function(a,b){return b.length-a.length;}).join('|'),'g'),SK=/^(SCRIPT|STYLE|TEXTAREA|INPUT|SELECT|OPTION|TITLE|CODE|PRE)$/;
  function txt(n){var t=n.data;if(t.length<11)return;var u=t.replace(re,function(w){return W[w].replace(/-/g,'­');});if(u!==t)n.data=u;}
  function run(root){if(!root)return;if(root.nodeType===3){if(!SK.test(root.parentNode&&root.parentNode.nodeName||''))txt(root);return;}if(root.nodeType!==1||SK.test(root.nodeName))return;
@@ -378,6 +380,16 @@ var HY=(function(){var W={'Leerstandsmanagement':'Leer-stands-manage-ment','Immo
  return run;})();
 
 /* ---------------- Leistungsseite rendern ---------------- */
+/* Welche Angaben helfen bei einer Anfrage (je Leistung) – nur Angaben, keine Versprechen */
+var INFO={
+ hauswartung:['Ort und Adresse der Liegenschaft','Anzahl Wohnungen und Hauseingänge','Welche Arbeiten regelmässig anfallen (z. B. Treppenhaus, Umgebung, Kontrollgänge)','Gewünschter Rhythmus und Starttermin'],
+ sanitaer:['Was defekt ist und wo (Bad, Küche, WC)','Ein oder zwei Fotos der Armatur, des Siphons oder des Spülkastens','Marke oder Typ, falls bekannt','Bei Mietwohnungen: ob die Verwaltung informiert ist'],
+ gartenunterhalt:['Ort und ungefähre Grösse der Fläche','Was zu tun ist: Rasen, Hecken, Rabatten, Laub','Einmalig oder regelmässig über das Jahr','Fotos des heutigen Zustands'],
+ reinigung:['Art der Reinigung: Unterhalt, Treppenhaus, Umzug oder Grundreinigung','Objekt und Grösse (Zimmer oder Fläche)','Gewünschter Termin oder Rhythmus','Zugang und Schlüssel'],
+ raeumung:['Was geräumt werden soll: Wohnung, Keller, Estrich','Ungefähre Menge, am besten mit Fotos','Stockwerk, Lift und Zufahrt','Gewünschter Termin'],
+ leerstand:['Objekt und Ort','Voraussichtliche Dauer des Leerstands','Gewünschte Kontrollen und Häufigkeit','Ansprechperson und Schlüsselübergabe'],
+ verkauf:['Objektart, Ort und ungefähre Grösse','Ob Sie verkaufen oder vermitteln möchten','Gewünschter Zeitpunkt','Vorhandene Unterlagen wie Grundriss oder Fotos'],
+ fotografie:['Objektart und Ort','Gewünschte Aufnahmen: Fotos, Drohne oder 360°-Rundgang','Verwendungszweck, z. B. Inserat oder Dokumentation','Gewünschter Termin'] };
 var SICON={hauswartung:'house',sanitaer:'drop',gartenunterhalt:'leaf',reinigung:'clean',raeumung:'box',leerstand:'key',verkauf:'tag',fotografie:'camera'};
 function renderService(key){
   var d=S[key], h='';
@@ -400,7 +412,10 @@ function renderService(key){
   // Zielgruppen + Ablauf
   h+='<section class="sec dark"><div class="wrap"><div class="side-l"><div><p class="mono eyebrow" style="color:var(--lime)">Geeignet für</p></div><ul class="aud">';
   d.aud.forEach(function(a){h+='<li>'+esc(a)+'</li>';});
-  h+='</ul></div><hr class="rule" style="margin:clamp(48px,6vw,80px) 0 0"><p class="mono eyebrow" style="margin-top:40px">Ablauf</p><ol class="steps" style="border-color:var(--line-d);margin-top:20px">';
+  h+='</ul></div>';
+  if(INFO[key]){h+='<hr class="rule" style="margin:clamp(48px,6vw,80px) 0 0"><div class="side-l" style="margin-top:40px"><div><p class="mono eyebrow" style="color:var(--lime)">Das hilft bei Ihrer Anfrage</p></div><ul class="info-list">';
+    INFO[key].forEach(function(x){h+='<li>'+esc(x)+'</li>';});h+='</ul></div>';}
+  h+='<hr class="rule" style="margin:clamp(48px,6vw,80px) 0 0"><p class="mono eyebrow" style="margin-top:40px">So geht es weiter</p><ol class="steps" style="border-color:var(--line-d);margin-top:20px">';
   d.steps.forEach(function(s,i){h+='<li style="border-color:var(--line-d)"><span class="n" style="color:var(--stone-d)">'+(i+1)+'</span><b>'+esc(s[0])+'</b><span class="muted">'+esc(s[1])+'</span></li>';});
   h+='</ol></div></section>';
   // FAQ
@@ -431,10 +446,10 @@ function fixOverview(){document.querySelectorAll('#overviewList a').forEach(func
 
 /* ---------------- Seitentitel ---------------- */
 var META={
- start:['ImmoReady – Hauswartung, Sanitär & Immobilienservice in Zürich und Aargau','Hauswartung, Sanitär, Gartenunterhalt, Reinigung, Räumung und Vermarktung für Liegenschaften in Zürich und Aargau. Persönlich geführt. Offerte anfragen.'],
+ start:['ImmoReady – Hauswartung, Sanitär & Immobilienservice in Zürich und Aargau','Familienbetrieb für Hauswartung, Sanitär und Unterhalt in Zürich und Aargau – dazu Garten, Reinigung, Räumung und Vermarktung. Persönlich betreut. Offerte anfragen.'],
  leistungen:['Leistungen rund um Ihre Liegenschaft | ImmoReady','Hauswartung, Sanitär & Unterhalt, Gartenunterhalt, Reinigung, Räumung, Leerstandsmanagement und Vermarktung in Zürich und Aargau.'],
  verwaltungen:['Liegenschaftsbetreuung für Verwaltungen | ImmoReady','Hauswartung, Garten, Reinigung und Unterhalt für kleine und mittlere Wohnliegenschaften – ein Ansprechpartner für Verwaltungen in Zürich und Aargau.'],
- ueber:['Über ImmoReady – Ardit Gashi | ImmoReady','ImmoReady wird von Ardit Gashi geführt: Fachmann Betriebsunterhalt EFZ und Facility Services Specialist WSF. Persönliche Betreuung in Zürich und Aargau.'],
+ ueber:['Über ImmoReady – Ardit Gashi | ImmoReady','ImmoReady ist ein Familienbetrieb für Hauswartung, Sanitär und Unterhalt in Zürich und Aargau. Ansprechpartner: Ardit Gashi, Fachmann Betriebsunterhalt EFZ.'],
  offerte:['Offerte anfragen | ImmoReady','Unverbindliche Offerte für Hauswartung, Sanitär, Garten, Reinigung, Räumung oder Vermarktung anfragen – in drei kurzen Schritten, mit Foto-Upload.'],
  kontakt:['Kontakt | ImmoReady','ImmoReady erreichen: Telefon 076 340 44 01, E-Mail info.immoready@gmail.com. Einsatzgebiet Zürich und Aargau.'],
  impressum:['Impressum | ImmoReady','Impressum von ImmoReady.'],
@@ -679,7 +694,9 @@ function wireForm(){var f=$('qf');
     if($('website').value)return;
     var ep=FORM_EP();
     if(ep){setBusy(true);sendQuote(ep).then(function(j){setBusy(false);var r=$('result');
-        r.innerHTML='<p class="ok">Vielen Dank für Ihre Anfrage.</p><p>Wir haben sie erhalten und melden uns bei Ihnen, um die nächsten Schritte zu besprechen.</p><p class="muted">Referenz: '+esc(String(j.id))+'</p><div style="display:flex;flex-wrap:wrap;gap:12px"><button type="button" class="btn inkb" id="newReq">Neue Anfrage</button></div>';
+        /* Drei Stufen getrennt: 1 übermittelt (Antwort erhalten), 2 gespeichert (Dienst bestätigt mit ok und Referenz),
+           3 Benachrichtigung – nur als zugestellt melden, wenn der Dienst es ausdrücklich bestätigt (notified === true). */
+        r.innerHTML='<p class="ok">Vielen Dank für Ihre Anfrage.</p><ul class="rstat"><li data-state="sent">Anfrage übermittelt</li><li data-state="stored">Anfrage gespeichert · Referenz '+esc(String(j.id))+'</li>'+(j.notified===true?'<li data-state="notified">Benachrichtigung an ImmoReady zugestellt</li>':'')+'</ul><p>Wir melden uns bei Ihnen, um die nächsten Schritte zu besprechen.</p><div style="display:flex;flex-wrap:wrap;gap:12px"><button type="button" class="btn inkb" id="newReq">Neue Anfrage</button></div>';
         f.hidden=true;r.hidden=false;r.focus();$('newReq').onclick=function(){f.reset();files=[];renderFiles();r.hidden=true;f.hidden=false;};})
       .catch(function(e){setBusy(false);var code=e&&e.code||'server';if(code==='invalid'&&e.fields){Object.keys(e.fields).forEach(function(k){setErr(k,String(e.fields[k]));});}
         $('failWhy').textContent=FAILTXT[code]||FAILTXT.server;$('failbox').hidden=false;$('failbox').scrollIntoView({block:'center'});});return;}
@@ -716,7 +733,7 @@ function renderSX(){var root=document.getElementById('svcx');if(!root)return;
   SX.forEach(function(d,i){var id='sx'+i;
     l+='<li class="sx-item'+(i===0?' on':'')+'" data-i="'+i+'"><h3 style="margin:0"><button type="button" class="sx-head" aria-pressed="'+(i===0)+'" aria-controls="sxDetail"><span class="n">'+pad(i+1)+'</span><i class="ico" data-icon="'+d[1]+'"></i><span class="t">'+esc(d[2])+'</span><svg class="chev" viewBox="0 0 20 20" aria-hidden="true"><path d="M7 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button></h3></li>';
     st+='<div class="sx-layer'+(i===0?' on':'')+'" data-i="'+i+'" aria-hidden="true"><div class="illu" data-illu="'+d[4]+'"></div></div>';
-    rail+='<li class="sx-card" data-i="'+i+'" ><div class="sx-cimg"><div class="illu" data-illu="'+d[4]+'"></div><span class="ph-tag">Symbolbild</span></div><div class="sx-cb"><span class="n">'+pad(i+1)+'</span><h3><i class="ico" data-icon="'+d[1]+'"></i>'+esc(d[2])+'</h3><p>'+esc(d[3])+'</p><div class="acts"><a class="btn sm" href="#offerte" data-pre="'+d[0]+'" data-mode="'+d[6]+'">'+esc(d[5])+' <i class="a"></i></a><a class="tlink" href="#'+d[0]+'">Details <i class="a"></i></a></div></div></li>';
+    rail+='<li class="sx-card" data-i="'+i+'" ><div class="sx-cimg"><div class="illu" data-illu="'+d[4]+'"></div></div><div class="sx-cb"><span class="n">'+pad(i+1)+'</span><h3><i class="ico" data-icon="'+d[1]+'"></i>'+esc(d[2])+'</h3><p>'+esc(d[3])+'</p><div class="acts"><a class="btn sm" href="#offerte" data-pre="'+d[0]+'" data-mode="'+d[6]+'">'+esc(d[5])+' <i class="a"></i></a><a class="tlink" href="#'+d[0]+'">Details <i class="a"></i></a></div></div></li>';
   });
   l+='<li class="sx-ind" aria-hidden="true" role="presentation"></li></ul>';st+='<span class="sx-tag" id="sxTag" aria-hidden="true">'+esc(SX[0][2])+'</span><span class="sx-count" aria-hidden="true"><b id="sxNum">01</b> / '+pad(N)+'</span><figcaption class="review-only">Symbolbilder (KI-generiert mit Canva)</figcaption></figure><div class="sx-detail" id="sxDetail" aria-live="polite"></div></div>';
   var mob='<ul class="sx-mob" role="list">'+rail+'</ul>';
@@ -734,11 +751,14 @@ function renderSX(){var root=document.getElementById('svcx');if(!root)return;
   act(0);
   /* Hover mit kurzer Absichtsverzögerung: schnelles Überfahren der Liste löst keine Bildwechsel-Kaskade aus */
   var hv=null,list=root.querySelector('.sx-list');
-  list.addEventListener('pointerover',function(e){if(e.pointerType!=='mouse')return;var h=e.target.closest('.sx-head');if(!h)return;clearTimeout(hv);var i=+h.closest('.sx-item').dataset.i;hv=setTimeout(function(){act(i);},55);});
+  /* Fertigstellung: Auswahl per Maus nur bei tatsächlicher Bewegung (pointermove mit Versatz) und nicht direkt nach Klick oder
+     Tastatur – sonst wählte der ruhende Zeiger nach dem Auf-/Zuklappen (Liste verschiebt sich) ungewollt den Nachbareintrag */
+  var lockUntil=0,lx=-1,ly=-1;
+  list.addEventListener('pointermove',function(e){if(e.pointerType!=='mouse')return;var mv=Math.abs(e.clientX-lx)+Math.abs(e.clientY-ly);lx=e.clientX;ly=e.clientY;if(mv<2||Date.now()<lockUntil)return;var h=e.target.closest('.sx-head');if(!h)return;var i=+h.closest('.sx-item').dataset.i;clearTimeout(hv);hv=setTimeout(function(){act(i);},55);});
   list.addEventListener('pointerleave',function(){clearTimeout(hv);});
-  list.addEventListener('click',function(e){var h=e.target.closest('.sx-head');if(!h)return;clearTimeout(hv);act(+h.closest('.sx-item').dataset.i);});
+  list.addEventListener('click',function(e){var h=e.target.closest('.sx-head');if(!h)return;clearTimeout(hv);lockUntil=Date.now()+900;act(+h.closest('.sx-item').dataset.i);});
   list.addEventListener('focusin',function(e){var h=e.target.closest('.sx-head');if(h)act(+h.closest('.sx-item').dataset.i);});
-  list.addEventListener('keydown',function(e){if(e.key!=='ArrowDown'&&e.key!=='ArrowUp')return;var h=e.target.closest('.sx-head');if(!h)return;e.preventDefault();var i=+h.closest('.sx-item').dataset.i+(e.key==='ArrowDown'?1:-1);i=(i+N)%N;root.querySelector('.sx-item[data-i="'+i+'"] .sx-head').focus();});
+  list.addEventListener('keydown',function(e){if(e.key!=='ArrowDown'&&e.key!=='ArrowUp')return;lockUntil=Date.now()+900;var h=e.target.closest('.sx-head');if(!h)return;e.preventDefault();var i=+h.closest('.sx-item').dataset.i+(e.key==='ArrowDown'?1:-1);i=(i+N)%N;root.querySelector('.sx-item[data-i="'+i+'"] .sx-head').focus();});
   root.querySelectorAll('.sx-layer [data-illu]').forEach(function(e){paintOne(e);});
 }
 
@@ -2600,11 +2620,21 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
     if (SMALL.matches || (RMQ.matches && reqMode === 'scroll')) setStatic();
     else root.classList.add('jr-live'), reqMode === 'steps' && root.classList.add('jr-button');
     function schedule(fn) { if (destroyed) return; if (win.requestIdleCallback) idleId = win.requestIdleCallback(fn, { timeout: 600 }); else startTimer = win.setTimeout(fn, 60); }
+    var later = function () { schedule(start); };
+    var startAfterLoad = function () { if (doc.readyState === 'complete') later(); else on(win, 'load', later, { once: true }); };
     if (opts.deferStart === false) { ensureBuilt(); start(); }
-    else {
-      var later = function () { schedule(start); };
-      if (doc.readyState === 'complete') later(); else on(win, 'load', later, { once: true });
+    /* Fertigstellung: Auf der Seite steht der Rundgang als optionaler Abschnitt weiter unten. Geometrie, Texturen, Lichtdaten
+       und WebGL erst vorbereiten, wenn er in Sichtnähe kommt (1,5 Bildschirmhöhen) – der Seitenstart bleibt frei.
+       Bildmodus (Smartphone, Bewegung reduzieren) startet wie bisher sofort, weil er nichts lädt. */
+    else if (opts.lazyStart && win.IntersectionObserver && !(SMALL.matches || (RMQ.matches && reqMode === 'scroll'))) {
+      var lazyIO = new win.IntersectionObserver(function (es) {
+        if (!es[0].isIntersecting || destroyed) return;
+        lazyIO.disconnect(); startAfterLoad();
+      }, { rootMargin: '150% 0px 150% 0px' });
+      lazyIO.observe(root);
+      disposers.push(function () { lazyIO.disconnect(); });
     }
+    else startAfterLoad();
 
     /* Routenprüfung: Abstand der Kamera zu allen Wänden und Möbeln entlang der ganzen Fahrt (interpoliert) */
     function checkRoute(n) {
@@ -2752,6 +2782,7 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
   var t=IRTour.create(root,{
     config:window.IR_RISE,
     mode:EMBED?'steps':'scroll',
+    lazyStart:!EMBED,
     textures:function(){return window.IR_TEX;},
     bake:function(){return window.IR_BAKE;},
     emit:function(name,detail){

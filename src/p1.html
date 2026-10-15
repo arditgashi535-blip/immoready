@@ -1,6 +1,6 @@
 <title>ImmoReady Relaunch</title>
 <link rel="icon" type="image/png" href="{{FAV}}">
-<meta name="description" content="Hauswartung, Sanitär, Gartenunterhalt, Reinigung, Räumung und Vermarktung für Liegenschaften in Zürich und Aargau.">
+<meta name="description" content="Familienbetrieb für Hauswartung, Sanitär und Unterhalt in Zürich und Aargau – dazu Garten, Reinigung, Räumung und Vermarktung. Persönlich betreut.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,200..900&display=swap">
@@ -1896,4 +1896,61 @@ body.hdr-compact .hdr{background:var(--ivory)}
 .co-list{margin:16px 0;display:grid;gap:0}.co-list>div{display:grid;grid-template-columns:minmax(0,14em) minmax(0,1fr);gap:4px 16px;padding:10px 0;border-top:1px solid var(--line)}
 .co-list dt{font-weight:600}.co-list dd{margin:0}
 @media (max-width:560px){.co-list>div{grid-template-columns:minmax(0,1fr)}}
+
+/* ===================== Fertigstellung (Familienbetrieb) =====================
+   Foto-Einstieg als erster Eindruck (Bildfläche «hero»), Karrierebereich, Rundgang als optionaler Abschnitt */
+.hero3{position:relative;background:var(--night,#252321);color:var(--ivory);overflow:hidden;isolation:isolate}
+.hero3-media{position:absolute;inset:0;margin:0;z-index:-1}
+.hero3-media .illu{width:100%;height:100%;overflow:hidden}
+.hero3-media .ph{animation:hero3Img 1.4s var(--e-out,ease) both}
+.hero3-media::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(37,35,33,.9) 0%,rgba(37,35,33,.66) 46%,rgba(37,35,33,.18) 100%);pointer-events:none}
+.hero3-media .ph-tag{top:auto;bottom:14px;right:14px;z-index:3}
+@keyframes hero3Img{from{transform:scale(1.045);opacity:.6}to{transform:none;opacity:1}}
+.hero3-copy{min-height:min(82vh,800px);display:flex;flex-direction:column;justify-content:center;padding-block:clamp(56px,8vw,120px)}
+.hero3-copy>*{max-width:40rem;animation:hero3In .9s var(--e-out,ease) both}
+.hero3-copy>:nth-child(2){animation-delay:.08s}.hero3-copy>:nth-child(3){animation-delay:.16s}.hero3-copy>:nth-child(4){animation-delay:.24s}.hero3-copy>:nth-child(5){animation-delay:.32s}
+@keyframes hero3In{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.hero3-kicker{color:var(--lime);letter-spacing:.16em;white-space:normal}
+.hero3-title{font-size:clamp(2.3rem,5.4vw,4.8rem);line-height:1.03;font-weight:300;font-stretch:118%;letter-spacing:-.01em;margin:18px 0 22px;color:#F7F3EB}
+.hero3-title b{font-weight:740;display:inline}
+.hero3-sub{font-size:clamp(1.08rem,1.45vw,1.28rem);line-height:1.55;color:#EEE8E0;max-width:40ch}
+.hero3-ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+.hero3 .btn.ghost{color:var(--ivory);border-color:rgba(252,248,245,.6)}
+.hero3 .btn.ghost:hover{background:rgba(252,248,245,.1)}
+.hero3 .btn:focus-visible{outline-color:var(--lime)}
+.hero3-facts{list-style:none;margin:34px 0 0;padding:18px 0 0;display:flex;flex-wrap:wrap;gap:8px 24px;color:#E7E1D9;font-size:.95rem;border-top:1px solid rgba(252,248,245,.22)}
+.hero3-facts li{display:flex;align-items:center;gap:10px}
+.hero3-facts li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--lime);flex:none}
+@media (max-width:760px){
+  .hero3-media{position:relative;inset:auto;aspect-ratio:4/3;z-index:0}
+  .hero3-media::after{background:linear-gradient(0deg,rgba(37,35,33,.45),rgba(37,35,33,0) 45%)}
+  .hero3-copy{min-height:0;padding-block:28px 40px}
+  .hero3-title{font-size:clamp(2.1rem,9.4vw,2.8rem);font-stretch:110%}
+  .hero3-ctas .btn{flex:1 1 100%;justify-content:space-between}
+  .hero3-facts{flex-direction:column;gap:10px}
+}
+@media (max-height:540px) and (min-width:701px){.hero3-copy{min-height:0;padding-block:40px}}
+
+.career{background:var(--graphite);color:var(--ivory)}
+.career-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(28px,5vw,80px);align-items:center}
+.career-media{position:relative;margin:0;aspect-ratio:4/3;border-radius:4px;overflow:hidden;background:#3E3B38}
+.career .num{color:var(--stone-d)}.career .num span{color:var(--lime)}
+.career .display{color:var(--ivory)}
+.career .lead{color:#E9E4DD;max-width:46ch;margin-top:20px}
+.career .row-ctas{margin-top:28px}
+.career .fine{color:var(--stone-d);max-width:54ch;margin-top:18px;font-size:.92rem;line-height:1.55}
+.career .fine a{color:var(--ivory)}
+@media (max-width:860px){.career-grid{grid-template-columns:minmax(0,1fr)}.career-media{aspect-ratio:16/10}}
+@media (max-width:760px){.career .row-ctas .btn{flex:1 1 100%;justify-content:space-between}}
+
+/* Rundgang mitten in der Seite: Abstand zum vorherigen Abschnitt, Überschrift als h2 (die h1 steht im Einstieg) */
+#reise .hx-title{font-size:clamp(2rem,4.4vw,3.8rem)}
+@media (prefers-reduced-motion:reduce){.hero3-media .ph,.hero3-copy>*{animation:none!important}}
+.info-list{list-style:none;margin:0;padding:0;display:grid;gap:0;grid-template-columns:minmax(0,1fr);min-width:0}
+.info-list li{padding:14px 0 14px 28px;border-top:1px solid var(--line-d);position:relative;color:#E9E4DD}
+.info-list li::before{content:"";position:absolute;left:4px;top:23px;width:8px;height:8px;border-radius:50%;border:1.5px solid var(--lime)}
+.rstat{list-style:none;margin:6px 0 4px;padding:0;display:grid;gap:6px}.rstat li{display:flex;gap:10px;align-items:center}
+.rstat li::before{content:"✓";display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--ink);color:var(--ivory);font-size:.72rem;flex:none}
+/* Hauswartung: längere Überschrift «Damit Ihre Liegenschaft im Alltag funktioniert.» – kleiner gesetzt, bleibt in ihrer Spalte */
+.hw-head .display{font-size:clamp(2.2rem,4.4vw,4.2rem);overflow-wrap:break-word}
 </style>

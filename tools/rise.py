@@ -99,7 +99,32 @@ def validate(d):
     if d['services'][0]['key'] != 'hauswartung':
         errors.append('Hauswartung muss die wichtigste Leistung bleiben (Priorität 1)')
     errors += _company_rules(d)
+    errors += _photo_career_rules(d)
     return errors
+
+
+def _photo_career_rules(d):
+    e = []
+    for sl in d['assets'].get('photos', {}).get('slots', []):
+        st = sl['status']
+        if st not in ('ki-symbolbild', 'eigen', 'stock', 'fehlt'):
+            e.append('Foto %s: unbekannter Status %s' % (sl['id'], st))
+        if st == 'stock':
+            miss = [k for k in ('file', 'source', 'sourceId', 'license', 'credit') if UNSPEC(sl.get(k, '[UNSPECIFIED]'))]
+            if miss:
+                e.append('Fremdbild %s: Nachweis fehlt (%s)' % (sl['id'], ', '.join(miss)))
+        if st == 'eigen' and UNSPEC(sl.get('file', '[UNSPECIFIED]')):
+            e.append('Eigenes Foto %s: Datei fehlt' % sl['id'])
+        if sl['id'] == 'portraet' and st not in ('eigen', 'fehlt'):
+            e.append('Porträt nur als eigenes Foto (kein Stock- oder KI-Bild)')
+    c = d.get('careers', {})
+    if c.get('vacancies'):
+        e.append('Keine Stellen ohne Bestätigung des Inhabers eintragen (careers.vacancies)')
+    if c.get('upload'):
+        e.append('Kein Lebenslauf-Upload ohne sichere Speicherung und Zugriffsschutz (careers.upload)')
+    if any('WSF' in q or 'Facility Services' in q for q in d['firm']['qualifications']):
+        e.append('WSF-Qualifikation nicht mehr aufführen')
+    return e
 
 
 UNSPEC = lambda v: isinstance(v, str) and v.startswith('[UNSPECIFIED')
@@ -143,6 +168,9 @@ def launch_check(d):
         o.append('Formular nicht angeschlossen (wix.formEndpoint) – Demo-Modus')
     if c['status'] != 'eingetragen' or d['firm']['role'] == 'Inhaber':
         o.append('Funktion von %s in der GmbH bestätigen und als Bezeichnung auf der Website setzen (firm.role, heute «%s»)' % (d['firm']['contactPerson'], d['firm']['role']))
+    for sl in d['assets'].get('photos', {}).get('slots', []):
+        if sl['status'] in ('ki-symbolbild', 'fehlt'):
+            o.append('Foto «%s»: %s (assets.photos)' % (sl['id'], 'KI-Übergangsbild durch eigenes oder lizenziertes Foto ersetzen' if sl['status'] == 'ki-symbolbild' else 'eigenes Foto fehlt'))
     if not c['goLiveApproved']:
         o.append('Livegang nicht ausdrücklich freigegeben (firm.company.goLiveApproved)')
     return o
@@ -150,6 +178,46 @@ def launch_check(d):
 
 def _miss(t):
     return '<span class="missing">%s</span>' % _e(t)
+
+
+def photo_credits(d):
+    """Bildnachweis im Impressum aus rise.json → assets.photos (Fremdbilder mit Quelle, Urheber und Nutzungsgrundlage)."""
+    slots = d['assets'].get('photos', {}).get('slots', [])
+    stock = [x for x in slots if x['status'] == 'stock']
+    own = any(x['status'] == 'eigen' for x in slots)
+    ki = [x for x in slots if x['status'] == 'ki-symbolbild']
+    parts = ['Logo: ImmoReady.']
+    if own:
+        parts.append('Eigene Fotos: ImmoReady.')
+    for x in stock:
+        parts.append('%s: %s, %s (%s).' % (_e(x['motive'].split(' (')[0]), _e(x['credit']), _e(x['source']), _e(x['license'])))
+    if ki:
+        parts.append('Symbolbilder: mit Canva erstellt (KI-generiert) – sie zeigen keine realen Objekte, Kundenliegenschaften oder Mitarbeitenden.')
+    parts.append('3D-Rundgang: illustrative Visualisierung, eigene Erstellung, kein Referenzobjekt.')
+    h = '<p>%s</p>' % ' '.join(parts)
+    if ki:
+        h += ('<p class="review-only placeholder-box" style="margin-top:16px">Offen: %d Bildflächen zeigen noch KI-Übergangsbilder (%s). '
+              'Ersetzen durch eigene oder nachweislich lizenzierte Fotos (rise.json → assets.photos); Nutzungsbedingungen der Canva-Bilder prüfen, solange sie verwendet werden.</p>') % (
+            len(ki), ', '.join(x['id'] for x in ki))
+    return h
+
+
+def careers_markup(d):
+    """Karrierebereich: Initiativbewerbung per E-Mail (kein Formular, kein Upload, keine erfundenen Stellen)."""
+    import urllib.parse
+    c = d['careers']
+    href = 'mailto:%s?subject=%s' % (c['email'], urllib.parse.quote(c['subject']))
+    return ('<section class="sec career" id="karriere" aria-labelledby="h-career">'
+            '<div class="wrap career-grid">'
+            '<figure class="career-media mask"><div class="mask-in"><div class="illu" data-illu="career"></div></div></figure>'
+            '<div class="career-copy"><p class="num reveal"><span>06</span>%s</p>'
+            '<h2 class="display reveal" id="h-career">%s</h2>'
+            '<p class="lead reveal">%s</p>'
+            '<div class="row-ctas reveal"><a class="btn sand" href="%s" data-career>%s <i class="a"></i></a></div>'
+            '<p class="fine reveal" id="career-hint">Der Knopf öffnet Ihr E-Mail-Programm mit dem Betreff «%s». '
+            'Sie erreichen uns auch direkt unter <a href="%s">%s</a>. Lebenslauf und Zeugnisse können Sie als Anhang mitsenden.</p>'
+            '</div></div></section>') % (_e(c['kicker']), _e(c['headline']), _e(c['text']), href, _e(c['cta']), _e(c['subject']),
+                                         href, _e(c['email']).replace('@', '<wbr>@'))
 
 
 def firm_markup(d):
@@ -291,7 +359,9 @@ def tour_markup(d, still_src, inline_arrow=False, page=True):
             l1 = parts[0] + ('.' if not parts[0].endswith('.') else '')
             l2 = ' '.join(parts[1:])
             out.append('<div class="jr-st jr-st0 hx-copy on" data-k="%s"><p class="mono hx-kicker">%s</p>' % (s['key'], _e(s['kicker'])))
-            out.append('<h1 id="h-hero" class="hx-title"><span class="ln"><span style="--d:.1s">%s</span></span><span class="ln"><span style="--d:.2s"><b>%s</b></span></span></h1>' % (_e(l1), _e(l2)))
+            # Rundgang ist ein optionaler Abschnitt der Seite (Abschnitt 6) – die Seitenüberschrift h1 steht im Foto-Einstieg
+            l2h = '<span class="ln"><span style="--d:.2s"><b>%s</b></span></span>' % _e(l2) if l2 else ''
+            out.append('<h2 id="h-hero" class="hx-title"><span class="ln"><span style="--d:.1s">%s</span></span>%s</h2>' % (_e(l1), l2h))
             out.append('<p class="hx-sub">%s</p>' % _e(s['text']))
             out.append('<div class="hx-ctas hx-in">%s</div></div>' % ''.join(_cta(c, inline_arrow, False) for c in s['ctas']))
         elif i == len(st) - 1:
@@ -321,7 +391,7 @@ def tour_markup(d, still_src, inline_arrow=False, page=True):
                   % (i, ' class="on" aria-current="step"' if i == 0 else '', _e(s['nav'])) for i, s in enumerate(st))
     out.append('<nav class="jr-nav" aria-label="Stationen des Rundgangs"><ol>%s</ol><div class="jr-bar" aria-hidden="true"><i></i></div></nav>' % nav)
     if page:
-        out.append('<div class="jr-skip"><a href="#leistungswelt" class="jr-skip-a">Tour überspringen %s</a><a href="#offerte" class="jr-skip-o">Offerte anfragen</a></div>' % a)
+        out.append('<div class="jr-skip"><a href="#ablauf" class="jr-skip-a">Tour überspringen %s</a><a href="#offerte" class="jr-skip-o">Offerte anfragen</a></div>' % a)
     else:
         out.append('<div class="jr-skip"><button type="button" class="jr-skip-a" data-skip>Tour überspringen %s</button><a href="#offerte" class="jr-skip-o">Offerte anfragen</a></div>' % a)
     out.append('<div class="jr-steps" role="group" aria-label="Rundgang steuern"><button type="button" class="jr-stepb" data-step="-1" aria-label="Vorherige Station">← Zurück</button><button type="button" class="jr-stepb" data-step="1" aria-label="Nächste Station">Weiter →</button></div>')

@@ -11,7 +11,7 @@ fs.mkdirSync(out, { recursive: true });
   const p = await b.newPage({ viewport: { width: 1440, height: 900 } });
   await p.addInitScript(() => { window.IR_FORCE_HQ = true; });
   await p.goto('file://' + file);
-  await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 120000 });
+  await p.evaluate(() => { const r = document.getElementById('reise'); if (r) r.scrollIntoView({ block: 'start', behavior: 'instant' }); }); await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 120000 });
   await p.addStyleTag({ content: '.jr-ui,.jr-tag,.jr-tech,.jr-hot{display:none!important}.jr-stage::after{display:none!important}.hdr,.demo,.mbar{display:none!important}' });
   for (const c of list) {
     await p.evaluate(c => { window.__JR.setScale(1, true); window.__JR.jump(c.q); window.__JR.setCamera({ e: c.e, t: c.t, f: c.f }); }, c);

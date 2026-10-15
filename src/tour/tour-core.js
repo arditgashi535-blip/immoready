@@ -1053,11 +1053,21 @@
     if (SMALL.matches || (RMQ.matches && reqMode === 'scroll')) setStatic();
     else root.classList.add('jr-live'), reqMode === 'steps' && root.classList.add('jr-button');
     function schedule(fn) { if (destroyed) return; if (win.requestIdleCallback) idleId = win.requestIdleCallback(fn, { timeout: 600 }); else startTimer = win.setTimeout(fn, 60); }
+    var later = function () { schedule(start); };
+    var startAfterLoad = function () { if (doc.readyState === 'complete') later(); else on(win, 'load', later, { once: true }); };
     if (opts.deferStart === false) { ensureBuilt(); start(); }
-    else {
-      var later = function () { schedule(start); };
-      if (doc.readyState === 'complete') later(); else on(win, 'load', later, { once: true });
+    /* Fertigstellung: Auf der Seite steht der Rundgang als optionaler Abschnitt weiter unten. Geometrie, Texturen, Lichtdaten
+       und WebGL erst vorbereiten, wenn er in Sichtnähe kommt (1,5 Bildschirmhöhen) – der Seitenstart bleibt frei.
+       Bildmodus (Smartphone, Bewegung reduzieren) startet wie bisher sofort, weil er nichts lädt. */
+    else if (opts.lazyStart && win.IntersectionObserver && !(SMALL.matches || (RMQ.matches && reqMode === 'scroll'))) {
+      var lazyIO = new win.IntersectionObserver(function (es) {
+        if (!es[0].isIntersecting || destroyed) return;
+        lazyIO.disconnect(); startAfterLoad();
+      }, { rootMargin: '150% 0px 150% 0px' });
+      lazyIO.observe(root);
+      disposers.push(function () { lazyIO.disconnect(); });
     }
+    else startAfterLoad();
 
     /* Routenprüfung: Abstand der Kamera zu allen Wänden und Möbeln entlang der ganzen Fahrt (interpoliert) */
     function checkRoute(n) {

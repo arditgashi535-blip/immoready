@@ -16,7 +16,7 @@ function renderSX(){var root=document.getElementById('svcx');if(!root)return;
   SX.forEach(function(d,i){var id='sx'+i;
     l+='<li class="sx-item'+(i===0?' on':'')+'" data-i="'+i+'"><h3 style="margin:0"><button type="button" class="sx-head" aria-pressed="'+(i===0)+'" aria-controls="sxDetail"><span class="n">'+pad(i+1)+'</span><i class="ico" data-icon="'+d[1]+'"></i><span class="t">'+esc(d[2])+'</span><svg class="chev" viewBox="0 0 20 20" aria-hidden="true"><path d="M7 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button></h3></li>';
     st+='<div class="sx-layer'+(i===0?' on':'')+'" data-i="'+i+'" aria-hidden="true"><div class="illu" data-illu="'+d[4]+'"></div></div>';
-    rail+='<li class="sx-card" data-i="'+i+'" ><div class="sx-cimg"><div class="illu" data-illu="'+d[4]+'"></div><span class="ph-tag">Symbolbild</span></div><div class="sx-cb"><span class="n">'+pad(i+1)+'</span><h3><i class="ico" data-icon="'+d[1]+'"></i>'+esc(d[2])+'</h3><p>'+esc(d[3])+'</p><div class="acts"><a class="btn sm" href="#offerte" data-pre="'+d[0]+'" data-mode="'+d[6]+'">'+esc(d[5])+' <i class="a"></i></a><a class="tlink" href="#'+d[0]+'">Details <i class="a"></i></a></div></div></li>';
+    rail+='<li class="sx-card" data-i="'+i+'" ><div class="sx-cimg"><div class="illu" data-illu="'+d[4]+'"></div></div><div class="sx-cb"><span class="n">'+pad(i+1)+'</span><h3><i class="ico" data-icon="'+d[1]+'"></i>'+esc(d[2])+'</h3><p>'+esc(d[3])+'</p><div class="acts"><a class="btn sm" href="#offerte" data-pre="'+d[0]+'" data-mode="'+d[6]+'">'+esc(d[5])+' <i class="a"></i></a><a class="tlink" href="#'+d[0]+'">Details <i class="a"></i></a></div></div></li>';
   });
   l+='<li class="sx-ind" aria-hidden="true" role="presentation"></li></ul>';st+='<span class="sx-tag" id="sxTag" aria-hidden="true">'+esc(SX[0][2])+'</span><span class="sx-count" aria-hidden="true"><b id="sxNum">01</b> / '+pad(N)+'</span><figcaption class="review-only">Symbolbilder (KI-generiert mit Canva)</figcaption></figure><div class="sx-detail" id="sxDetail" aria-live="polite"></div></div>';
   var mob='<ul class="sx-mob" role="list">'+rail+'</ul>';
@@ -34,11 +34,14 @@ function renderSX(){var root=document.getElementById('svcx');if(!root)return;
   act(0);
   /* Hover mit kurzer Absichtsverzögerung: schnelles Überfahren der Liste löst keine Bildwechsel-Kaskade aus */
   var hv=null,list=root.querySelector('.sx-list');
-  list.addEventListener('pointerover',function(e){if(e.pointerType!=='mouse')return;var h=e.target.closest('.sx-head');if(!h)return;clearTimeout(hv);var i=+h.closest('.sx-item').dataset.i;hv=setTimeout(function(){act(i);},55);});
+  /* Fertigstellung: Auswahl per Maus nur bei tatsächlicher Bewegung (pointermove mit Versatz) und nicht direkt nach Klick oder
+     Tastatur – sonst wählte der ruhende Zeiger nach dem Auf-/Zuklappen (Liste verschiebt sich) ungewollt den Nachbareintrag */
+  var lockUntil=0,lx=-1,ly=-1;
+  list.addEventListener('pointermove',function(e){if(e.pointerType!=='mouse')return;var mv=Math.abs(e.clientX-lx)+Math.abs(e.clientY-ly);lx=e.clientX;ly=e.clientY;if(mv<2||Date.now()<lockUntil)return;var h=e.target.closest('.sx-head');if(!h)return;var i=+h.closest('.sx-item').dataset.i;clearTimeout(hv);hv=setTimeout(function(){act(i);},55);});
   list.addEventListener('pointerleave',function(){clearTimeout(hv);});
-  list.addEventListener('click',function(e){var h=e.target.closest('.sx-head');if(!h)return;clearTimeout(hv);act(+h.closest('.sx-item').dataset.i);});
+  list.addEventListener('click',function(e){var h=e.target.closest('.sx-head');if(!h)return;clearTimeout(hv);lockUntil=Date.now()+900;act(+h.closest('.sx-item').dataset.i);});
   list.addEventListener('focusin',function(e){var h=e.target.closest('.sx-head');if(h)act(+h.closest('.sx-item').dataset.i);});
-  list.addEventListener('keydown',function(e){if(e.key!=='ArrowDown'&&e.key!=='ArrowUp')return;var h=e.target.closest('.sx-head');if(!h)return;e.preventDefault();var i=+h.closest('.sx-item').dataset.i+(e.key==='ArrowDown'?1:-1);i=(i+N)%N;root.querySelector('.sx-item[data-i="'+i+'"] .sx-head').focus();});
+  list.addEventListener('keydown',function(e){if(e.key!=='ArrowDown'&&e.key!=='ArrowUp')return;lockUntil=Date.now()+900;var h=e.target.closest('.sx-head');if(!h)return;e.preventDefault();var i=+h.closest('.sx-item').dataset.i+(e.key==='ArrowDown'?1:-1);i=(i+N)%N;root.querySelector('.sx-item[data-i="'+i+'"] .sx-head').focus();});
   root.querySelectorAll('.sx-layer [data-illu]').forEach(function(e){paintOne(e);});
 }
 

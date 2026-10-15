@@ -15,7 +15,7 @@ import base64, json, os, re, shutil, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 os.chdir(HERE)
 sys.path.insert(0, HERE)
-from tools.rise import load, tour_config, tour_markup, firm_markup, launch_check  # noqa: E402
+from tools.rise import load, tour_config, tour_markup, firm_markup, launch_check, careers_markup, photo_credits  # noqa: E402
 
 RISE = load()  # bricht bei Schemafehlern ab
 # Veröffentlichungsstand nur nach bestätigter GmbH-Eintragung und ausdrücklicher Freigabe (docs/VEROEFFENTLICHUNG.md).
@@ -96,10 +96,55 @@ def firm(h):
     h = h.replace('<!--{{FIRM_IMPRINT}} (Unternehmensangaben aus rise.json → firm.company, erzeugt durch build.py)-->', FIRM['imprint'])
     h = h.replace('<!--{{FIRM_PRIVACY}}-->', FIRM['privacy']).replace('<!--{{FIRM_ADDRESS_NOTE}}-->', FIRM['address_note'])
     h = h.replace('<!--{{FIRM_FOOTER}}-->', FIRM['footer']).replace('{{FIRM_ROLE}}', RISE['firm']['role'])
+    h = h.replace('<!--{{CAREERS}}-->', careers_markup(RISE)).replace('<!--{{PHOTO_CREDITS}}-->', photo_credits(RISE))
     return h
 
 
 html = firm(html)
+
+# ---------------- Fotos (rise.json → assets.photos) ----------------
+# Jede Bildfläche hat eine ID. Liegt ein eigenes oder lizenziertes Foto vor (status eigen/stock, Datei vorhanden), wird es
+# verkleinert (max. 1800 px, JPEG 82) eingebettet; sonst bleibt das gekennzeichnete Übergangsbild (interim).
+PHOTOS = RISE['assets'].get('photos', {}).get('slots', [])
+
+
+def _photo_uri(path):
+    try:
+        from PIL import Image
+        import io
+        im = Image.open(path).convert('RGB')
+        if im.width > 1800:
+            im = im.resize((1800, round(im.height * 1800 / im.width)), Image.LANCZOS)
+        buf = io.BytesIO()
+        im.save(buf, 'JPEG', quality=82, optimize=True, progressive=True)
+        return 'data:image/jpeg;base64,' + base64.b64encode(buf.getvalue()).decode()
+    except ImportError:
+        return b64(path, 'image/jpeg')
+
+
+def photos(h):
+    i = h.index('var PH=')
+    j = h.index('};', i)
+    ph = json.loads(h[i + 7:j + 1])
+    alt, pos, tag, src = {}, {}, {}, {}
+    for sl in PHOTOS:
+        real = sl['status'] in ('eigen', 'stock') and not sl['file'].startswith('[') and os.path.exists(sl['file'])
+        if real:
+            ph[sl['id']] = _photo_uri(sl['file'])
+        elif sl.get('interim'):
+            ph[sl['id']] = ph[sl['interim']]
+        else:
+            continue
+        if real:  # Übergangsbilder behalten die Beschreibung des tatsächlich gezeigten Bildes (PHALT im Skript)
+            alt[sl['id']] = sl['alt']
+            pos[sl['id']] = sl['pos']
+        else:
+            src[sl['id']] = sl['interim']
+        tag[sl['id']] = '' if (real and sl['status'] == 'eigen') else ('Symbolbild' if real else 'Symbolbild (KI)')
+    return (h[:i] + 'var PH=' + json.dumps(ph) + ';var PHSLOT=' + json.dumps({'alt': alt, 'pos': pos, 'tag': tag, 'src': src}, ensure_ascii=False) + h[j + 1:])
+
+
+html = photos(html)
 html = html.replace('{{LOGOO}}', b64('assets/logo_orig.png', 'image/png')).replace('{{FAV}}', b64('assets/fav.png', 'image/png'))
 html = html.replace('window.IR_RISE={{CFG}};', 'window.IR_RISE=' + CFG_JS + ';', 1)
 assert '{{' not in html, 'Platzhalter übrig: ' + html[html.index('{{'):html.index('{{') + 40]
@@ -174,7 +219,7 @@ def build_site():
     h = ''.join(read('src/' + p) for p in PARTS[:2]) + '<script>window.IR_RISE={{CFG}};</script>' + ''.join(read('src/' + p) for p in PARTS[2:])
     h = h.replace('<!--{{RISE_TOUR}} (erzeugt aus rise.json durch build.py)-->',
                   tour_markup(RISE, lambda i, s, portrait: 'assets/tour/' + os.path.basename(PORTRAIT_FILES[i] if portrait else STILL_FILES[i])))
-    h = firm(h.replace('/*{{TOUR_CORE}}*/', CORE)).replace('{{LOGOO}}', 'assets/logo_orig.png').replace('{{FAV}}', 'assets/fav.png')
+    h = photos(firm(h.replace('/*{{TOUR_CORE}}*/', CORE))).replace('{{LOGOO}}', 'assets/logo_orig.png').replace('{{FAV}}', 'assets/fav.png')
     h = h.replace('window.IR_RISE={{CFG}};', 'window.IR_RISE=' + CFG_JS + ';', 1)
     i = h.index('var PH=')
     j = h.index('};', i)

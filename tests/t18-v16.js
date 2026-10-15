@@ -11,7 +11,7 @@ const log = []; const ok = (c, m) => log.push((c ? 'PASS ' : 'FAIL ') + m);
   const b = await chromium.launch({ ...(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}), args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
   let p = await b.newPage({ viewport: { width: 1440, height: 900 } }); const errs = []; p.on('pageerror', e => errs.push(e.message));
   await p.goto(url);
-  await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 90000 });
+  await p.evaluate(() => { const r = document.getElementById('reise'); if (r) r.scrollIntoView({ block: 'start', behavior: 'instant' }); }); await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 90000 });
 
   // 1 Treppe: Kopfhöhe senkrecht über jeder Stufenvorderkante bis zur nächsten Fläche (echte Dreiecksgeometrie)
   const head = await p.evaluate(F => { const o = []; for (let s = 0; s < 11; s++) { const y = F + 0.176 * (s + 1) + 0.002, z = 5.01 - 0.29 * s - 0.015; [-2.7, -2.35, -2.0].forEach(x => { const up = window.__JR.rayY(x, y, z, 1); o.push(up === null ? 99 : +(up - y).toFixed(3)); }); } return o; }, FLOOR);

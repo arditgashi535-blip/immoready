@@ -16,7 +16,7 @@ const settle = (p, q) => p.evaluate(q => { window.__f0 = window.__JR.state().fra
   let p = await b.newPage({ viewport: { width: 1440, height: 900 } }); const errs = []; p.on('pageerror', e => errs.push(e.message));
   p.on('console', m => { if (/GL_INVALID|WebGL: INVALID|feedback loop/i.test(m.text())) errs.push(m.text()); });
   await p.goto(url);
-  await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 90000 });
+  await p.evaluate(() => { const r = document.getElementById('reise'); if (r) r.scrollIntoView({ block: 'start', behavior: 'instant' }); }); await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 90000 });
 
   // 1 Nahebene (nicht nur der Kameramittelpunkt) gegen Wände, Möbel und die bewegten Türflügel
   const fr = await p.evaluate(() => window.__JR.checkFrustum(3000));
@@ -74,7 +74,7 @@ const settle = (p, q) => p.evaluate(q => { window.__f0 = window.__JR.state().fra
   ok(rq.length === 1 && rq[0].service === 'gartenunterhalt' && rq[0].station === 'garten' && rq[0].source === 'tour', `Klick → request-quote ${JSON.stringify(rq[0] || {})}`);
   ok(pre[0] === '#offerte' && pre[1] === 'gartenunterhalt', `Offertformular geöffnet, Leistung vorausgewählt (${pre.join(' · ')})`);
   await p.goto(url);
-  await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 90000 });
+  await p.evaluate(() => { const r = document.getElementById('reise'); if (r) r.scrollIntoView({ block: 'start', behavior: 'instant' }); }); await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 90000 });
 
   // 5 Ruhige Kamera: zwei Bilder hintereinander identisch (kein Textur- oder Laubflackern, kein Spiegelrauschen)
   const still = [];
@@ -99,7 +99,7 @@ const settle = (p, q) => p.evaluate(q => { window.__f0 = window.__JR.state().fra
   const p2 = await b.newPage({ viewport: { width: 1280, height: 800 } }); const e2 = []; p2.on('pageerror', e => e2.push(e.message));
   await p2.addInitScript(() => { window.IR_EMBED = 1; });
   await p2.goto(url);
-  await p2.waitForFunction(() => window.__jr === true, null, { timeout: 90000 });
+  await p2.evaluate(() => { const r = document.getElementById('reise'); if (r) r.scrollIntoView({ block: 'start', behavior: 'instant' }); }); await p2.waitForFunction(() => window.__jr === true, null, { timeout: 90000 });
   for (const i of [4, 0, 5, 2, 3, 1, 4, 2]) { await p2.evaluate(i => window.__JR.goStation(i), i); await p2.waitForTimeout(60); }
   await p2.waitForFunction(() => { const s = window.__JR.state(); return Math.abs(s.p - s.ps) < 0.0004; }, null, { timeout: 30000 }).catch(() => {});
   const fin = await p2.evaluate(() => ({ st: window.__JR.station(), p: window.__JR.state().ps }));

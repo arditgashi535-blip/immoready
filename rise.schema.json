@@ -126,8 +126,7 @@
           "type": "array",
           "items": {
             "enum": [
-              "Fachmann Betriebsunterhalt EFZ",
-              "Facility Services Specialist WSF"
+              "Fachmann Betriebsunterhalt EFZ"
             ]
           },
           "uniqueItems": true

@@ -36,21 +36,16 @@ Nichts davon ist erfunden: Firmenname, Sitz, Geschäftsadresse, UID, Handelsregi
 
 `python3 tools/rise.py --launch` (oder `npm run launch:check`) listet die offenen Punkte und bricht mit Exit 1 ab, solange etwas fehlt. `python3 build.py --release` verweigert in diesem Fall den Release-Build.
 
-Heute offen (14 Punkte):
-1. Gründung der GmbH bestätigt (Eintragung im Handelsregister).
-2. Eingetragener Firmenname (muss «GmbH» enthalten).
-3. Sitz.
-4. Geschäftsadresse.
-5. UID (Format `CHE-123.456.789`).
-6. Handelsregister (Kanton, Eintrag).
-7. Zeichnungsberechtigte Person(en) und Funktion.
-8. MWST-Nummer oder Vermerk «nicht MWST-pflichtig».
-9. Funktion von Ardit Gashi in der GmbH bestätigen. Heute steht auf der Seite «Inhaber» (`firm.role`).
-10. Impressum: endgültiger Text (fachlich prüfen lassen).
-11. Datenschutzerklärung: endgültiger Text mit den tatsächlich aktiven Diensten (fachlich prüfen lassen).
-12. Hosting und Auftragsbearbeiter.
-13. Formular anschliessen (Wix-Backend, siehe `wix/EINBAU.md`). Bis dahin läuft es im Demo-Modus.
-14. Ausdrückliche Freigabe des Livegangs durch den Inhaber.
+Heute offen (23 Punkte, Ausgabe von `npm run launch:check` am 15.10.2026):
+1. Gründung der GmbH bestätigen (Eintragung im Handelsregister).
+2. Unternehmensangaben (7): eingetragener Firmenname (muss «GmbH» enthalten), Sitz, Geschäftsadresse, UID (`CHE-123.456.789`), Handelsregister (Kanton, Eintrag), zeichnungsberechtigte Person(en) und Funktion, MWST-Nummer oder «nicht MWST-pflichtig».
+3. Funktion von Ardit Gashi in der GmbH bestätigen. Auf der Website steht bis dahin «Ihr Ansprechpartner»; im Impressum steht vorläufig «Inhaber» (`firm.role`).
+4. Impressum: endgültiger Text (fachlich prüfen lassen).
+5. Datenschutzerklärung: endgültiger Text. Der Entwurf ist auf die Technik abgestimmt: Wix-Hosting und -Speicherung, Google Fonts, Bewerbungen per E-Mail, keine eigenen Statistik-Cookies. Er braucht noch eine fachliche Prüfung.
+6. Hosting und Auftragsbearbeiter.
+7. Formular anschliessen (Wix-Backend, siehe `wix/EINBAU.md`). Bis dahin läuft es im Demo-Modus.
+8. Fotos (9): acht KI-Übergangsbilder ersetzen und ein eigenes Porträt beziehungsweise Familienfoto liefern (`docs/FOTOLISTE.md`).
+9. Ausdrückliche Freigabe des Livegangs durch den Inhaber.
 
 ## Ablauf nach bestätigter Gründung
 

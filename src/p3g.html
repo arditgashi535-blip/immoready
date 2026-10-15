@@ -9,6 +9,7 @@
   var t=IRTour.create(root,{
     config:window.IR_RISE,
     mode:EMBED?'steps':'scroll',
+    lazyStart:!EMBED,
     textures:function(){return window.IR_TEX;},
     bake:function(){return window.IR_BAKE;},
     emit:function(name,detail){

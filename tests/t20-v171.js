@@ -142,7 +142,7 @@ function pageFacts() {
       const r = await p.evaluate(h => { const m = /\broute-(\S+)/.exec(document.body.className); return { page: m && m[1], el: !!document.getElementById(h.slice(1)) }; }, h);
       if (r.page === 'start' && h !== '#start' && !r.el) dead.push(h); }
     ok(hashes.length >= 15 && dead.length === 0, `Alle ${hashes.length} Seitenanker führen über den Router zu einer Seite oder einem Element${dead.length ? ' – tot: ' + dead.join(', ') : ''}`);
-    ok(L.tel.length === 1 && L.tel[0] === 'tel:+41763404401' && L.mail.length === 1 && L.mail[0] === 'mailto:info.immoready@gmail.com', `Telefon- und E-Mail-Links einheitlich (${L.tel.join(', ')} · ${L.mail.join(', ')})`);
+    ok(L.tel.length === 1 && L.tel[0] === 'tel:+41763404401' && L.mail.every(m => m === 'mailto:info.immoready@gmail.com' || m === 'mailto:info.immoready@gmail.com?subject=' + encodeURIComponent('Initiativbewerbung ImmoReady')) && L.mail.includes('mailto:info.immoready@gmail.com'), `Telefon- und E-Mail-Links einheitlich (Karriere mit Betreff) (${L.tel.join(', ')} · ${L.mail.join(', ')})`);
     ok(L.termin > 0 && L.ext.every(h => /^https:\/\/(www\.)?immoready\.ch\//.test(h) || /^https:\/\/fonts\./.test(h)), `Terminlink vorhanden (${L.termin}×), externe Links nur HTTPS auf immoready.ch`);
     await p.goto(url + '#leistungen'); await p.waitForTimeout(400); await p.goto(url + '#kontakt'); await p.waitForTimeout(400);
     await p.evaluate(() => { location.hash = '#sanitaer'; }); await p.waitForTimeout(400);
@@ -168,7 +168,7 @@ function pageFacts() {
   {
     const p = await b.newPage({ viewport: { width: 1440, height: 900 } }); const errs = []; p.on('pageerror', e => errs.push(e.message));
     await p.addInitScript(() => { window.IR_FORCE_HQ = true; });
-    await p.goto(url); await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 150000 });
+    await p.goto(url); await p.evaluate(() => { const r = document.getElementById('reise'); if (r) r.scrollIntoView({ block: 'start', behavior: 'instant' }); }); await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 150000 });
     const st = await p.evaluate(() => window.__JR.sceneStats());
     ok(st.prebaked === true, 'Lichtdaten passen zur V17.1-Geometrie (Prüfsumme)');
     // schräge Treppenwange: senkrechter Strahl über der Wange trifft sie auf Höhe der Stufenlinie (vorher waagrecht bei 1,13 m)

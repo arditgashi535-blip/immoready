@@ -11,7 +11,7 @@ const log = []; const ok = (c, m) => log.push((c ? 'PASS ' : 'FAIL ') + m);
   const b = await chromium.launch({ ...(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}), args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
   let p = await b.newPage({ viewport: { width: 1440, height: 900 } }); const errs = []; p.on('pageerror', e => errs.push(e.message));
   await p.goto(url);
-  await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 90000 });
+  await p.evaluate(() => { const r = document.getElementById('reise'); if (r) r.scrollIntoView({ block: 'start', behavior: 'instant' }); }); await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 90000 });
   const st = await p.evaluate(() => window.__JR.sceneStats());
   ok(st.textures === 'ready', `Materialtexturen geladen und gepackt (Zustand ${st.textures}, Anisotropie ${st.anisotropy}, Software-Grafik ${st.softwareGL})`);
   ok(st.prebaked === true, `Vorab gerechnetes Licht passt zur Geometrie (Umgebungsverdeckung + weiche Schatten aktiv)`);
@@ -66,7 +66,7 @@ const log = []; const ok = (c, m) => log.push((c ? 'PASS ' : 'FAIL ') + m);
   p = await b.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
   await p.addInitScript(() => { window.IR_EMBED = 1; }); // Stationsmodus (Scrollmodus zeigt bei «Bewegung reduzieren» Standbilder)
   await p.goto(url);
-  await p.waitForFunction(() => window.__jr === true, null, { timeout: 90000 }).catch(() => {});
+  await p.evaluate(() => { const r = document.getElementById('reise'); if (r) r.scrollIntoView({ block: 'start', behavior: 'instant' }); }); await p.waitForFunction(() => window.__jr === true, null, { timeout: 90000 }).catch(() => {});
   if (await p.evaluate(() => window.__jr === true)) {
     await p.evaluate(() => window.__JR.goStation(3)); await p.waitForFunction(() => { const s = window.__JR.state(); return Math.abs(s.p - s.ps) < 0.0004; }, null, { timeout: 30000 }).catch(() => {});
     await p.waitForTimeout(600); const w = await p.evaluate(() => window.__JR.state().wind);
@@ -79,7 +79,7 @@ const log = []; const ok = (c, m) => log.push((c ? 'PASS ' : 'FAIL ') + m);
     p = await b.newPage({ viewport: { width: 1200, height: 800 } }); const e2 = []; p.on('pageerror', e => e2.push(e.message));
     await p.addInitScript(k => { Object.defineProperty(window, k, { get() { return null; }, set() {}, configurable: true }); }, v.k);
     await p.goto(url);
-    const okk = await p.waitForFunction(() => window.__jr === true && document.getElementById('reise').classList.contains('jr-ready'), null, { timeout: 90000 }).then(() => true).catch(() => false);
+    await p.evaluate(() => { const r = document.getElementById('reise'); if (r) r.scrollIntoView({ block: 'start', behavior: 'instant' }); }); const okk = await p.waitForFunction(() => window.__jr === true && document.getElementById('reise').classList.contains('jr-ready'), null, { timeout: 90000 }).then(() => true).catch(() => false);
     const s2 = await p.evaluate(() => window.__JR.sceneStats());
     ok(okk && e2.length === 0 && (v.k === 'IR_BAKE' ? s2.prebaked === false : s2.textures === 'off'), `Ersatzweg ${v.t}: Szene läuft (Licht ${s2.prebaked ? 'vorab' : 'zur Laufzeit'}, Texturen ${s2.textures})`);
     await p.close();

@@ -21,26 +21,28 @@ const launch = () => chromium.launch({ ...(process.env.CHROMIUM_PATH ? { executa
     await p.goto(url); await p.waitForTimeout(1200);
     const r = await p.evaluate(() => {
       const R = el => { const q = el.getBoundingClientRect(); return { l: q.left, r: q.right, t: q.top, b: q.bottom, w: q.width, h: q.height }; };
-      const bar = document.querySelector('.mbar'), mb = R(bar), h1 = R(document.querySelector('#reise .jr-st.on h1')), nav = document.querySelector('#reise .jr-nav');
+      const bar = document.querySelector('.mbar'), mb = R(bar), h1 = R(document.querySelector('#einstieg h1')), nav = document.querySelector('#reise .jr-nav');
       const logo = document.querySelector('.logo img'), lg = R(logo), cs = getComputedStyle(logo);
       const ctrls = Array.from(document.querySelectorAll('.hdr-call,.burger,.mbar a')).map(e => { const q = e.getBoundingClientRect(); return Math.min(q.width, q.height); });
       const btns = Array.from(nav.querySelectorAll('button')).map(R), nr = R(nav);
       return { sw: document.documentElement.scrollWidth, iw: innerWidth, mb, h1, nav: nr, navScroll: nav.scrollWidth > nav.clientWidth + 2, first: btns[0], navH: nr.h,
-        logo: { nw: logo.naturalWidth, nh: logo.naturalHeight, ...lg, filter: cs.filter, objFit: cs.objectFit }, ctrls, pb: parseFloat(getComputedStyle(document.body).paddingBottom), hdr: R(document.querySelector('.hdr')), reise: R(document.getElementById('reise')) };
+        logo: { nw: logo.naturalWidth, nh: logo.naturalHeight, ...lg, filter: cs.filter, objFit: cs.objectFit }, ctrls, pb: parseFloat(getComputedStyle(document.body).paddingBottom), hdr: R(document.querySelector('.hdr')), reise: R(document.querySelector('#einstieg .hero3-media')) };
     });
     ok(r.sw <= w + 1 && r.iw === w, `${w} px: kein seitliches Scrollen (Dokument ${r.sw} px, Layout-Viewport ${r.iw} px)`);
     ok(r.mb.h <= 60 && Math.min(...r.ctrls) >= 44, `${w} px: Kontaktleiste flach (${Math.round(r.mb.h)} px), alle Bedienelemente ≥ 44 px (kleinstes ${Math.round(Math.min(...r.ctrls))} px)`);
-    ok(r.h1.b <= r.mb.t && r.h1.t >= r.hdr.b, `${w} px: Hero-Titel vollständig sichtbar und nicht unter der Kontaktleiste (Titel ${Math.round(r.h1.t)}–${Math.round(r.h1.b)}, Leiste ab ${Math.round(r.mb.t)})`);
-    ok(r.nav.b <= r.mb.t && r.navScroll && r.first.l >= 0, `${w} px: Stationsleiste über der Kontaktleiste, waagrecht scrollbar, Anfang nicht abgeschnitten`);
+    ok(r.h1.b <= r.mb.t && r.h1.t >= r.hdr.b, `${w} px: Titel im Foto-Einstieg vollständig sichtbar und nicht unter der Kontaktleiste (Titel ${Math.round(r.h1.t)}–${Math.round(r.h1.b)}, Leiste ab ${Math.round(r.mb.t)})`);
+    /* Rundgang steht jetzt als Abschnitt 6 weiter unten: Stationsleiste dort messen */
+    const nv = await p.evaluate(() => { const nav = document.querySelector('#reise .jr-nav'); nav.scrollIntoView({ block: 'center', behavior: 'instant' }); const n = nav.getBoundingClientRect(), f = nav.querySelector('button').getBoundingClientRect(), bar = document.querySelector('.mbar').getBoundingClientRect(); const o = { b: n.bottom, barT: bar.top, scroll: nav.scrollWidth > nav.clientWidth + 2, fl: f.left }; scrollTo({ top: 0, behavior: 'instant' }); return o; });
+    ok(nv.b <= nv.barT && nv.scroll && nv.fl >= 0, `${w} px: Stationsleiste über der Kontaktleiste, waagrecht scrollbar, Anfang nicht abgeschnitten`);
     ok(r.pb >= r.mb.h - 1, `${w} px: Platz für die Kontaktleiste unten reserviert (padding-bottom ${r.pb} px ≥ Leiste ${Math.round(r.mb.h)} px)`);
     const ratio = r.logo.w / r.logo.h;
     ok(r.logo.nw === 762 && r.logo.nh === 578 && Math.abs(ratio - 762 / 578) < 0.01 && r.logo.l >= 0 && r.logo.r <= r.iw && r.logo.filter === 'none' && r.logo.h >= 96,
       `${w} px: Original-Logo vollständig, unverzerrt (${r.logo.w.toFixed(0)}×${r.logo.h.toFixed(0)} px, Seitenverhältnis ${ratio.toFixed(3)}), ohne Filter`);
-    ok(Math.abs(r.reise.t - r.hdr.b) < 2, `${w} px: Rundgangsbild beginnt direkt unter dem Kopf (keine leeren Platzhalter davor)`);
+    ok(Math.abs(r.reise.t - r.hdr.b) < 2, `${w} px: Einstiegsfoto beginnt direkt unter dem Kopf (keine leeren Platzhalter davor)`);
     // Hero-CTA lässt sich ganz über die Kontaktleiste scrollen und ist dort frei klickbar
-    const cta = await p.evaluate(() => { const a = document.querySelector('#reise .jr-st.on .btn'), bar = document.querySelector('.mbar'); const q = a.getBoundingClientRect();
+    const cta = await p.evaluate(() => { const a = document.querySelector('#einstieg .hero3-ctas .btn'), bar = document.querySelector('.mbar'); const q = a.getBoundingClientRect();
       scrollTo({ top: Math.max(0, q.bottom + scrollY - bar.getBoundingClientRect().top + 8), behavior: 'instant' }); const q2 = a.getBoundingClientRect(), e = document.elementFromPoint(q2.left + q2.width / 2, q2.top + q2.height / 2); const okc = e === a || a.contains(e); scrollTo({ top: 0, behavior: 'instant' }); return okc; });
-    ok(cta, `${w} px: «Offerte anfragen» im Hero früh erreichbar und frei über der Kontaktleiste`);
+    ok(cta, `${w} px: «Offerte anfragen» im Einstieg früh erreichbar und frei über der Kontaktleiste`);
     // aktive Station sichtbar: letzte Station wählen
     await p.evaluate(() => document.querySelectorAll('#reise .jr-nav button')[5].click()); await p.waitForTimeout(900);
     const act = await p.evaluate(() => { const nav = document.querySelector('#reise .jr-nav'), n = nav.getBoundingClientRect(), b = nav.querySelector('button.on').getBoundingClientRect(); return { l: b.left - n.left, r: n.right - b.right }; });
@@ -90,7 +92,7 @@ const launch = () => chromium.launch({ ...(process.env.CHROMIUM_PATH ? { executa
   {
     const p = await b.newPage({ viewport: { width: 1440, height: 900 } }); const errs = []; p.on('pageerror', e => errs.push(e.message));
     await p.goto(url);
-    await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 120000 });
+    await p.evaluate(() => { const r = document.getElementById('reise'); if (r) r.scrollIntoView({ block: 'start', behavior: 'instant' }); }); await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 120000 });
     const st = await p.evaluate(() => window.__JR.sceneStats());
     ok(st.prebaked === true, 'Vorab gerechnetes Licht passt zur endgültigen Geometrie (Prüfsumme)');
     ok(st.vertices <= 361344 * 1.25, `Geometrie nicht pauschal erhöht: ${st.vertices} Eckpunkte (V16: 361 344, Grenze +25 %)`);
@@ -166,7 +168,7 @@ const launch = () => chromium.launch({ ...(process.env.CHROMIUM_PATH ? { executa
     try {
       const p = await b.newPage({ viewport: { width: 1440, height: 900 } }); const pe = []; p.on('pageerror', e => pe.push(e.message));
       await p.goto('http://127.0.0.1:8704/index.html');
-      await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 120000 });
+      await p.evaluate(() => { const r = document.getElementById('reise'); if (r) r.scrollIntoView({ block: 'start', behavior: 'instant' }); }); await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 120000 });
       await p.waitForFunction(() => window.__JR.sceneStats().prebaked === true, null, { timeout: 20000 }).catch(() => {});
       const r = await p.evaluate(() => ({ pre: window.__JR.sceneStats().prebaked, b64: document.documentElement.outerHTML.indexOf('base64,') >= 0, logo: document.querySelector('.logo img').naturalWidth, ph: Array.from(document.querySelectorAll('img')).filter(i => /assets\/img\//.test(i.currentSrc || i.src)).length }));
       ok(r.pre === true && !r.b64 && r.logo === 762 && pe.length === 0, `Produktionsform dist/site/ (HTTP): Rundgang mit Lichtdaten aus licht.json, keine Base64-Daten im Dokument, Logo aus Datei${pe.length ? ' – ' + pe.join(' | ') : ''}`);

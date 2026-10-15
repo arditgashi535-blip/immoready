@@ -92,7 +92,8 @@ function splitWords() {
 
   /* 5b Vorauswahl der Leistung aus jeder Station (390 px, Bildmodus): Aktion antippen → Offertformular mit passender Leistung */
   {
-    const exp = [['aussen', null], ['garten', 'gartenunterhalt'], ['eingang', 'hauswartung'], ['wohnung:reinigung', 'reinigung'], ['wohnung:raeumung', 'raeumung'], ['wohnung:leerstand', 'leerstand'], ['bad', 'sanitaer'], ['zurueck', null]];
+    /* Station «Gebäude» ist jetzt der Einstieg in den optionalen Rundgang (Aktion «Rundgang starten», keine Offerte) */
+    const exp = [['garten', 'gartenunterhalt'], ['eingang', 'hauswartung'], ['wohnung:reinigung', 'reinigung'], ['wohnung:raeumung', 'raeumung'], ['wohnung:leerstand', 'leerstand'], ['bad', 'sanitaer'], ['zurueck', null]];
     const res = [];
     for (const [k, want] of exp) {
       const q = await b.newPage(mob(390, 844)); await q.goto(url); await q.waitForTimeout(500);

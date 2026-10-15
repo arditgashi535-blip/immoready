@@ -18,7 +18,8 @@
     "brand": "ImmoReady",
     "contactPerson": "Ardit Gashi",
     "role": "Inhaber",
-    "qualifications": ["Fachmann Betriebsunterhalt EFZ", "Facility Services Specialist WSF"],
+    "qualifications": ["Fachmann Betriebsunterhalt EFZ"],
+    "businessType": "Familienbetrieb",
     "area": ["Zürich", "Aargau"],
     "company": {
       "status": "in_gruendung",
@@ -125,7 +126,21 @@
     "stationStills": "assets/tour/station-{nn}-{key}.webp",
     "stillSize": [1440, 900],
     "stationStillsPortrait": "assets/tour/station-{nn}-{key}-hoch.webp",
-    "stillSizePortrait": [960, 864]
+    "stillSizePortrait": [960, 864],
+    "photos": {
+      "_note": "Bildflächen der Website. status: ki-symbolbild (Übergang, ersetzen) | eigen (eigenes Foto, Rechte beim Inhaber) | stock (Fremdbild mit dokumentierter Nutzungsgrundlage). Datei unter assets/photos/<id>.jpg; build.py verwendet sie automatisch statt des Übergangsbildes.",
+      "slots": [
+        {"id": "hero", "motive": "Glaubwürdige Schweizer Wohnliegenschaft (Mehrfamilienhaus, Aussenansicht, Tageslicht)", "use": "Einstieg Startseite, Vermarktung", "alt": "Gepflegtes Mehrfamilienhaus mit Umgebung", "pos": "50% 50%", "status": "ki-symbolbild", "interim": "hero", "file": "[UNSPECIFIED]", "source": "Canva (KI-generiert)", "sourceId": "[UNSPECIFIED]", "author": "[UNSPECIFIED]", "license": "[UNSPECIFIED_TO_CHECK]", "credit": "[UNSPECIFIED]"},
+        {"id": "hauswartung", "motive": "Hauswartung bei der Arbeit (Kontrollrundgang, Treppenhaus oder Technikraum)", "use": "Schwerpunkt Hauswartung", "alt": "Hauswartung im Treppenhaus einer Wohnliegenschaft", "pos": "40% 50%", "status": "ki-symbolbild", "interim": "treppe", "file": "[UNSPECIFIED]", "source": "Canva (KI-generiert)", "sourceId": "[UNSPECIFIED]", "author": "[UNSPECIFIED]", "license": "[UNSPECIFIED_TO_CHECK]", "credit": "[UNSPECIFIED]"},
+        {"id": "sanitaer", "motive": "Tatsächliche Sanitärarbeit (Armatur, Siphon oder Spülkasten, Hände mit Werkzeug)", "use": "Sanitär & Unterhalt", "alt": "Arbeit an einer Waschtischarmatur", "pos": "38% 50%", "status": "ki-symbolbild", "interim": "sanitaer", "file": "[UNSPECIFIED]", "source": "Canva (KI-generiert)", "sourceId": "[UNSPECIFIED]", "author": "[UNSPECIFIED]", "license": "[UNSPECIFIED_TO_CHECK]", "credit": "[UNSPECIFIED]"},
+        {"id": "garten", "motive": "Gepflegter Garten einer Wohnliegenschaft (Hecke, Rasen, Weg)", "use": "Gartenunterhalt", "alt": "Gepflegte Hecke und Rasen bei einer Wohnliegenschaft", "pos": "40% 55%", "status": "ki-symbolbild", "interim": "garten", "file": "[UNSPECIFIED]", "source": "Canva (KI-generiert)", "sourceId": "[UNSPECIFIED]", "author": "[UNSPECIFIED]", "license": "[UNSPECIFIED_TO_CHECK]", "credit": "[UNSPECIFIED]"},
+        {"id": "reinigung", "motive": "Reinigung eines Treppenhauses (Boden nass gewischt, Geländer)", "use": "Reinigung, Räumung & Aufbereitung", "alt": "Gereinigter, heller Wohnraum", "pos": "50% 55%", "status": "ki-symbolbild", "interim": "raum", "file": "[UNSPECIFIED]", "source": "Canva (KI-generiert)", "sourceId": "[UNSPECIFIED]", "author": "[UNSPECIFIED]", "license": "[UNSPECIFIED_TO_CHECK]", "credit": "[UNSPECIFIED]"},
+        {"id": "eingang", "motive": "Hauseingang einer Wohnliegenschaft (Briefkästen, Vordach)", "use": "Leerstand, Leistungsübersicht", "alt": "Gepflegter Hauseingang einer Wohnliegenschaft", "pos": "50% 45%", "status": "ki-symbolbild", "interim": "eingang", "file": "[UNSPECIFIED]", "source": "Canva (KI-generiert)", "sourceId": "[UNSPECIFIED]", "author": "[UNSPECIFIED]", "license": "[UNSPECIFIED_TO_CHECK]", "credit": "[UNSPECIFIED]"},
+        {"id": "luft", "motive": "Luftaufnahme einer Wohnliegenschaft (eigene Drohnenaufnahme)", "use": "Immobilienpräsentation", "alt": "Luftaufnahme einer Wohnüberbauung", "pos": "55% 50%", "status": "ki-symbolbild", "interim": "luft", "file": "[UNSPECIFIED]", "source": "Canva (KI-generiert)", "sourceId": "[UNSPECIFIED]", "author": "[UNSPECIFIED]", "license": "[UNSPECIFIED_TO_CHECK]", "credit": "[UNSPECIFIED]"},
+        {"id": "karriere", "motive": "Arbeitsmotiv für den Karrierebereich (Werkzeug, Arbeitskleidung, Liegenschaft – ohne erkennbare fremde Personen als Mitarbeitende)", "use": "Karrierebanner", "alt": "Werkzeug und Arbeitsmaterial für den Liegenschaftsunterhalt", "pos": "50% 50%", "status": "ki-symbolbild", "interim": "treppe", "file": "[UNSPECIFIED]", "source": "Canva (KI-generiert)", "sourceId": "[UNSPECIFIED]", "author": "[UNSPECIFIED]", "license": "[UNSPECIFIED_TO_CHECK]", "credit": "[UNSPECIFIED]"},
+        {"id": "portraet", "motive": "Echtes Porträt von Ardit Gashi bzw. Familienfoto (nur eigenes Foto, kein Stock- oder KI-Bild)", "use": "Familienbetrieb und Ansprechpartner", "alt": "Ardit Gashi, ImmoReady", "pos": "50% 30%", "status": "fehlt", "interim": null, "file": "[UNSPECIFIED]", "source": "[UNSPECIFIED]", "sourceId": "[UNSPECIFIED]", "author": "[UNSPECIFIED]", "license": "[UNSPECIFIED]", "credit": "[UNSPECIFIED]"}
+      ]
+    }
   },
   "tour": {
     "renderer": "WebGL (eigener Code, keine Bibliothek)",
@@ -142,12 +157,11 @@
         "nav": "Gebäude",
         "range": [0, 0.15],
         "hold": 0.03,
-        "kicker": "Immobilienservice · Zürich & Aargau",
-        "title": "Ihre Immobilie. Bis ins Detail betreut.",
-        "text": "Hauswartung, Sanitär und Unterhalt für Immobilien in Zürich und Aargau.",
+        "kicker": "Optional · Illustrativer Rundgang",
+        "title": "Leistungen am Gebäude entdecken.",
+        "text": "Ein illustratives Mehrfamilienhaus zeigt, wo wir unterstützen: vom Garten über Eingang und Treppenhaus bis in die Wohnung und ins Bad. Wählen Sie eine Station oder überspringen Sie den Rundgang.",
         "ctas": [
-          {"label": "Offerte anfragen", "service": null, "primary": true},
-          {"label": "Gebäude entdecken", "goTo": 1}
+          {"label": "Rundgang starten", "goTo": 1}
         ],
         "still": "station-01-aussen",
         "stillAlt": "Wohnblock in der blauen Stunde mit Garten"
@@ -325,6 +339,17 @@
     "request-quote": {"service": "<services.key | empty>", "station": "<station.key>", "source": "tour", "version": 1},
     "request-contact": {"station": "<station.key>", "source": "tour", "version": 1},
     "tour-error": {"code": "WEBGL_UNAVAILABLE | WEBGL_INIT_FAILED | WEBGL_CONTEXT_LOST", "fallback": "stills"}
+  },
+  "careers": {
+    "headline": "Gemeinsam anpacken.",
+    "kicker": "Arbeiten bei ImmoReady",
+    "text": "Sie arbeiten sorgfältig, sind zuverlässig und haben Freude an gepflegten Liegenschaften? Wir freuen uns, Sie kennenzulernen. Erzählen Sie uns kurz von Ihrer Erfahrung und dem Bereich, in dem Sie mitarbeiten möchten.",
+    "cta": "Initiativ bewerben",
+    "email": "info.immoready@gmail.com",
+    "subject": "Initiativbewerbung ImmoReady",
+    "vacancies": [],
+    "upload": false,
+    "note": "Keine bestätigten Stellen: keine Pensen, Löhne, Arbeitsorte oder Zusatzleistungen nennen. Bewerbungen nur per E-Mail, nicht über das Offertformular; kein Lebenslauf-Upload ohne sichere Speicherung."
   },
   "wix": {
     "site": "Immoready (Classic Editor, Premium, eigene Domain, Velo aktiv)",

@@ -1,7 +1,7 @@
 # Abnahmeliste ImmoReady – Stand V17.1 (Fertigstellung)
 
 Stand: 15. Oktober 2026 · Branch `v17.1-release-candidate`. Ergebnis «✓» = am finalen Build im zusammenhängenden Gesamtlauf
-(`npm run test:alle`: **442 bestanden, 0 fehlgeschlagen, ohne Wiederholung**) bzw. in der Sichtprüfung bestätigt. Umgebung: Headless-Chromium mit Software-GPU (SwiftShader),
+(`npm run test:alle`: **495 bestanden, 0 fehlgeschlagen, ohne Wiederholung**) bzw. in der Sichtprüfung bestätigt. Umgebung: Headless-Chromium mit Software-GPU (SwiftShader),
 Browseremulation für Smartphone/Tablet. **Kein echtes Smartphone, kein Safari, kein Wix-Betrieb geprüft.**
 
 ## Status getrennt
@@ -47,6 +47,9 @@ Browseremulation für Smartphone/Tablet. **Kein echtes Smartphone, kein Safari, 
 | Produktionsform | `dist/site/` über HTTP ohne fehlgeschlagene Anfragen und Konsolenfehler (Desktop 3D, Mobil) | t19, t21 | ✓ | Hosting-Adresse offen |
 | Unternehmensangaben | Impressum, Datenschutz, Kontakt, Footer aus `rise.json → firm.company`; öffentlich keine «GmbH»; Entwurf nur mit Prüfhinweisen; nichts erfunden | test_rise (8 Regeln), t23 | ✓ | Registerangaben nach Eintragung |
 | Zugriff / Indexierung | Vorschau privat (Artefakt), `noindex,nofollow,noarchive`, `robots.txt` sperrt; Release-Build und `--launch` verweigern bis zur Freigabe | t23 | ✓ | Zugriffsschutz bei einem allfälligen Testhosting (Passwort) |
+| Inhalte Familienbetrieb | WSF entfernt, kein Abschnitt Einsatzgebiet, Startseite in verlangter Reihenfolge, Familienbetrieb, Karriere (mailto), Leistungsseiten mit 4 Fragen | t24 (30), Sichtprüfung `docs/v171/handy-uebersicht.jpg`, `desktop-abschnitte.jpg` | ✓ | – |
+| Echte Fotos | eigene oder lizenzierte Fotos statt KI-Bildern | `npm run launch:check` (9 offene Bildflächen) | **✗ nicht umgesetzt** | Fotos liefern oder Netzwerkzugang für Stockquellen (`docs/FOTOLISTE.md`) |
+| Rundgang optional | Abschnitt 6, startet erst in Sichtnähe, «Tour überspringen» → Ablauf | t11, t14, t16–t19 | ✓ | – |
 | Sichtprüfung Szene | Fassade, Garten, Eingang, Treppe, Lift, Wohnung, Küche, Bad, WC, Waschtisch, Armatur, Spiegel | 20 Szenenbilder, selbst geprüft | ✓ | – |
 | Sichtprüfung Seite | Startseite mobil, Menü, alle 6 Stationen, Leistungen, Sanitär, Formular leer/Fehler, Footer + Kontaktleiste, 320, quer, Tablet, Desktop; ganze Seiten | 13 + 18 Sichtbereiche, 6 ganze Seiten, selbst geprüft | ✓ | – |
 

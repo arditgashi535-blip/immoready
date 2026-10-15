@@ -15,6 +15,7 @@ const RISE = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../rise.json'),
     document.addEventListener('DOMContentLoaded', () => { new MutationObserver(() => { const r = document.getElementById('reise'); if (r && r.classList.contains('jr-ready') && !window.__readyAt) window.__readyAt = performance.now(); }).observe(document.getElementById('reise'), { attributes: true, attributeFilter: ['class'] }); });
   });
   await p.goto(url);
+  await p.evaluate(() => document.getElementById('reise').scrollIntoView({ block: 'start', behavior: 'instant' }));  /* Rundgang ist Abschnitt 6, Start in Sichtnähe */
   await p.waitForFunction(() => window.__JR && window.__JR.state().scan.state === 'done', null, { timeout: 60000 }).catch(() => {});
   // 1 · Scan-Kante
   const sc = await p.evaluate(() => Object.assign({ readyAt: window.__readyAt }, window.__JR.state().scan));
@@ -69,7 +70,10 @@ const RISE = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../rise.json'),
   // 6 · Layout in drei Breiten, je Station
   for (const vp of [{ w: 1440, h: 900 }, { w: 768, h: 1024 }, { w: 390, h: 844, m: true }]) {
     p = await b.newPage({ viewport: { width: vp.w, height: vp.h }, ...(vp.m ? { isMobile: true, hasTouch: true } : {}) });
-    await p.goto(url); await p.waitForTimeout(vp.m ? 1500 : 4000);
+    await p.goto(url); await p.waitForTimeout(vp.m ? 1500 : 1000);
+    /* Rundgang ist Abschnitt 6: hinscrollen, Desktop wartet auf die gestartete Szene */
+    await p.evaluate(() => document.getElementById('reise').scrollIntoView({ block: 'start', behavior: 'instant' }));
+    if (!vp.m) await p.waitForFunction(() => document.getElementById('reise').classList.contains('jr-ready'), null, { timeout: 90000 }).catch(() => {});
     const issues = [];
     for (let i = 0; i < 6; i++) {
       await p.evaluate(i => document.querySelectorAll('#reise .jr-nav button')[i].click(), i);

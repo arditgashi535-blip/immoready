@@ -29,7 +29,7 @@ const PORTRAIT = {
     /* Bildproduktion: volle Qualität auch in der Software-Grafik dieser Umgebung (anisotrope Filterung, volle Auflösung) */
     await p.addInitScript(() => { window.IR_FORCE_HQ = true; });
     await p.goto(PAGE);
-    await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 60000 });
+    await p.evaluate(() => { const r = document.getElementById('reise'); if (r) r.scrollIntoView({ block: 'start', behavior: 'instant' }); }); await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 60000 });
     await p.addStyleTag({ content: '.jr-ui,.jr-tag,.jr-tech,.jr-hot{display:none!important}.jr-stage::after{display:none!important}.hdr,.demo,.mbar{display:none!important}' });
     await p.evaluate(() => { window.__JR.setScale(1, true); });
     /* Stationen und ihre Nahansichten (rise.json → details): gleiche Szene, gleiches Licht */

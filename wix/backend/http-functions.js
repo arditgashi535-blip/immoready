@@ -70,7 +70,8 @@ export async function post_offerte(request) {
     const eintrag = await auth.elevate(items.insert)(SAMMLUNG, Object.assign({}, daten, { fotos, quelle: 'website', status: 'neu' }));
     /* Annahme bestätigt (gespeichert). Die Benachrichtigung an info.immoready@gmail.com läuft getrennt über eine
        Wix-Automation «Neuer Eintrag in Offertanfragen → E-Mail» und wird separat geprüft. */
-    return antwort(ok, request, { ok: true, id: eintrag._id });
+    /* notified: false – die E-Mail läuft über die Automation und wird hier nicht bestätigt; die Seite meldet sie deshalb nicht als zugestellt */
+    return antwort(ok, request, { ok: true, id: eintrag._id, notified: false });
   } catch (e) {
     console.error('offerte speichern', e);
     return antwort(serverError, request, { ok: false, error: 'speichern' });

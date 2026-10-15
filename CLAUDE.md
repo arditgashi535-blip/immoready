@@ -24,9 +24,15 @@ Inhaber ausdrücklich freigibt.
   UID, Handelsregister, Vertretung, MWST, `foundingConfirmed`, `goLiveApproved`); Impressum, Datenschutz, Kontakt und Footer
   werden daraus erzeugt (`firm_markup`). Keine Adresse, UID, Registerdaten oder Rollen erfinden. Veröffentlichung erst nach
   bestätigter Gründung und ausdrücklicher Freigabe: `python3 tools/rise.py --launch` / `build.py --release` sperren bis dahin.
-  Vorschau nur privat (Claude-Artefakt privat; `noindex` + `robots.txt` sind kein Zugriffsschutz). Details: `docs/VEROEFFENTLICHUNG.md`. Bestätigte Qualifikationen: Fachmann Betriebsunterhalt EFZ, Facility Services Specialist WSF.
+  Vorschau nur privat (Claude-Artefakt privat; `noindex` + `robots.txt` sind kein Zugriffsschutz). Details: `docs/VEROEFFENTLICHUNG.md`.
+- **Familienbetrieb, Qualifikation:** ImmoReady ist ein Familienbetrieb (`firm.businessType`). Bestätigte Qualifikation: nur
+  Fachmann Betriebsunterhalt EFZ (WSF wurde auf Wunsch des Inhabers entfernt und darf nicht wieder erscheinen; Schema und Regeln sperren es).
+  Funktion von Ardit Gashi in der GmbH erst nach Bestätigung nennen; bis dahin «Ihr Ansprechpartner».
 - **Kontakt:** 076 340 44 01 · info.immoready@gmail.com · Zürich und Aargau.
-- **Bilder:** KI-Bilder (Canva) und die 3D-Szene sind Illustrationen und werden als solche gekennzeichnet
+- **Bilder:** Bildflächen nur über `rise.json → assets.photos` (ID, Motiv, Status ki-symbolbild|eigen|stock|fehlt, Quelle, Lizenz,
+  Bildnachweis); Datei `assets/photos/<id>.jpg` ersetzt das Übergangsbild beim Build (`build.py → photos()`), Impressum-Bildnachweis
+  wird erzeugt (`photo_credits`). Fotoliste: `docs/FOTOLISTE.md`. Kein Stock- oder KI-Porträt.
+  KI-Bilder (Canva) und die 3D-Szene sind Illustrationen und werden als solche gekennzeichnet
   («Symbolbild»; Rundgang: «Illustrative Visualisierung · kein Referenzobjekt» aus `rise.json → tour.scene.label`).
   Sie dürfen nie als echte Objekte, Kundenreferenzen, Mitarbeitende oder Vorher-nachher-Ergebnisse erscheinen.
 - **Formular:** Es läuft im Demo-Modus. Eine Erfolgsbestätigung erscheint nur nach echter Übermittlung, sonst
@@ -40,6 +46,13 @@ Inhaber ausdrücklich freigibt.
   Szene. «Tour überspringen» und «Offerte anfragen» sind immer erreichbar. Informationen nie nur bei Hover.
 
 ## Aufbau
+
+**Startseite (Fertigstellung):** 1 Foto-Einstieg `#einstieg` (h1) · 01 Leistungen `#leistungswelt` · 02 Hauswartung · 03 Sanitär ·
+04 Familienbetrieb `#familienbetrieb` · optionaler Rundgang `#reise` (h2, aus `rise.json → tour`, «Tour überspringen» → `#ablauf`) ·
+05 Ablauf `#ablauf` · 06 Karriere `#karriere` (aus `rise.json → careers`, nur mailto, keine Stellen, kein Upload) · 07 Häufige Fragen ·
+Kontakt/Offerte `#anfrage` · Footer (Link «Karriere»). Kein eigener Abschnitt «Einsatzgebiet». Leistungsseiten: Was wir übernehmen ·
+Geeignet für · Das hilft bei Ihrer Anfrage (`INFO` in `p3b`) · So geht es weiter. Formularbestätigung in Stufen (übermittelt, gespeichert,
+Benachrichtigung nur bei `notified: true`). Prüfung: `tests/t24-inhalte.js`.
 
 **Einzige Quelle für Fakten und Tour: `rise.json`** (geprüft gegen `rise.schema.json` und die Regeln in
 `tools/rise.py`). Firmen-/Kontaktdaten, Leistungsschlüssel, Stationen und Texte, Kameraroute, Türen,
@@ -285,7 +298,7 @@ Ausgaben in `dist/`:
 python3 tools/rise.py             # rise.json prüfen
 python3 build.py                  # baut dist/ (prüft rise.json zuerst)
 npm install && npx playwright install chromium
-npm test                          # Build, RISE, Velo (t15), t7 Seite, t9 Interaktionen, t11 Rundgang, t14 V13/V14, t16 V14, t17 V15, t18 V16, t19 V17, t20 V17.1, t21 Fertigstellung, t22 Handy, t23 GmbH/Startsperre
+npm test                          # Build, RISE, Velo (t15), t7 Seite, t9 Interaktionen, t11 Rundgang, t14 V13/V14, t16 V14, t17 V15, t18 V16, t19 V17, t20 V17.1, t21 Fertigstellung, t22 Handy, t23 GmbH/Startsperre, t24 Inhalte
 npm run abnahme                   # 32 Abnahmebilder + Übersicht/Vergleich → docs/v171/
 npm run bake                      # Build → Licht vorab rechnen → Build (nach Geometrieänderungen Pflicht)
 npm run perf                      # Ladeleistung gedrosselt (Server: python3 -m http.server 8702)
@@ -302,7 +315,7 @@ node tests/bench-frames.js <html> …  # Bildzeiten (Testumgebung)
 
 - Tests mit WebGL starten Chromium mit SwiftShader (Software-GPU, V15 ≈0,5–1,8 s je Bild); zeitkritische Prüfungen
   warten deshalb auf Bedingungen bzw. auf gezeichnete Bilder (`state().frames`) statt auf feste Zeiten.
-- Stand V17.1 (Branch `v17.1-release-candidate`): 356 bestehende Prüfungen + t20 43/43 = 399 (Details und ehrliche
+- Stand Fertigstellung (Branch `v17.1-release-candidate`, 15.10.2026): Gesamtlauf 495/0 ohne Wiederholung (inkl. t21–t24). Früher V17.1: 356 bestehende Prüfungen + t20 43/43 = 399 (Details und ehrliche
   Einordnung eines einmaligen Zeitausreissers in t11: `docs/TESTBERICHT-V17.1.md`, Leistung: `docs/PERFORMANCE-V17.1.md`).
 - Stand V17 (Branch `v17-final-realism`, Tag `v17-stand`; Sicherung des V16-Stands: Tag `v16-stand`):
   RISE 21/21, t15 10/10, t7 68/68, t9 18/18, t11 37/37, t12 14/14, t13 24/24, t14 28/28, t16 19/19, t17 18/18,

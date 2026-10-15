@@ -110,14 +110,15 @@ const J = (o, status) => ({ status: status || 200, contentType: 'application/jso
   // 5 Renderloop: ausserhalb des Sichtbereichs keine Bilder, auch bei Scroll-/Grössenereignissen; zurück im Bild wieder Bilder
   {
     const p = await b.newPage({ viewport: { width: 1440, height: 900 } }); const errs = []; p.on('pageerror', e => errs.push(e.message));
-    await p.goto(url); await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 150000 });
+    await p.goto(url); await p.evaluate(() => { const r = document.getElementById('reise'); if (r) r.scrollIntoView({ block: 'start', behavior: 'instant' }); }); await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 150000 });
     const runs = [];
     for (let k = 0; k < 3; k++) {
       await p.evaluate(() => scrollTo({ top: document.body.scrollHeight, behavior: 'instant' })); await p.waitForTimeout(1500);
       const f0 = await p.evaluate(() => window.__JR.state().frames);
       await p.evaluate(() => { for (let i = 0; i < 10; i++) { scrollBy(0, i % 2 ? -1 : 1); dispatchEvent(new Event('scroll')); } dispatchEvent(new Event('resize')); });
       await p.waitForTimeout(2000); const f1 = await p.evaluate(() => window.__JR.state().frames);
-      await p.evaluate(() => scrollTo({ top: 0, behavior: 'instant' })); await p.waitForTimeout(2500); const f2 = await p.evaluate(() => window.__JR.state().frames);
+      /* zurück zum Rundgang (Abschnitt 6 der Startseite, nicht mehr am Seitenanfang) */
+      await p.evaluate(() => document.getElementById('reise').scrollIntoView({ block: 'start', behavior: 'instant' })); await p.waitForTimeout(2500); const f2 = await p.evaluate(() => window.__JR.state().frames);
       runs.push([f1 - f0, f2 - f1]);
     }
     ok(runs.every(r => r[0] === 0 && r[1] > 0) && errs.length === 0, `Renderloop: ausserhalb des Sichtbereichs 0 Bilder trotz Scroll/Resize, im Bild wieder gezeichnet (3 Durchgänge: ${runs.map(r => r.join('/')).join(', ')})`);
@@ -151,7 +152,7 @@ const J = (o, status) => ({ status: status || 200, contentType: 'application/jso
         p.on('response', r => { if (r.status() >= 400) bad.push(r.status() + ' ' + r.url()); });
         p.on('console', m => { if (m.type() === 'error' && !/fonts\.(googleapis|gstatic)|ERR_TUNNEL|net::ERR/.test(m.text())) cons.push(m.text()); }); p.on('pageerror', e => cons.push(e.message));
         await p.goto('http://127.0.0.1:8705/index.html');
-        if (!mob) await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 150000 }); else await p.waitForTimeout(1500);
+        if (!mob) { await p.evaluate(() => { const r = document.getElementById('reise'); if (r) r.scrollIntoView({ block: 'start', behavior: 'instant' }); }); await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 150000 }); } else await p.waitForTimeout(1500);
         for (const r of ['#leistungen', '#sanitaer', '#offerte', '#kontakt', '#impressum']) { await p.evaluate(r => { location.hash = r; }, r); await p.waitForTimeout(400); }
         if (mob) { await p.evaluate(() => { location.hash = '#start'; }); await p.waitForTimeout(500); for (let i = 0; i < 6; i++) { await p.evaluate(i => document.querySelectorAll('#reise .jr-nav button')[i].click(), i); await p.waitForTimeout(250); } }
         ok(bad.length === 0 && cons.length === 0, `Produktionsform über HTTP ${w} px: alle Anfragen erfolgreich, keine Konsolenfehler${bad.length ? ' – ' + bad.slice(0, 3).join(', ') : ''}${cons.length ? ' – ' + cons.slice(0, 2).join(' | ') : ''}`);

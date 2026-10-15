@@ -16,7 +16,7 @@ var HY=(function(){var W={'Leerstandsmanagement':'Leer-stands-manage-ment','Immo
  'mehrwertsteuerpflichtig':'mehrwertsteuer-pflichtig','Grundreinigung':'Grund-reinigung','Hauswartung':'Haus-wartung','Vermarktung':'Ver-marktung','Vermittlung':'Ver-mittlung',
  'Koordinationsaufwand':'Koordinations-aufwand','Wohnungsabnahme':'Wohnungs-abnahme','Unterhaltsarbeiten':'Unterhalts-arbeiten','Gesamtansicht':'Gesamt-ansicht',
  'Unterhaltsreinigung':'Unterhalts-reinigung','Treppenhausreinigung':'Treppenhaus-reinigung','Kompletträumung':'Komplett-räumung','Mehrfamilienhäuser':'Mehrfamilien-häuser',
- 'Umzugsreinigung':'Umzugs-reinigung','Kontrollrundgänge':'Kontroll-rundgänge','Gemeinschaftliche':'Gemeinschaft-liche','Zusammenarbeit':'Zusammen-arbeit','Aufbereitung':'Auf-bereitung','Kontaktdaten':'Kontakt-daten','Offertanfrage':'Offert-anfrage'};
+ 'Umzugsreinigung':'Umzugs-reinigung','Kontrollrundgänge':'Kontroll-rundgänge','Gemeinschaftliche':'Gemeinschaft-liche','Zusammenarbeit':'Zusammen-arbeit','Aufbereitung':'Auf-bereitung','Familienbetrieb':'Familien-betrieb','Initiativbewerbung':'Initiativ-bewerbung','Leistungsübersicht':'Leistungs-übersicht','Kontaktdaten':'Kontakt-daten','Offertanfrage':'Offert-anfrage'};
  var re=new RegExp(Object.keys(W).sort(function(a,b){return b.length-a.length;}).join('|'),'g'),SK=/^(SCRIPT|STYLE|TEXTAREA|INPUT|SELECT|OPTION|TITLE|CODE|PRE)$/;
  function txt(n){var t=n.data;if(t.length<11)return;var u=t.replace(re,function(w){return W[w].replace(/-/g,'­');});if(u!==t)n.data=u;}
  function run(root){if(!root)return;if(root.nodeType===3){if(!SK.test(root.parentNode&&root.parentNode.nodeName||''))txt(root);return;}if(root.nodeType!==1||SK.test(root.nodeName))return;
@@ -26,6 +26,16 @@ var HY=(function(){var W={'Leerstandsmanagement':'Leer-stands-manage-ment','Immo
  return run;})();
 
 /* ---------------- Leistungsseite rendern ---------------- */
+/* Welche Angaben helfen bei einer Anfrage (je Leistung) – nur Angaben, keine Versprechen */
+var INFO={
+ hauswartung:['Ort und Adresse der Liegenschaft','Anzahl Wohnungen und Hauseingänge','Welche Arbeiten regelmässig anfallen (z. B. Treppenhaus, Umgebung, Kontrollgänge)','Gewünschter Rhythmus und Starttermin'],
+ sanitaer:['Was defekt ist und wo (Bad, Küche, WC)','Ein oder zwei Fotos der Armatur, des Siphons oder des Spülkastens','Marke oder Typ, falls bekannt','Bei Mietwohnungen: ob die Verwaltung informiert ist'],
+ gartenunterhalt:['Ort und ungefähre Grösse der Fläche','Was zu tun ist: Rasen, Hecken, Rabatten, Laub','Einmalig oder regelmässig über das Jahr','Fotos des heutigen Zustands'],
+ reinigung:['Art der Reinigung: Unterhalt, Treppenhaus, Umzug oder Grundreinigung','Objekt und Grösse (Zimmer oder Fläche)','Gewünschter Termin oder Rhythmus','Zugang und Schlüssel'],
+ raeumung:['Was geräumt werden soll: Wohnung, Keller, Estrich','Ungefähre Menge, am besten mit Fotos','Stockwerk, Lift und Zufahrt','Gewünschter Termin'],
+ leerstand:['Objekt und Ort','Voraussichtliche Dauer des Leerstands','Gewünschte Kontrollen und Häufigkeit','Ansprechperson und Schlüsselübergabe'],
+ verkauf:['Objektart, Ort und ungefähre Grösse','Ob Sie verkaufen oder vermitteln möchten','Gewünschter Zeitpunkt','Vorhandene Unterlagen wie Grundriss oder Fotos'],
+ fotografie:['Objektart und Ort','Gewünschte Aufnahmen: Fotos, Drohne oder 360°-Rundgang','Verwendungszweck, z. B. Inserat oder Dokumentation','Gewünschter Termin'] };
 var SICON={hauswartung:'house',sanitaer:'drop',gartenunterhalt:'leaf',reinigung:'clean',raeumung:'box',leerstand:'key',verkauf:'tag',fotografie:'camera'};
 function renderService(key){
   var d=S[key], h='';
@@ -48,7 +58,10 @@ function renderService(key){
   // Zielgruppen + Ablauf
   h+='<section class="sec dark"><div class="wrap"><div class="side-l"><div><p class="mono eyebrow" style="color:var(--lime)">Geeignet für</p></div><ul class="aud">';
   d.aud.forEach(function(a){h+='<li>'+esc(a)+'</li>';});
-  h+='</ul></div><hr class="rule" style="margin:clamp(48px,6vw,80px) 0 0"><p class="mono eyebrow" style="margin-top:40px">Ablauf</p><ol class="steps" style="border-color:var(--line-d);margin-top:20px">';
+  h+='</ul></div>';
+  if(INFO[key]){h+='<hr class="rule" style="margin:clamp(48px,6vw,80px) 0 0"><div class="side-l" style="margin-top:40px"><div><p class="mono eyebrow" style="color:var(--lime)">Das hilft bei Ihrer Anfrage</p></div><ul class="info-list">';
+    INFO[key].forEach(function(x){h+='<li>'+esc(x)+'</li>';});h+='</ul></div>';}
+  h+='<hr class="rule" style="margin:clamp(48px,6vw,80px) 0 0"><p class="mono eyebrow" style="margin-top:40px">So geht es weiter</p><ol class="steps" style="border-color:var(--line-d);margin-top:20px">';
   d.steps.forEach(function(s,i){h+='<li style="border-color:var(--line-d)"><span class="n" style="color:var(--stone-d)">'+(i+1)+'</span><b>'+esc(s[0])+'</b><span class="muted">'+esc(s[1])+'</span></li>';});
   h+='</ol></div></section>';
   // FAQ
@@ -79,10 +92,10 @@ function fixOverview(){document.querySelectorAll('#overviewList a').forEach(func
 
 /* ---------------- Seitentitel ---------------- */
 var META={
- start:['ImmoReady – Hauswartung, Sanitär & Immobilienservice in Zürich und Aargau','Hauswartung, Sanitär, Gartenunterhalt, Reinigung, Räumung und Vermarktung für Liegenschaften in Zürich und Aargau. Persönlich geführt. Offerte anfragen.'],
+ start:['ImmoReady – Hauswartung, Sanitär & Immobilienservice in Zürich und Aargau','Familienbetrieb für Hauswartung, Sanitär und Unterhalt in Zürich und Aargau – dazu Garten, Reinigung, Räumung und Vermarktung. Persönlich betreut. Offerte anfragen.'],
  leistungen:['Leistungen rund um Ihre Liegenschaft | ImmoReady','Hauswartung, Sanitär & Unterhalt, Gartenunterhalt, Reinigung, Räumung, Leerstandsmanagement und Vermarktung in Zürich und Aargau.'],
  verwaltungen:['Liegenschaftsbetreuung für Verwaltungen | ImmoReady','Hauswartung, Garten, Reinigung und Unterhalt für kleine und mittlere Wohnliegenschaften – ein Ansprechpartner für Verwaltungen in Zürich und Aargau.'],
- ueber:['Über ImmoReady – Ardit Gashi | ImmoReady','ImmoReady wird von Ardit Gashi geführt: Fachmann Betriebsunterhalt EFZ und Facility Services Specialist WSF. Persönliche Betreuung in Zürich und Aargau.'],
+ ueber:['Über ImmoReady – Ardit Gashi | ImmoReady','ImmoReady ist ein Familienbetrieb für Hauswartung, Sanitär und Unterhalt in Zürich und Aargau. Ansprechpartner: Ardit Gashi, Fachmann Betriebsunterhalt EFZ.'],
  offerte:['Offerte anfragen | ImmoReady','Unverbindliche Offerte für Hauswartung, Sanitär, Garten, Reinigung, Räumung oder Vermarktung anfragen – in drei kurzen Schritten, mit Foto-Upload.'],
  kontakt:['Kontakt | ImmoReady','ImmoReady erreichen: Telefon 076 340 44 01, E-Mail info.immoready@gmail.com. Einsatzgebiet Zürich und Aargau.'],
  impressum:['Impressum | ImmoReady','Impressum von ImmoReady.'],

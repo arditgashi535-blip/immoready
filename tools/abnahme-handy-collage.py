@@ -20,8 +20,9 @@ def font(sz):
 
 F = font(16)
 views = sorted(glob.glob(os.path.join(SRC, 'h*.png')))
+desk = sorted(glob.glob(os.path.join(SRC, 'd*.png')))
 fulls = sorted(glob.glob(os.path.join(SRC, 'g-*.png')))
-for f in views + fulls:
+for f in views + desk + fulls:
     im = Image.open(f).convert('RGB')
     if im.height > 12000:  # ganze Seiten: auf lesbare Höhe begrenzen
         r = 12000 / im.height
@@ -43,6 +44,17 @@ for i, f in enumerate(views):
     d.text((x + 4, y + 4), os.path.basename(f)[:-4], fill='#2b2a29', font=F)
 sheet.save(os.path.join(OUT, 'handy-uebersicht.jpg'), quality=84)
 
+# Desktop-Abschnitte 1440 px: 2 Spalten
+if desk:
+    DW, DH = 900, 563
+    dsheet = Image.new('RGB', (2 * (DW + 10), ((len(desk) + 1) // 2) * (DH + L + 10)), '#f3efe9')
+    dd = ImageDraw.Draw(dsheet)
+    for i, f in enumerate(desk):
+        im = Image.open(f).convert('RGB').resize((DW, DH), Image.LANCZOS)
+        x, y = (i % 2) * (DW + 10), (i // 2) * (DH + L + 10)
+        dsheet.paste(im, (x, y + L)); dd.text((x + 4, y + 4), os.path.basename(f)[:-4], fill='#2b2a29', font=F)
+    dsheet.save(os.path.join(OUT, 'desktop-abschnitte.jpg'), quality=84)
+
 # ganze Seiten nebeneinander, gemeinsame Höhe
 H = 3000
 ims = []
@@ -59,4 +71,4 @@ for name, im in ims:
     d.text((x + 2, 4), name, fill='#2b2a29', font=font(13))
     x += im.width + 16
 strip.save(os.path.join(OUT, 'handy-ganze-seiten.jpg'), quality=84)
-print('docs/v171: %d Sichtbereiche, %d ganze Seiten' % (len(views), len(fulls)))
+print('docs/v171: %d Sichtbereiche, %d Desktop-Abschnitte, %d ganze Seiten' % (len(views), len(desk), len(fulls)))

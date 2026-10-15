@@ -10,7 +10,7 @@ const list = (process.argv[6] || 's0,s1,s2,s3,s4,s5');
   const errs = []; p.on('console', m => { if (m.type() === 'error' || m.type() === 'warning' || /Rundgang/.test(m.text())) errs.push(m.type() + ': ' + m.text()); }); p.on('pageerror', e => errs.push('pageerror: ' + e.message));
   await p.addInitScript(() => { window.IR_FORCE_HQ = true; });
   await p.goto('file://' + file);
-  try { await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 90000 }); } catch (e) { console.log('NICHT BEREIT', errs.join('\n')); }
+  try { await p.evaluate(() => { const r = document.getElementById('reise'); if (r) r.scrollIntoView({ block: 'start', behavior: 'instant' }); }); await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 90000 }); } catch (e) { console.log('NICHT BEREIT', errs.join('\n')); }
   await p.addStyleTag({ content: '.jr-ui,.jr-tag,.jr-tech{display:none!important}.hdr,.demo,.mbar{display:none!important}' });
   await p.evaluate(() => window.__JR.setScale(1, true));
   const st = await p.evaluate(() => { const s = window.__JR.sceneStats(); return s; });

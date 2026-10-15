@@ -98,7 +98,9 @@ function wireForm(){var f=$('qf');
     if($('website').value)return;
     var ep=FORM_EP();
     if(ep){setBusy(true);sendQuote(ep).then(function(j){setBusy(false);var r=$('result');
-        r.innerHTML='<p class="ok">Vielen Dank für Ihre Anfrage.</p><p>Wir haben sie erhalten und melden uns bei Ihnen, um die nächsten Schritte zu besprechen.</p><p class="muted">Referenz: '+esc(String(j.id))+'</p><div style="display:flex;flex-wrap:wrap;gap:12px"><button type="button" class="btn inkb" id="newReq">Neue Anfrage</button></div>';
+        /* Drei Stufen getrennt: 1 übermittelt (Antwort erhalten), 2 gespeichert (Dienst bestätigt mit ok und Referenz),
+           3 Benachrichtigung – nur als zugestellt melden, wenn der Dienst es ausdrücklich bestätigt (notified === true). */
+        r.innerHTML='<p class="ok">Vielen Dank für Ihre Anfrage.</p><ul class="rstat"><li data-state="sent">Anfrage übermittelt</li><li data-state="stored">Anfrage gespeichert · Referenz '+esc(String(j.id))+'</li>'+(j.notified===true?'<li data-state="notified">Benachrichtigung an ImmoReady zugestellt</li>':'')+'</ul><p>Wir melden uns bei Ihnen, um die nächsten Schritte zu besprechen.</p><div style="display:flex;flex-wrap:wrap;gap:12px"><button type="button" class="btn inkb" id="newReq">Neue Anfrage</button></div>';
         f.hidden=true;r.hidden=false;r.focus();$('newReq').onclick=function(){f.reset();files=[];renderFiles();r.hidden=true;f.hidden=false;};})
       .catch(function(e){setBusy(false);var code=e&&e.code||'server';if(code==='invalid'&&e.fields){Object.keys(e.fields).forEach(function(k){setErr(k,String(e.fields[k]));});}
         $('failWhy').textContent=FAILTXT[code]||FAILTXT.server;$('failbox').hidden=false;$('failbox').scrollIntoView({block:'center'});});return;}

@@ -19,6 +19,39 @@ laufendes Bild der Software-GPU, ≈0,7–0,8 s je Bild, fiel in das 1-s-Messfen
 37/37 bestanden. Im vorherigen Gesamtlauf am fast identischen Stand bestand die Prüfung ebenfalls. Kein Code-Fehler
 gefunden; auf echter GPU ist ein Bild um Grössenordnungen kürzer.
 
+## Fertigstellung Inhalte «Familienbetrieb» (15. Oktober 2026)
+
+**Gesamtlauf am finalen Build, ohne Wiederholung:** `sh tests/alle.sh` → **495 bestanden, 0 fehlgeschlagen**
+(npm test exit 0, t12 exit 0, t13 exit 0). Neu: **t24 Inhalte 30/30**, RISE-Regeln 30.
+
+Umgesetzt und geprüft (t24, t7, t9, t11, t19–t23):
+- WSF aus `rise.json`, Schema, Seiten, Metadaten und allen Builds entfernt (Schema und Regel sperren die Rückkehr).
+- Abschnitt «06 Einsatzgebiet» entfernt; Zürich und Aargau im Einstieg, in den häufigen Fragen, im Kontaktbereich und im Footer; Nummerierung 01–07 lückenlos.
+- Startseite neu geordnet:
+  - Ablauf: Foto-Einstieg (einzige h1) → Leistungen → Hauswartung → Sanitär → Familienbetrieb → optionaler Rundgang → Ablauf → Karriere → Häufige Fragen → Kontakt/Offerte.
+  - Entfernt: der doppelte Einordnungsblock und die Vorher-nachher-Funktionsdemo.
+- Familienbetrieb auf Start- und Über-uns-Seite mit Ardit Gashi (EFZ); vor bestätigter GmbH-Funktion keine Funktionsbezeichnung in Werbetexten.
+- Karriere: «Initiativ bewerben» als mailto mit Betreff, mit Hinweis auf das E-Mail-Programm; keine Stellen, Pensen oder Löhne; kein Upload; nicht im Offertformular; Link im Footer.
+- Leistungsseiten mit «Was wir übernehmen», «Geeignet für», «Das hilft bei Ihrer Anfrage» (neu, 8 Leistungen) und «So geht es weiter».
+- Bildflächen über `rise.json → assets.photos`: Datei `assets/photos/<id>.jpg` ersetzt automatisch; Kennzeichnung «Symbolbild (KI)»; Bildnachweis im Impressum wird erzeugt.
+- Formularbestätigung in Stufen: übermittelt, gespeichert (mit Referenz), Benachrichtigung nur bei ausdrücklicher Bestätigung (`notified: true`). Das Backend meldet `notified: false`.
+- Datenschutz-Entwurf auf die tatsächliche Technik abgestimmt: Wix, Google Fonts, Bewerbungen per E-Mail, keine eigenen Statistik-Cookies.
+- 3D-Rundgang: lädt und startet erst in Sichtnähe (`lazyStart`). Der Seitenstart bleibt frei; t11 prüft, dass die Szene beim Laden nicht startet.
+
+Im Durchgang gefundene und behobene Fehler:
+- **Leistungsliste sprang unter dem ruhenden Mauszeiger** (Hover-Auswahl nach dem Auf- und Zuklappen): Auswahl nur noch bei echter Mausbewegung, kurze Sperre nach Klick oder Tastatur.
+  - Gefunden durch wechselnde Fehlschläge in t9. Danach fünf Läufe in Folge fehlerfrei; Prüfungen warten jetzt auf Bedingungen statt auf feste Zeiten.
+- Hauswartungs-Überschrift lief am Desktop ins Bild.
+- «Familienbetrieb» brach auf 320 px mitten im Wort.
+- Die neue Liste «Das hilft bei Ihrer Anfrage» war bei 200 % Text zu breit.
+
+Testanpassungen: Ältere Tests bezogen sich auf den früheren Einstieg im Rundgang (`#intro`, Hero-h1 im Rundgang, «Tour überspringen» → Leistungen, Szene am Seitenanfang). Sie scrollen jetzt zum Rundgang und messen den Foto-Einstieg. Die Prüfaussagen und Grenzwerte sind unverändert, ausser:
+- t11 «Tour überspringen» führt jetzt zum Ablauf;
+- t20 lässt neben der allgemeinen E-Mail-Adresse den Karriere-Link mit Betreff zu;
+- t22 prüft die Station «Gebäude» nicht mehr auf eine Offerte-Vorauswahl, weil sie jetzt «Rundgang starten» ist.
+
+**Nicht umgesetzt (Blocker, ehrlich):** Echte Fotos fehlen. Eigene Fotos sind keine vorhanden. Die Wix-Mediathek enthält nur KI-Bilder und Dateien ohne Lizenznachweis. Stockquellen sperrt die Netzwerkrichtlinie dieser Umgebung (403), und Google Drive ist nicht angemeldet. Details: `docs/FOTOLISTE.md`.
+
 ## GmbH in Gründung und Veröffentlichungssperre (15. Oktober 2026)
 
 **Gesamtlauf am finalen Build, ohne Wiederholung:** `sh tests/alle.sh` → **465 bestanden, 0 fehlgeschlagen**
