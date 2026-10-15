@@ -327,6 +327,8 @@
     "previewWarning": "Editor und Vorschau zeigen Custom Elements in einem iFrame; das Verhalten auf der Live-Seite separat prüfen",
     "liveRequirements": ["Premium", "eigene Domain", "Wix-Werbung entfernt"],
     "changesMade": "keine",
+    "formEndpoint": "[UNSPECIFIED]",
+    "formEndpointNote": "HTTPS-Basisadresse der Velo-HTTP-Funktionen (wix/backend/http-functions.js), z. B. https://www.immoready.ch/_functions – erst nach Einrichtung der Sammlung «Offertanfragen» und Freigabe eintragen. Solange [UNSPECIFIED]: Formular im Demo-Modus.",
     "publishWithoutApproval": false
   },
   "fallbacks": {

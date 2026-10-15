@@ -41,6 +41,10 @@ const HIDE = '.jr-ui,.jr-tag,.jr-tech,.jr-hot{display:none!important}.jr-stage::
     p = await b.newPage(mob(390)); await p.goto('file://' + file + '#offerte'); await p.waitForTimeout(900);
     await p.evaluate(() => { const t = document.getElementById('formRoot').getBoundingClientRect().top + scrollY - 110; scrollTo({ top: t, behavior: 'instant' }); }); await shot(p, '28-formular-oben-390');
     await p.evaluate(() => { const t = document.getElementById('next').getBoundingClientRect().bottom + scrollY - innerHeight + 40; scrollTo({ top: t, behavior: 'instant' }); }); await shot(p, '29-formular-unten-390'); await p.close();
+    /* 33: Fehlerzustand nach leerem Absenden (Fokus auf erstem Fehlerfeld, Übersicht sichtbar) */
+    p = await b.newPage(mob(390)); await p.goto('file://' + file + '#offerte'); await p.waitForTimeout(900);
+    await p.fill('#name', 'Test Person'); await p.evaluate(() => { const t = document.getElementById('next').getBoundingClientRect().top + scrollY - innerHeight / 2; scrollTo({ top: t, behavior: 'instant' }); });
+    await p.click('#next'); await p.waitForTimeout(600); await p.evaluate(() => { const e = document.getElementById('errsum').getBoundingClientRect().top + scrollY - 120; scrollTo({ top: e, behavior: 'instant' }); }); await shot(p, '33-formular-fehler-390'); await p.close();
     p = await b.newPage(mob(390)); await p.goto('file://' + file + '#leistungen'); await p.waitForTimeout(900);
     await p.evaluate(() => scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' })); await shot(p, '30-kontaktleiste-footer-390'); await p.close();
     p = await b.newPage({ viewport: { width: 768, height: 1024 }, isMobile: true, hasTouch: true, deviceScaleFactor: 1 }); await p.goto('file://' + file); await p.waitForTimeout(1500); await shot(p, '31-tablet-768'); await p.close();

@@ -819,7 +819,7 @@
     function windOn(now) { return !!(TX.lb && extra && extra.fol.nm && !RMQ.matches && insideAmt(camNow(ps).e) < 0.5 && now - lastInput < WIND.idleMs); }
     function poke() { lastInput = win.performance.now(); if (running) request(); }
     function step(now) {
-      raf = 0; if (!running) return; var need = dirty, more = false; dirty = false; var d = p - ps; var raw = lastT ? now - lastT : 0, dt = lastT ? Math.min(100, raw) : 16; lastT = now;
+      raf = 0; if (!running) return; if (!show()) { lastT = 0; return; } /* V17.1: kein Bild mehr, wenn die Szene inzwischen unsichtbar ist */ var need = dirty, more = false; dirty = false; var d = p - ps; var raw = lastT ? now - lastT : 0, dt = lastT ? Math.min(100, raw) : 16; lastT = now;
       /* Texturen: das erste 3D-Bild höchstens 1,5 s auf die Materialtexturen warten lassen (bis dahin bleibt das Standbild) */
       if (!ready && TX.state === 'loading' && Date.now() - TX.t0 < 1500) { dirty = true; cont(); return; }
       /* zeitbasierte Glättung: unabhängig von der Bildrate, kein langes Hinterherlaufen */
@@ -860,8 +860,13 @@
     /* request(): von aussen (Grösse, Kamera, Sichtbarkeit, Texturen …) → nächstes Bild sicher zeichnen.
        Die Fortsetzung innerhalb von step() (Glättung, Wind) plant ohne diese Markierung. */
     var dirty = true;
-    function request() { dirty = true; if (!raf && running) raf = win.requestAnimationFrame(step); }
-    function cont() { if (!raf && running) raf = win.requestAnimationFrame(step); }
+    /* V17.1: ausserhalb des Sichtbereichs bzw. bei verstecktem Tab wird nichts geplant – die Markierung bleibt und das
+       nächste Bild entsteht, sobald IntersectionObserver/visibilitychange die Szene wieder sichtbar melden */
+    /* zusätzlich synchron die Lage im Fenster prüfen: unabhängig davon, wann der IntersectionObserver meldet (bei langsamer
+       Grafik kann das mehrere Bilder dauern) */
+    function show() { if (!visible || doc.hidden) return false; var r = root.getBoundingClientRect(), vh = win.innerHeight || doc.documentElement.clientHeight; return r.bottom > 0 && r.top < vh && r.width > 0; }
+    function request() { dirty = true; if (!raf && running && show()) raf = win.requestAnimationFrame(step); }
+    function cont() { if (!raf && running && show()) raf = win.requestAnimationFrame(step); }
 
     /* ---------- HTML-Einblendungen und Ereignisse aus dem Fortschritt ---------- */
     function stationOf(q) { for (var i = 0; i < ST.length; i++) if (q < ST[i].b || i === ST.length - 1) return i; return 0; }
@@ -925,8 +930,8 @@
       var weak = (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) || (navigator.deviceMemory && navigator.deviceMemory <= 4);
       dpr = Math.min(win.devicePixelRatio || 1, weak ? 1 : 1.5); resize(); running = true; ps = p; expoCur = -1; lastInput = win.performance.now();
       if (win.ResizeObserver) { ro = new win.ResizeObserver(function () { resize(); request(); }); ro.observe(stage); }
-      if (win.IntersectionObserver) { io = new win.IntersectionObserver(function (es) { visible = es[0].isIntersecting; if (visible) request(); }); io.observe(root); }
-      on(doc, 'visibilitychange', function () { if (!doc.hidden) request(); });
+      if (win.IntersectionObserver) { io = new win.IntersectionObserver(function (es) { visible = es[0].isIntersecting; if (visible) request(); else if (windTimer) { win.clearTimeout(windTimer); windTimer = 0; } }); io.observe(root); }
+      on(doc, 'visibilitychange', function () { if (!doc.hidden) request(); else if (windTimer) { win.clearTimeout(windTimer); windTimer = 0; } });
       on(canvas, 'webglcontextlost', function (e) { e.preventDefault(); if (!destroyed) fail('WEBGL_CONTEXT_LOST'); });
       /* Scan nur beim ersten Start auf der Gesamtansicht und ohne «Bewegung reduzieren» */
       if (scan.count === 0 && !RMQ.matches && p < ST[0].b) { scan.count = 1; scan.state = 'wait'; scan.start = win.performance.now() + SCAN_DELAY; sweep = -8; }
@@ -1019,7 +1024,7 @@
     });
     /* Eingaben halten den Wind kurz am Leben (danach steht die Szene still) */
     ['pointermove', 'pointerdown', 'wheel', 'keydown', 'touchstart'].forEach(function (ev) { on(root, ev, function () { if (running && win.performance.now() - lastInput > 250) poke(); }, { passive: true }); });
-    if (reqMode === 'scroll') on(win, 'scroll', function () { if (!scrollTick) { scrollTick = true; win.requestAnimationFrame(function () { scrollTick = false; if (mode === 'live') setProgress(scrollProg()); }); } }, { passive: true });
+    if (reqMode === 'scroll') on(win, 'scroll', function () { /* V17.1: ausserhalb des Sichtbereichs ohne Bildanforderung (Fortschritt bleibt am Rand) */ if (!show()) { if (mode === 'live' && !scrollTick) setProgress(scrollProg()); return; } if (!scrollTick) { scrollTick = true; win.requestAnimationFrame(function () { scrollTick = false; if (mode === 'live') setProgress(scrollProg()); }); } }, { passive: true });
     function prefChange() { if (mode !== 'static' && (SMALL.matches || (RMQ.matches && reqMode === 'scroll'))) { stopGL(); setStatic(); } }
     onMQ(RMQ, prefChange); onMQ(SMALL, prefChange);
 

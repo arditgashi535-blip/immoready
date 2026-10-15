@@ -116,6 +116,7 @@ def tour_config(d):
         'label': t['scene']['label'],
         'services': [s['key'] for s in d['services']],
         'allowedOrigins': d['wix']['allowedOrigins'],
+        'formEndpoint': None if d['wix'].get('formEndpoint', '[UNSPECIFIED]') == '[UNSPECIFIED]' else d['wix']['formEndpoint'],
     }
 
 

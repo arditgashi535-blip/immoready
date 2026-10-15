@@ -669,6 +669,10 @@
         },
         "publishWithoutApproval": {
           "const": false
+        },
+        "formEndpoint": {
+          "type": "string",
+          "pattern": "^(\\[UNSPECIFIED\\]|https://[a-z0-9.-]+(/[A-Za-z0-9_./-]*)?)$"
         }
       }
     },

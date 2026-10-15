@@ -72,6 +72,29 @@ Steuerung von der Wix-Seite: `$w('#immoreadyTour').setAttribute('station', '4')`
 | `wix/velo-custom-element.js` | Seitencode der Startseite |
 | `wix/velo-offertseite.js` | Seitencode der Offertseite |
 
+## Offertformular an Wix anbinden (vorbereitet, nicht eingerichtet)
+
+Geprüft am 15.10.2026 über die Wix-API (nur lesend): Site «Immoready» veröffentlicht, Velo aktiv, Wix Forms installiert,
+**im aktuellen Wix-Forms-System ist kein Formular vorhanden** (Form Schemas: 0). Wix Bookings mit 8 Diensten vorhanden.
+Es gibt also noch keinen Empfänger für Offertanfragen; die Vorschau bleibt bis zur Einrichtung im Demo-Modus.
+
+| Schritt | Was | Wer / Freigabe |
+|---|---|---|
+| 1 | CMS-Sammlung **`Offertanfragen`** anlegen. Felder: `leistung`, `auftrag`, `ort`, `beschreibung`, `name`, `email`, `tel` (Text), `fotos` (Array/Objekt), `quelle`, `status` (Text). Berechtigungen: Lesen/Schreiben nur Admin (Einträge schreibt der Backend-Code mit `auth.elevate`). | Änderung an der Site → **Freigabe nötig** |
+| 2 | `wix/backend/http-functions.js` als **Backend → http-functions.js** einfügen (Endpunkte `/_functions/offerte`, `/_functions/offerteUpload`, CORS nur für immoready.ch). | Freigabe nötig |
+| 3 | Wix-Automation «Neuer Eintrag in Offertanfragen → E-Mail an info.immoready@gmail.com» einrichten. **Annahme (Eintrag gespeichert) und Benachrichtigung sind getrennte Prüfschritte.** | Freigabe nötig |
+| 4 | Site veröffentlichen (HTTP-Funktionen sind erst auf der veröffentlichten Site erreichbar). | **ausdrückliche Freigabe** |
+| 5 | In `rise.json → wix.formEndpoint` die Basisadresse eintragen (`https://www.immoready.ch/_functions`), `python3 build.py`. Danach verschwindet der Demo-Hinweis. | lokal |
+| 6 | Testversand mit einer eigenen Adresse (z. B. info.immoready@gmail.com), keine Kundendaten: Eintrag in der Sammlung sichtbar? E-Mail angekommen? Foto im Media Manager unter `/offerten`? | Freigabe für den Testversand |
+
+Verhalten im Browser (getestet gegen einen simulierten Endpunkt, `tests/t21-fertigstellung.js`): Fotos werden einzeln über eine
+vom Server erzeugte Upload-Adresse hochgeladen (keine Schlüssel im Browser), danach wird die Anfrage gesendet. Erfolg erscheint
+nur bei HTTP 200 mit `ok:true` und Referenz-ID. Netzwerkausfall, Zeitüberschreitung, Upload-Fehler, Serverprüfung (400 mit Feldern)
+und unbestätigte Antworten zeigen je eine eigene Meldung; Eingaben bleiben erhalten; Doppelklick ist gesperrt.
+
+**Einschränkung:** Der Backend-Code wurde in dieser Umgebung nur mit Platzhalter-Modulen geprüft (Logik, Validierung, CORS),
+nicht in Wix ausgeführt. `@wix/data`, `@wix/media` und `@wix/essentials` müssen im Wix-Editor unter «Pakete» verfügbar sein.
+
 ## Warum Stationsmodus statt Scrollmodus in Wix
 
 Der Scrollmodus braucht einen Abschnitt von rund 7,6 Bildschirmhöhen, dessen Fortschritt aus dem Seitenscroll
