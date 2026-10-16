@@ -675,12 +675,14 @@
     /* ---------- Badspiegel: planare Spiegelung (Szene am Spiegel gespiegelt in eine Textur), nur wenn sichtbar ---------- */
     var MIR = { x: 3.25, y0: FLOOR + 1.17, y1: FLOOR + 1.83, z0: 0.45, z1: 1.15, fb: null, rb: null, tex: null, w: 0, h: 0, frames: 0 };
     function mirrorVisible(mm) {
-      var e = mm.e; if (e[0] < MIR.x + 0.05 || e[0] > XW || e[2] < -0.95 || e[2] > 2.4 || e[1] < 0.5 || e[1] > 3.1) return false;
+      /* Korrektur 3D-Reise: auch beim Blick durch die Badtür (Kamera in Flur/Wohnung bis x 7,6) echte Spiegelung – vorher sprang der
+         Spiegel dort auf die grobe Reflexionsaufnahme (128²) um, die Deckenleuchte erschien als gezackter weisser Fleck */
+      var e = mm.e; if (e[0] < MIR.x + 0.05 || e[0] > 7.6 || e[2] < -0.95 || e[2] > 3.0 || e[1] < 0.5 || e[1] > 3.1) return false;
       var cs = [[MIR.x, MIR.y0, MIR.z0], [MIR.x, MIR.y1, MIR.z0], [MIR.x, MIR.y0, MIR.z1], [MIR.x, MIR.y1, MIR.z1]], inx = false;
       cs.forEach(function (v) { var q = project(mm.m, v); if (q[2] > 0 && q[0] > -10 && q[0] < 110 && q[1] > -10 && q[1] < 110) inx = true; }); return inx;
     }
     function renderMirror(mm, ord, ms, expo) {
-      var s = EXT.sw === true ? 0.35 : 0.5, W2 = Math.max(16, Math.round(canvas.width * s)), H2 = Math.max(16, Math.round(canvas.height * s));
+      var s = EXT.sw === true ? 0.35 : 1.0, W2 = Math.max(16, Math.round(canvas.width * s)), H2 = Math.max(16, Math.round(canvas.height * s));
       if (!MIR.fb) { MIR.fb = gl.createFramebuffer(); MIR.rb = gl.createRenderbuffer(); }
       if (MIR.w !== W2 || MIR.h !== H2) {
         if (!MIR.tex) { MIR.tex = gl.createTexture(); textures.push(MIR.tex); }
@@ -693,7 +695,10 @@
       gl.bindFramebuffer(gl.FRAMEBUFFER, MIR.fb); gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, MIR.tex, 0); gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, MIR.rb);
       gl.viewport(0, 0, W2, H2); gl.clearColor(0.05, 0.05, 0.06, 1); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
       var Rm = [-1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 2 * MIR.x, 0, 0, 1], Mr = mul(mm.m, Rm), ev = [2 * MIR.x - mm.e[0], mm.e[1], mm.e[2]];
-      for (var i = 0; i < ord.length; i++) if (ord[i].name !== 'ENV' && ord[i].name !== 'BLD') drawSet(ord[i], Mr, ev, ms[i], expo, 1, { mode: 2, clip: [1, 0, 0, -MIR.x - 0.004], lm: ord[i].LM ? ord[i].LM(ps) : 0 });
+      /* Korrektur 3D-Reise: Hülle (BLD) und Himmel gehören ins Spiegelbild – sonst fehlten durch die Badtür hindurch die
+         Aussenwand und der Himmel hinter dem Wohnzimmerfenster (heller, gezackter Fleck oben im Spiegel). Umgebung (ENV) bleibt weg. */
+      for (var i = 0; i < ord.length; i++) if (ord[i].name !== 'ENV') drawSet(ord[i], Mr, ev, ms[i], expo, 1, { mode: 2, clip: [1, 0, 0, -MIR.x - 0.004], lm: ord[i].LM ? ord[i].LM(ps) : 0 });
+      var skyS = sets.filter(function (o) { return o.name === 'SKY'; })[0]; if (skyS) { gl.depthMask(false); drawSky(skyS, Mr, ev, expo); gl.depthMask(true); disableAttrs(); }
       gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, canvas.width, canvas.height); disableAttrs(); MIR.frames++;
     }
     function drawSky(o, Mx, e, expo) {
@@ -739,7 +744,7 @@
     var drawCount = 0;
     function draw() {
       drawCount++; cullStats.drawn = 0; cullStats.total = 0;
-      var mm = matrix(ps), Mx = mm.m, ein = mm.ins > 0.5 ? 1 : 0, expo = expoCur > 0 ? expoCur : expoTarget(mm.ins), q = ps;
+      var mm = matrix(ps), Mx = mm.m, ein = mm.ins > 0.5 ? 1 : 0, expo = expoCur > 0 ? expoCur : expoTarget(mm.ins, mm.e), q = ps;
       var by = {}; sets.forEach(function (o) { by[o.name] = o; });
       /* Reflexionsaufnahme des Raums, in dem die Kamera steht (einmalig erzeugt) */
       curProbe = camOverride && camOverride.noProbe ? null : probeFor(mm.e); if (curProbe && !curProbe.tex) { bindTex(); captureProbe(curProbe); }
@@ -815,7 +820,8 @@
     function easeIO(k) { return k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2; }
     /* Belichtung: drinnen (warm, hell beleuchtet) etwas knapper als draussen in der Dämmerung; der Wechsel geschieht
        weich über ≈0,45 s wie bei einer Kamera-Belichtungsautomatik (bei «Bewegung reduzieren» sofort) */
-    function expoTarget(ins) { return 1.0 - 0.15 * ins; }
+    /* Korrektur 3D-Reise: die Wohnung (x > 5,4) war deutlich zu dunkel – dort gezielt etwas mehr Belichtung; Bad und Halle unverändert */
+    function expoTarget(ins, e) { var wo = e ? sstep(5.25, 5.95, e[0]) * sstep(-0.95, -0.6, e[2]) : 0; return 1.0 - 0.15 * ins + 0.32 * ins * wo; }
     /* Wind: nur wenn Aussenraum im Bild, nicht bei «Bewegung reduzieren», höchstens 30 Bilder/s und nur bis
        WIND.idleMs nach der letzten Eingabe – danach steht die Szene still und rendert nicht mehr */
     var WIND = C.wind || { idleMs: 15000, maxFps: 30 }, lastInput = 0, lastDraw = 0;
@@ -842,13 +848,13 @@
       }
       if (hiNow !== hOld) need = true;
       /* Belichtung nachführen */
-      var et = expoTarget(insideAmt(camNow(ps).e));
+      var cn = camNow(ps).e, et = expoTarget(insideAmt(cn), cn);
       if (expoCur < 0 || RMQ.matches) { if (expoCur !== et) need = true; expoCur = et; }
       else if (Math.abs(et - expoCur) > 0.002) { expoCur += (et - expoCur) * (1 - Math.exp(-(raw ? Math.min(1000, raw) : 16) / 450)); need = true; } /* zeitbasiert auch bei langsamen Bildern (sonst ≈20 Bilder Nachlauf) */ else if (expoCur !== et) { expoCur = et; need = true; }
       var windy = windOn(now);
       if (windy && now - lastDraw >= 1000 / WIND.maxFps - 2) need = true;
       if (need || !ready) {
-        if (raw && lastDrew) adapt(raw);
+        if (raw && lastDrew) { adapt(raw); if (inline3d) perfCheck(raw); }
         windT = now / 1000; draw(); lastDraw = now; lastDrew = true;
         if (!ready) { ready = true; root.classList.add('jr-ready'); }
       } else lastDrew = false;
@@ -893,6 +899,7 @@
     /* ---------- WebGL-Start, Fehler, Freigabe ---------- */
     function fail(code) {
       emit('tour-error', { code: code, fallback: 'stills' });
+      if (inline3d) { end3d('3D wurde beendet. Sie sehen Bilder derselben Szene.'); return; }
       stopGL(); setStatic();
     }
     function initGL() {
@@ -935,7 +942,7 @@
       if (win.ResizeObserver) { ro = new win.ResizeObserver(function () { resize(); request(); }); ro.observe(stage); }
       if (win.IntersectionObserver) { io = new win.IntersectionObserver(function (es) { visible = es[0].isIntersecting; if (visible) request(); else if (windTimer) { win.clearTimeout(windTimer); windTimer = 0; } }); io.observe(root); }
       on(doc, 'visibilitychange', function () { if (!doc.hidden) request(); else if (windTimer) { win.clearTimeout(windTimer); windTimer = 0; } });
-      on(canvas, 'webglcontextlost', function (e) { e.preventDefault(); if (!destroyed) fail('WEBGL_CONTEXT_LOST'); });
+      on(canvas, 'webglcontextlost', function (e) { e.preventDefault(); if (!destroyed && running && e.target === canvas) fail('WEBGL_CONTEXT_LOST'); }); /* eigenes Beenden (stopGL) ist kein Fehler */
       /* Scan nur beim ersten Start auf der Gesamtansicht und ohne «Bewegung reduzieren» */
       if (scan.count === 0 && !RMQ.matches && p < ST[0].b) { scan.count = 1; scan.state = 'wait'; scan.start = win.performance.now() + SCAN_DELAY; sweep = -8; }
       else { scan.state = 'done'; sweep = 1e4; }
@@ -961,6 +968,29 @@
     /* ---------- Modi: Standbilder, Stationen, Scroll ---------- */
     function showStill(i) { cur = i; ui(ST[i].hold); root.querySelectorAll('.jr-still').forEach(function (im, j) { im.classList.toggle('on', j === i); }); root.querySelectorAll('.jr-det [data-det]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.detI === '-1')); }); }
     function setStatic() { mode = 'static'; root.classList.add('jr-static'); root.classList.remove('jr-live', 'jr-button'); showStill(cur); }
+    /* Handy und niedrige Bildschirme: Bildmodus zuerst; «3D-Ansicht starten» startet dieselbe Szene im Stationsmodus
+       (gleicher Fortschritt, gleiche Schleife, kein Festhalten beim Scrollen) innerhalb des Bildrahmens. Läuft sie auf dem
+       Gerät nicht flüssig (gemessene Bildzeiten), kehrt sie mit Hinweis zu den Bildern derselben Szene zurück. */
+    var inline3d = false, perf = null, PERF_MS = C.mobile3d ? C.mobile3d.maxFrameMs : 60;
+    function canOffer3d() { return !!(win.WebGLRenderingContext && canvas) && !opts.no3dOffer; }
+    function set3dBtn(on) { root.querySelectorAll('[data-3d]').forEach(function (b) { b.hidden = !canOffer3d(); b.setAttribute('aria-pressed', String(!!on)); var l = b.querySelector('span') || b; l.textContent = on ? (b.dataset.off || 'Bilder statt 3D') : (b.dataset.on || '3D-Ansicht starten'); }); }
+    function offer3d() { set3dBtn(false); }
+    function note3d(t) { var n = root.querySelector('.jr-3d-note'); if (n) { n.textContent = t || ''; n.hidden = !t; } }
+    function start3D() {
+      if (destroyed || inline3d || mode !== 'static' || !canOffer3d()) return false;
+      inline3d = true; note3d(''); root.classList.add('jr-3d-wait'); p = ps = ST[cur].hold; schedule(start); return true;
+    }
+    function end3d(msg) {
+      if (!inline3d) return; inline3d = false; perf = null; if (gl || running) stopGL();
+      /* abgegebener Kontext lässt sich nicht wieder öffnen: frische Zeichenfläche für einen späteren Neustart */
+      if (canvas && canvas.parentNode) { var nc = canvas.cloneNode(false); canvas.parentNode.replaceChild(nc, canvas); canvas = nc; }
+      root.classList.remove('jr-3d', 'jr-3d-wait', 'jr-ready'); setStatic(); set3dBtn(false); if (msg) note3d(msg);
+    }
+    function perfCheck(raw) {
+      if (!perf || !raw) return; perf.push(raw); if (perf.length < 12) return;
+      var a = perf.slice().sort(function (x, y) { return x - y; }), med = a[a.length >> 1]; perf = null;
+      if (med > (win.IR_PERF_MS || PERF_MS) && !win.IR_NO_PERF_FALLBACK) { emit('tour-error', { code: 'TOO_SLOW', fallback: 'stills' }); end3d('3D läuft auf diesem Gerät nicht flüssig. Sie sehen Bilder derselben Szene.'); }
+    }
     function scrollProg() { var r = root.getBoundingClientRect(); var span = root.offsetHeight - win.innerHeight; return span > 0 ? (-r.top) / span : 0; }
     function goStation(i) {
       if (destroyed) return; i = Math.max(0, Math.min(ST.length - 1, i | 0)); var q = ST[i].hold; cur = i;
@@ -995,6 +1025,7 @@
     }
     on(root, 'click', function (e) {
       var ch = e.target.closest('[data-choice]'); if (ch && root.contains(ch)) { e.preventDefault(); choose(ch, false); return; }
+      var b3 = e.target.closest('[data-3d]'); if (b3 && root.contains(b3)) { e.preventDefault(); if (inline3d) end3d(); else start3D(); return; }
       var dtb = e.target.closest('[data-det]'); if (dtb && root.contains(dtb)) { e.preventDefault(); goDetail(dtb); return; }
       var g = e.target.closest('[data-go]'); if (g && root.contains(g)) { e.preventDefault(); goStation(+g.dataset.go); return; }
       var s = e.target.closest('[data-step]'); if (s && root.contains(s)) { e.preventDefault(); goStation(currentIndex() + (+s.dataset.step)); return; }
@@ -1028,25 +1059,27 @@
     /* Eingaben halten den Wind kurz am Leben (danach steht die Szene still) */
     ['pointermove', 'pointerdown', 'wheel', 'keydown', 'touchstart'].forEach(function (ev) { on(root, ev, function () { if (running && win.performance.now() - lastInput > 250) poke(); }, { passive: true }); });
     if (reqMode === 'scroll') on(win, 'scroll', function () { /* V17.1: ausserhalb des Sichtbereichs ohne Bildanforderung (Fortschritt bleibt am Rand) */ if (!show()) { if (mode === 'live' && !scrollTick) setProgress(scrollProg()); return; } if (!scrollTick) { scrollTick = true; win.requestAnimationFrame(function () { scrollTick = false; if (mode === 'live') setProgress(scrollProg()); }); } }, { passive: true });
-    function prefChange() { if (mode !== 'static' && (SMALL.matches || (RMQ.matches && reqMode === 'scroll'))) { stopGL(); setStatic(); } }
+    function prefChange() { if (mode !== 'static' && !inline3d && (SMALL.matches || (RMQ.matches && reqMode === 'scroll'))) { stopGL(); setStatic(); } }
     onMQ(RMQ, prefChange); onMQ(SMALL, prefChange);
 
     /* Ereignisse erst nach dem Start: Listener (z. B. Velo in $w.onReady) verpassen nichts */
     function ready_(m) { started = true; emit('tour-ready', { version: C.version, mode: m }); var i = currentIndex(); emit('station-change', { station: ST[i].k, index: i, progress: Math.round((mode === 'static' ? ST[i].hold : p) * 1000) / 1000 }); }
     function start() {
       startTimer = 0; idleId = 0; if (destroyed) return;
-      if (SMALL.matches || (RMQ.matches && reqMode === 'scroll')) { setStatic(); ready_('stills'); return; }
+      if (!inline3d && (SMALL.matches || (RMQ.matches && reqMode === 'scroll'))) { setStatic(); ready_('stills'); offer3d(); return; }
       /* Texturen und vorab gerechnetes Licht nur laden, wenn 3D wirklich startet (nicht auf Smartphones) */
       if (TX.state === 'none') loadTex();
       if (pbState === 'none') loadBake();
       /* lange Rechenarbeit in Etappen, damit Eingaben zwischendurch verarbeitet werden */
       if (!baked) { if (!buildStep()) { schedule(start); return; } }
-      if (reqMode === 'scroll') { root.classList.add('jr-live'); mode = 'live'; } else { root.classList.add('jr-live', 'jr-button'); mode = 'button'; }
-      root.classList.remove('jr-static');
+      if (inline3d) { root.classList.add('jr-3d'); mode = 'button'; }
+      else if (reqMode === 'scroll') { root.classList.add('jr-live'); mode = 'live'; } else { root.classList.add('jr-live', 'jr-button'); mode = 'button'; }
+      if (!inline3d) root.classList.remove('jr-static');
       if (mode === 'live') { p = Math.max(0, Math.min(1, scrollProg())); ui(p); } else p = ST[cur].hold;
       var err = initGL();
-      if (err) { stopGL(); setStatic(); emit('tour-error', { code: err, fallback: 'stills' }); ready_('stills'); return; }
+      if (err) { stopGL(); if (inline3d) end3d(); setStatic(); emit('tour-error', { code: err, fallback: 'stills' }); ready_('stills'); return; }
       ps = p; ui(p);
+      if (inline3d) { perf = []; root.classList.remove('jr-3d-wait'); set3dBtn(true); }
       ready_('webgl');
     }
 
@@ -1136,7 +1169,7 @@
     }
 
     return {
-      goStation: goStation, setProgress: setProgress, glide: glide, destroy: destroy,
+      goStation: goStation, setProgress: setProgress, glide: glide, destroy: destroy, start3D: start3D, stop3D: function () { end3d(); },
       progress: function () { return p; }, mode: function () { return mode; }, station: function () { return currentIndex(); },
       jump: function (q) { p = ps = q; expoCur = -1; if (scan.state !== 'done') { scan.state = 'done'; } sweep = 1e4; ui(q); if (running) request(); },
       ui: ui, stationOf: stationOf, checkRoute: checkRoute, checkFrustum: checkFrustum, routeStats: routeStats, camAt: camAt, doorAngle: doorAngle, aptAngle: aptAngle, terSlide: terSlide,
@@ -1204,7 +1237,7 @@
       },
       lightW: function (q, n, m) { return lightW(q, n, m); },
       roomOf: function (q) { return roomOf(q); },
-      state: function () { return { frames: drawCount, p: p, ps: ps, ready: ready, running: running, mode: mode, destroyed: destroyed, listeners: disposers.length, expo: expoCur, wind: !!windTimer || (running && windOn(win.performance.now())), scan: { state: scan.state, start: scan.start, end: scan.end, count: scan.count }, hi: hiNow, pulseLast: pulse.last, canvas: canvas ? [canvas.width, canvas.height] : null, css: [w, h], dpr: dpr, rs: rs, pxCap: pxCap }; }
+      state: function () { return { frames: drawCount, p: p, ps: ps, ready: ready, running: running, mode: mode, destroyed: destroyed, listeners: disposers.length, expo: expoCur, wind: !!windTimer || (running && windOn(win.performance.now())), scan: { state: scan.state, start: scan.start, end: scan.end, count: scan.count }, hi: hiNow, pulseLast: pulse.last, canvas: canvas ? [canvas.width, canvas.height] : null, css: [w, h], inline3d: inline3d, dpr: dpr, rs: rs, pxCap: pxCap }; }
     };
   }
 

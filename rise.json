@@ -273,7 +273,8 @@
         "text": "Erzählen Sie uns von Ihrem Objekt oder Ihrem Auftrag. Wir besprechen mit Ihnen die passende Unterstützung.",
         "ctas": [
           {"label": "Offerte anfragen", "service": null, "primary": true},
-          {"label": "Kontakt aufnehmen", "contact": true}
+          {"label": "Kontakt aufnehmen", "contact": true},
+          {"label": "Tour erneut starten", "goTo": 0}
         ],
         "still": "station-06-zurueck",
         "stillAlt": "Wohnblock in der Gesamtansicht am Abend"
@@ -287,6 +288,7 @@
       {"p": 0.3, "pos": [0, 1.75, 13.5], "lookAt": [0, 1.9, 5.5], "fovRad": 0.78},
       {"p": 0.355, "pos": [0, 1.95, 7.6], "lookAt": [0, 2.0, 4], "fovRad": 0.84},
       {"p": 0.39, "pos": [0, 2.1, 4.7], "lookAt": [0, 2.1, 2.4], "fovRad": 0.88},
+      {"p": 0.415, "pos": [-0.1, 2.1, 4.72], "lookAt": [-2.45, 2.55, 2.9], "fovRad": 0.9},
       {"p": 0.44, "pos": [-0.35, 2.1, 4.75], "lookAt": [1.6, 1.5, 1.6], "fovRad": 0.9},
       {"p": 0.46, "pos": [0.4, 2.1, 4.3], "lookAt": [2.8, 1.8, 2.0], "fovRad": 0.9},
       {"p": 0.48, "pos": [1.5, 2.1, 3.75], "lookAt": [4.0, 2.0, 2.9], "fovRad": 0.9},

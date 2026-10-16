@@ -5,7 +5,7 @@
   "scripts": {
     "build": "python3 build.py",
     "check:rise": "python3 tools/rise.py",
-    "test": "npm run build && python3 tests/test_rise.py && node tests/t15-velo.js && node tests/t7.js && node tests/t9.js && node tests/t11.js && node tests/t14-v13.js && node tests/t16-v14.js && node tests/t17-v15.js && node tests/t18-v16.js && node tests/t19-v17.js && node tests/t20-v171.js && node tests/t21-fertigstellung.js && node tests/t22-mobil.js && node tests/t23-gmbh.js && node tests/t24-inhalte.js && node tests/t25-premium.js && node tests/t26-videos.js",
+    "test": "npm run build && python3 tests/test_rise.py && node tests/t15-velo.js && node tests/t7.js && node tests/t9.js && node tests/t11.js && node tests/t14-v13.js && node tests/t16-v14.js && node tests/t17-v15.js && node tests/t18-v16.js && node tests/t19-v17.js && node tests/t20-v171.js && node tests/t21-fertigstellung.js && node tests/t22-mobil.js && node tests/t23-gmbh.js && node tests/t24-inhalte.js && node tests/t25-premium.js && node tests/t26-videos.js && node tests/t27-reise.js",
     "test:servers": "python3 -m http.server 8702 --bind 127.0.0.1 & (cd tests/harness && python3 -m http.server 8701 --bind 127.0.0.1 &) ; (cd tests/harness && python3 -m http.server 8703 --bind 127.0.0.1)",
     "test:embed": "node tests/t12.js",
     "test:component": "node tests/t13-component.js",
@@ -24,7 +24,7 @@
     "test:gmbh": "node tests/t23-gmbh.js",
     "test:inhalte": "node tests/t24-inhalte.js",
     "test:premium": "node tests/t25-premium.js",
-    "test:videos": "node tests/t26-videos.js",
+    "test:videos": "node tests/t26-videos.js && node tests/t27-reise.js",
     "aufnahme": "node tools/aufnahme-rundgang.js dist/immoready-vorschau.html docs/premium/rundgang-aufnahme.mp4",
     "launch:check": "python3 tools/rise.py --launch",
     "abnahme": "node tools/abnahme-final.js dist/immoready-vorschau.html shots/v171-abnahme alle && python3 tools/abnahme-final-collage.py",

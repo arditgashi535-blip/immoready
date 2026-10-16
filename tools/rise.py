@@ -455,9 +455,11 @@ def tour_markup(d, still_src, inline_arrow=False, page=True):
                   % (i, ' class="on" aria-current="step"' if i == 0 else '', _e(s['nav'])) for i, s in enumerate(st))
     out.append('<nav class="jr-nav" aria-label="Stationen des Rundgangs"><ol>%s</ol><div class="jr-bar" aria-hidden="true"><i></i></div></nav>' % nav)
     if page:
-        out.append('<div class="jr-skip"><a href="#ablauf" class="jr-skip-a">Tour überspringen %s</a><a href="#offerte" class="jr-skip-o">Offerte anfragen</a></div>' % a)
+        out.append('<p class="jr-3d-note" role="status" hidden></p>')
+        out.append('<div class="jr-skip"><button type="button" class="jr-3d-btn" data-3d hidden aria-pressed="false"><span>3D-Ansicht starten</span></button><a href="#ablauf" class="jr-skip-a">Tour überspringen %s</a><a href="#offerte" class="jr-skip-o">Offerte anfragen</a></div>' % a)
     else:
-        out.append('<div class="jr-skip"><button type="button" class="jr-skip-a" data-skip>Tour überspringen %s</button><a href="#offerte" class="jr-skip-o">Offerte anfragen</a></div>' % a)
+        out.append('<p class="jr-3d-note" role="status" hidden></p>')
+        out.append('<div class="jr-skip"><button type="button" class="jr-3d-btn" data-3d hidden aria-pressed="false"><span>3D-Ansicht starten</span></button><button type="button" class="jr-skip-a" data-skip>Tour überspringen %s</button><a href="#offerte" class="jr-skip-o">Offerte anfragen</a></div>' % a)
     out.append('<div class="jr-steps" role="group" aria-label="Rundgang steuern"><button type="button" class="jr-stepb" data-step="-1" aria-label="Vorherige Station">← Zurück</button><button type="button" class="jr-stepb" data-step="1" aria-label="Nächste Station">Weiter →</button></div>')
     out.append('</div></div></section>')
     if page:
