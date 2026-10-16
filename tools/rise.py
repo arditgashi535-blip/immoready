@@ -213,7 +213,7 @@ def careers_markup(d):
             '<div class="career-copy"><p class="num reveal"><span>06</span>%s</p>'
             '<h2 class="display reveal" id="h-career">%s</h2>'
             '<p class="lead reveal">%s</p>'
-            '<div class="row-ctas reveal"><a class="btn sand" href="%s" data-career>%s <i class="a"></i></a></div>'
+            '<div class="row-ctas reveal"><a class="btn sand" href="%s" data-career>%s <i class="a" aria-hidden="true"></i></a></div>'
             '<p class="fine reveal" id="career-hint">Der Knopf öffnet Ihr E-Mail-Programm mit dem Betreff «%s». '
             'Sie erreichen uns auch direkt unter <a href="%s">%s</a>. Lebenslauf und Zeugnisse können Sie als Anhang mitsenden.</p>'
             '</div></div></section>') % (_e(c['kicker']), _e(c['headline']), _e(c['text']), href, _e(c['cta']), _e(c['subject']),
@@ -281,7 +281,7 @@ def _e(s):
 
 
 def _cta(c, inline_arrow, small):
-    a = ARR if inline_arrow else '<i class="a"></i>'
+    a = ARR if inline_arrow else '<i class="a" aria-hidden="true"></i>'
     if 'goTo' in c:
         return '<a class="btn ghost" href="#reise" data-go="%d">%s %s</a>' % (c['goTo'], _e(c['label']), a)
     if c.get('contact'):
@@ -305,7 +305,7 @@ def _title(t):
 
 
 def _choices(s, inline_arrow):
-    a = ARR if inline_arrow else '<i class="a"></i>'
+    a = ARR if inline_arrow else '<i class="a" aria-hidden="true"></i>'
     ch = s['choices']
     opts = ''.join('<button type="button" role="radio" aria-checked="%s" tabindex="%d" data-choice="%s" data-cta="%s"><span class="jr-rd" aria-hidden="true"></span><span>%s</span></button>'
                    % ('true' if i == 0 else 'false', 0 if i == 0 else -1, c['service'], _e(c['cta']), _e(c['label'])) for i, c in enumerate(ch))
@@ -322,7 +322,7 @@ def tour_markup(d, still_src, inline_arrow=False, page=True):
     page=True: Links auf Seiten der Vorschau (Details, Überspringen); page=False: nur Rundgang (Komponente)."""
     t = d['tour']
     st = t['stations']
-    a = ARR if inline_arrow else '<i class="a"></i>'
+    a = ARR if inline_arrow else '<i class="a" aria-hidden="true"></i>'
     routes = {s['key']: s.get('route', '#' + s['key']) for s in d['services']}
     hl = t['highlights'][0]
     out = ['<section class="jr" id="reise" aria-labelledby="h-hero" data-st="0">']

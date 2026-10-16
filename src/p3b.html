@@ -43,8 +43,8 @@ function renderService(key){
   h+='<p class="crumbs mono"><a href="#start">Start</a><span>/</span><a href="#leistungen">Leistungen</a><span>/</span><span>'+esc(d.name)+'</span></p>';
   h+='<p class="k" style="margin-top:22px"><i class="ico" data-icon="'+(SICON[key]||'house')+'"></i><span class="mono">'+esc(d.name)+' · Zürich &amp; Aargau</span></p>';
   h+='<h1>'+esc(d.h1).replace(/(\S+\s\S+)$/,'<b>$1</b>')+'</h1><p class="lead" style="color:#DAD8D0;max-width:46ch">'+esc(d.intro)+'</p>';
-  h+='<div style="margin-top:30px;display:flex;flex-wrap:wrap;gap:12px"><a class="btn" href="#offerte" data-pre="'+key+'" data-mode="'+(d.mode||'')+'">'+esc(d.cta)+' <i class="a"></i></a>';
-  h+='<a class="btn ghost on-dark" href="#umfang-'+key+'">Leistungsumfang <i class="a"></i></a></div></div>';
+  h+='<div style="margin-top:30px;display:flex;flex-wrap:wrap;gap:12px"><a class="btn" href="#offerte" data-pre="'+key+'" data-mode="'+(d.mode||'')+'">'+esc(d.cta)+' <i class="a" aria-hidden="true"></i></a>';
+  h+='<a class="btn ghost on-dark" href="#umfang-'+key+'">Leistungsumfang <i class="a" aria-hidden="true"></i></a></div></div>';
   h+='<figure class="fig"><div class="illu" data-illu="'+d.illu+'"></div><figcaption class="review-only">Bildplatzhalter · echtes Foto '+esc(d.name)+'</figcaption></figure></div></section>';
   // Umfang
   h+='<section class="sec" id="umfang-'+key+'"><div class="wrap side-l"><div><p class="mono eyebrow">Leistungsumfang</p><h2 class="h2" style="font-size:clamp(1.8rem,3.4vw,2.8rem)">Was wir übernehmen.</h2>';
@@ -69,7 +69,7 @@ function renderService(key){
   d.faq.forEach(function(f){h+='<details><summary>'+esc(f[0])+' <span class="pm"></span></summary><p>'+esc(f[1])+'</p></details>';});
   h+='</div></div></section>';
   // CTA
-  h+='<section class="sec paper" style="padding-block:clamp(56px,7vw,96px)"><div class="wrap cta-band"><h2>Anfrage für '+esc(d.name)+' stellen.</h2><div class="acts"><a class="btn inkb" href="#offerte" data-pre="'+key+'" data-mode="'+(d.mode||'')+'">'+esc(d.cta)+' <i class="a"></i></a>';
+  h+='<section class="sec paper" style="padding-block:clamp(56px,7vw,96px)"><div class="wrap cta-band"><h2>Anfrage für '+esc(d.name)+' stellen.</h2><div class="acts"><a class="btn inkb" href="#offerte" data-pre="'+key+'" data-mode="'+(d.mode||'')+'">'+esc(d.cta)+' <i class="a" aria-hidden="true"></i></a>';
   if(d.book)h+='<a class="btn ghost" href="'+BOOK+d.book[1]+'" target="_blank" rel="noopener">'+esc(d.book[0])+' ↗</a>';
   h+='</div></div>';
   if(d.books){h+='<div class="wrap" style="margin-top:28px;display:flex;flex-wrap:wrap;gap:10px 22px"><span class="mono muted">Weitere Termine:</span>';d.books.forEach(function(b){h+='<a class="lnk" href="'+BOOK+b[1]+'" target="_blank" rel="noopener">'+esc(b[0])+' ↗</a>';});h+='</div>';}

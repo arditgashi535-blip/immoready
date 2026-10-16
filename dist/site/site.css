@@ -1902,10 +1902,11 @@ body.hdr-compact .hdr{background:var(--ivory)}
 @keyframes hero3Img{from{transform:scale(1.045);opacity:.6}to{transform:none;opacity:1}}
 .hero3-copy{min-height:min(82vh,800px);display:flex;flex-direction:column;justify-content:center;padding-block:clamp(56px,8vw,120px)}
 .hero3-copy>*{max-width:40rem;animation:hero3In .9s var(--e-out,ease) both}
+.hero3-copy>.hero3-title{max-width:min(100%,58rem)}
 .hero3-copy>:nth-child(2){animation-delay:.08s}.hero3-copy>:nth-child(3){animation-delay:.16s}.hero3-copy>:nth-child(4){animation-delay:.24s}.hero3-copy>:nth-child(5){animation-delay:.32s}
 @keyframes hero3In{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 .hero3-kicker{color:var(--lime);letter-spacing:.16em;white-space:normal}
-.hero3-title{font-size:clamp(2.3rem,5.4vw,4.8rem);line-height:1.03;font-weight:300;font-stretch:118%;letter-spacing:-.01em;margin:18px 0 22px;color:#F7F3EB}
+.hero3-title{font-size:clamp(2.3rem,4.6vw,4.7rem);line-height:1.03;font-weight:300;font-stretch:118%;letter-spacing:-.01em;margin:18px 0 22px;color:#F7F3EB}
 .hero3-title b{font-weight:740;display:inline}
 .hero3-sub{font-size:clamp(1.08rem,1.45vw,1.28rem);line-height:1.55;color:#EEE8E0;max-width:40ch}
 .hero3-ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
@@ -1947,3 +1948,18 @@ body.hdr-compact .hdr{background:var(--ivory)}
 .rstat li::before{content:"✓";display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--ink);color:var(--ivory);font-size:.72rem;flex:none}
 /* Hauswartung: längere Überschrift «Damit Ihre Liegenschaft im Alltag funktioniert.» – kleiner gesetzt, bleibt in ihrer Spalte */
 .hw-head .display{font-size:clamp(2.2rem,4.4vw,4.2rem);overflow-wrap:break-word}
+
+/* ===== V14 Premium: Gestaltungs-Tokens (aus dem bestehenden Projekt abgeleitet; Markenfarben unverändert) ===== */
+:root{--page-max:1280px;--page-gutter:clamp(16px,4vw,64px);--space-section:clamp(56px,8vw,120px);--radius-media:clamp(12px,2vw,24px);
+  --dur-fast:160ms;--dur-base:280ms;--dur-slow:650ms;
+  /* bestehende Namen zeigen auf die Tokens, damit es nur eine Quelle gibt */
+  --max:var(--page-max);--gut:var(--page-gutter)}
+.sec{padding-block:var(--space-section)}
+/* Aktionen: einheitlich mind. 48 px, Anheben nur mit Maus, gedrückt/gesperrt sichtbar */
+.btn{min-height:48px}
+.btn.sm{min-height:48px}
+.btn:disabled,.btn[aria-disabled="true"]{opacity:.55;cursor:not-allowed;box-shadow:none;transform:none}
+@media (hover:hover) and (pointer:fine){.btn:not(:disabled):hover{transform:translateY(-1px)}}
+.btn:not(:disabled):active{transform:translateY(0) scale(.98)}
+@media (prefers-reduced-motion:reduce){.btn,.btn:hover,.btn:active{transform:none!important;transition:none!important}}
+.jr-static .jr-stage{border-radius:var(--radius-media);overflow:hidden}

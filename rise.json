@@ -157,7 +157,7 @@
         "nav": "Gebäude",
         "range": [0, 0.15],
         "hold": 0.03,
-        "kicker": "Optional · Illustrativer Rundgang",
+        "kicker": "Station 1 · Gesamtansicht · Illustration",
         "title": "Leistungen am Gebäude entdecken.",
         "text": "Ein illustratives Mehrfamilienhaus zeigt, wo wir unterstützen: vom Garten über Eingang und Treppenhaus bis in die Wohnung und ins Bad. Wählen Sie eine Station oder überspringen Sie den Rundgang.",
         "ctas": [
@@ -190,9 +190,10 @@
         "hold": 0.44,
         "kicker": "Station 3 · Eingang & Treppenhaus",
         "title": "Hauswartung, die den Überblick behält.",
-        "text": "Wir betreuen Ihre Liegenschaft und stimmen die anfallenden Arbeiten mit Ihnen ab.",
+        "text": "Hauswartung und Reinigung für Eingang, Treppenhaus und allgemeine Flächen, abgestimmt auf Ihre Liegenschaft.",
         "ctas": [
-          {"label": "Hauswartung anfragen", "service": "hauswartung", "mode": "laufend"}
+          {"label": "Hauswartung anfragen", "service": "hauswartung", "mode": "laufend"},
+          {"label": "Reinigung anfragen", "service": "reinigung", "ghost": true}
         ],
         "hotspots": [{"label": "Hauswartung", "service": "hauswartung", "at": [1.7, 1.55, 1.6]}],
         "still": "station-03-eingang",

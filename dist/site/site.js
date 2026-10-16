@@ -397,8 +397,8 @@ function renderService(key){
   h+='<p class="crumbs mono"><a href="#start">Start</a><span>/</span><a href="#leistungen">Leistungen</a><span>/</span><span>'+esc(d.name)+'</span></p>';
   h+='<p class="k" style="margin-top:22px"><i class="ico" data-icon="'+(SICON[key]||'house')+'"></i><span class="mono">'+esc(d.name)+' · Zürich &amp; Aargau</span></p>';
   h+='<h1>'+esc(d.h1).replace(/(\S+\s\S+)$/,'<b>$1</b>')+'</h1><p class="lead" style="color:#DAD8D0;max-width:46ch">'+esc(d.intro)+'</p>';
-  h+='<div style="margin-top:30px;display:flex;flex-wrap:wrap;gap:12px"><a class="btn" href="#offerte" data-pre="'+key+'" data-mode="'+(d.mode||'')+'">'+esc(d.cta)+' <i class="a"></i></a>';
-  h+='<a class="btn ghost on-dark" href="#umfang-'+key+'">Leistungsumfang <i class="a"></i></a></div></div>';
+  h+='<div style="margin-top:30px;display:flex;flex-wrap:wrap;gap:12px"><a class="btn" href="#offerte" data-pre="'+key+'" data-mode="'+(d.mode||'')+'">'+esc(d.cta)+' <i class="a" aria-hidden="true"></i></a>';
+  h+='<a class="btn ghost on-dark" href="#umfang-'+key+'">Leistungsumfang <i class="a" aria-hidden="true"></i></a></div></div>';
   h+='<figure class="fig"><div class="illu" data-illu="'+d.illu+'"></div><figcaption class="review-only">Bildplatzhalter · echtes Foto '+esc(d.name)+'</figcaption></figure></div></section>';
   // Umfang
   h+='<section class="sec" id="umfang-'+key+'"><div class="wrap side-l"><div><p class="mono eyebrow">Leistungsumfang</p><h2 class="h2" style="font-size:clamp(1.8rem,3.4vw,2.8rem)">Was wir übernehmen.</h2>';
@@ -423,7 +423,7 @@ function renderService(key){
   d.faq.forEach(function(f){h+='<details><summary>'+esc(f[0])+' <span class="pm"></span></summary><p>'+esc(f[1])+'</p></details>';});
   h+='</div></div></section>';
   // CTA
-  h+='<section class="sec paper" style="padding-block:clamp(56px,7vw,96px)"><div class="wrap cta-band"><h2>Anfrage für '+esc(d.name)+' stellen.</h2><div class="acts"><a class="btn inkb" href="#offerte" data-pre="'+key+'" data-mode="'+(d.mode||'')+'">'+esc(d.cta)+' <i class="a"></i></a>';
+  h+='<section class="sec paper" style="padding-block:clamp(56px,7vw,96px)"><div class="wrap cta-band"><h2>Anfrage für '+esc(d.name)+' stellen.</h2><div class="acts"><a class="btn inkb" href="#offerte" data-pre="'+key+'" data-mode="'+(d.mode||'')+'">'+esc(d.cta)+' <i class="a" aria-hidden="true"></i></a>';
   if(d.book)h+='<a class="btn ghost" href="'+BOOK+d.book[1]+'" target="_blank" rel="noopener">'+esc(d.book[0])+' ↗</a>';
   h+='</div></div>';
   if(d.books){h+='<div class="wrap" style="margin-top:28px;display:flex;flex-wrap:wrap;gap:10px 22px"><span class="mono muted">Weitere Termine:</span>';d.books.forEach(function(b){h+='<a class="lnk" href="'+BOOK+b[1]+'" target="_blank" rel="noopener">'+esc(b[0])+' ↗</a>';});h+='</div>';}
@@ -621,7 +621,7 @@ function buildForm(){
     h+='<div class="f" aria-hidden="true" style="position:absolute;left:-9999px"><label for="website">Website</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>';
   h+='<p class="privacy">Wir verwenden Ihre Angaben und Fotos nur, um Ihre Anfrage zu bearbeiten und mit Ihnen Kontakt aufzunehmen. Keine Weitergabe zu Werbezwecken, keine Newsletter-Anmeldung. Mehr dazu in der <a href="#datenschutz">Datenschutzerklärung</a>.</p>';
   h+='</div></div>';
-  h+='<div class="fnav"><span class="review-only" style="font-size:.85rem"><label style="display:inline-flex;gap:8px;align-items:center;cursor:pointer"><input type="checkbox" id="simFail"> Demo: Übermittlungsfehler testen</label></span><button type="submit" class="btn inkb" id="next" data-primary>Unverbindliche Offerte anfragen <span class="spin" aria-hidden="true"></span><i class="a"></i></button><span class="sr" id="busyMsg" aria-live="polite"></span></div>';
+  h+='<div class="fnav"><span class="review-only" style="font-size:.85rem"><label style="display:inline-flex;gap:8px;align-items:center;cursor:pointer"><input type="checkbox" id="simFail"> Demo: Übermittlungsfehler testen</label></span><button type="submit" class="btn inkb" id="next" data-primary>Unverbindliche Offerte anfragen <span class="spin" aria-hidden="true"></span><i class="a" aria-hidden="true"></i></button><span class="sr" id="busyMsg" aria-live="polite"></span></div>';
   h+='</form><div id="result" class="result" hidden tabindex="-1"></div>';
   var root=document.getElementById('formRoot');root.innerHTML=h;paintArrows(root);wireForm();
 }
@@ -733,13 +733,13 @@ function renderSX(){var root=document.getElementById('svcx');if(!root)return;
   SX.forEach(function(d,i){var id='sx'+i;
     l+='<li class="sx-item'+(i===0?' on':'')+'" data-i="'+i+'"><h3 style="margin:0"><button type="button" class="sx-head" aria-pressed="'+(i===0)+'" aria-controls="sxDetail"><span class="n">'+pad(i+1)+'</span><i class="ico" data-icon="'+d[1]+'"></i><span class="t">'+esc(d[2])+'</span><svg class="chev" viewBox="0 0 20 20" aria-hidden="true"><path d="M7 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button></h3></li>';
     st+='<div class="sx-layer'+(i===0?' on':'')+'" data-i="'+i+'" aria-hidden="true"><div class="illu" data-illu="'+d[4]+'"></div></div>';
-    rail+='<li class="sx-card" data-i="'+i+'" ><div class="sx-cimg"><div class="illu" data-illu="'+d[4]+'"></div></div><div class="sx-cb"><span class="n">'+pad(i+1)+'</span><h3><i class="ico" data-icon="'+d[1]+'"></i>'+esc(d[2])+'</h3><p>'+esc(d[3])+'</p><div class="acts"><a class="btn sm" href="#offerte" data-pre="'+d[0]+'" data-mode="'+d[6]+'">'+esc(d[5])+' <i class="a"></i></a><a class="tlink" href="#'+d[0]+'">Details <i class="a"></i></a></div></div></li>';
+    rail+='<li class="sx-card" data-i="'+i+'" ><div class="sx-cimg"><div class="illu" data-illu="'+d[4]+'"></div></div><div class="sx-cb"><span class="n">'+pad(i+1)+'</span><h3><i class="ico" data-icon="'+d[1]+'"></i>'+esc(d[2])+'</h3><p>'+esc(d[3])+'</p><div class="acts"><a class="btn sm" href="#offerte" data-pre="'+d[0]+'" data-mode="'+d[6]+'">'+esc(d[5])+' <i class="a" aria-hidden="true"></i></a><a class="tlink" href="#'+d[0]+'">Details <i class="a" aria-hidden="true"></i></a></div></div></li>';
   });
   l+='<li class="sx-ind" aria-hidden="true" role="presentation"></li></ul>';st+='<span class="sx-tag" id="sxTag" aria-hidden="true">'+esc(SX[0][2])+'</span><span class="sx-count" aria-hidden="true"><b id="sxNum">01</b> / '+pad(N)+'</span><figcaption class="review-only">Symbolbilder (KI-generiert mit Canva)</figcaption></figure><div class="sx-detail" id="sxDetail" aria-live="polite"></div></div>';
   var mob='<ul class="sx-mob" role="list">'+rail+'</ul>';
   root.innerHTML=l+st+mob;paintArrows(root);paintIcons(root);
   var cur=-1;
-  function detail(i){var d=SX[i],el=document.getElementById('sxDetail');el.classList.remove('show');void el.offsetWidth;el.innerHTML='<span class="n">'+pad(i+1)+' · '+esc(d[2])+'</span><p>'+esc(d[3])+'</p><div class="acts"><a class="btn sm" href="#offerte" data-pre="'+d[0]+'" data-mode="'+d[6]+'">'+esc(d[5])+' <i class="a"></i></a><a class="tlink" href="#'+d[0]+'">Details <i class="a"></i></a></div>';paintArrows(el);el.classList.add('show');}
+  function detail(i){var d=SX[i],el=document.getElementById('sxDetail');el.classList.remove('show');void el.offsetWidth;el.innerHTML='<span class="n">'+pad(i+1)+' · '+esc(d[2])+'</span><p>'+esc(d[3])+'</p><div class="acts"><a class="btn sm" href="#offerte" data-pre="'+d[0]+'" data-mode="'+d[6]+'">'+esc(d[5])+' <i class="a" aria-hidden="true"></i></a><a class="tlink" href="#'+d[0]+'">Details <i class="a" aria-hidden="true"></i></a></div>';paintArrows(el);el.classList.add('show');}
   function act(i){if(i===cur)return;cur=i;
     root.querySelectorAll('.sx-item').forEach(function(it){var on=+it.dataset.i===i;it.classList.toggle('on',on);it.querySelector('.sx-head').setAttribute('aria-pressed',String(on));});
     root.querySelectorAll('.sx-layer').forEach(function(ly){ly.classList.toggle('on',+ly.dataset.i===i);});
@@ -2371,7 +2371,10 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
     function dist2(a, b) { var x = a[0] - b[0], y = a[1] - b[1], z = a[2] - b[2]; return x * x + y * y + z * z; }
     /* Renderauflösung: Gerätepixel begrenzt (max. 1,5), bei langsamen Bildern adaptiv bis 0,5 reduziert */
     var rs = 1, ft = [], rsLock = false;
-    function resize() { if (!stage) return; var r = stage.getBoundingClientRect(); w = Math.max(1, r.width); h = Math.max(1, r.height); if (canvas) { canvas.width = Math.max(1, Math.round(w * dpr * rs)); canvas.height = Math.max(1, Math.round(h * dpr * rs)); } if (gl) gl.viewport(0, 0, canvas.width, canvas.height); }
+    /* Pixelbudget: höchstens MAXPX Bildpunkte je Bild (grosse Bildschirme, z. B. 1920×1080 bei Pixeldichte 1,5),
+       Seitenverhältnis bleibt. Projektion (w/h), Zeichenfläche und Spiegelziel folgen jeder Grössenänderung. */
+    var MAXPX = opts.maxPixels || 2e6, pxCap = 1;
+    function resize() { if (!stage) return; var r = stage.getBoundingClientRect(); w = Math.max(1, r.width); h = Math.max(1, r.height); if (canvas) { var f = dpr * rs; pxCap = Math.min(1, Math.sqrt(MAXPX / Math.max(1, w * h * f * f))); f *= pxCap; var cw = Math.max(1, Math.round(w * f)), ch = Math.max(1, Math.round(h * f)); if (canvas.width !== cw) canvas.width = cw; if (canvas.height !== ch) canvas.height = ch; } if (gl) gl.viewport(0, 0, canvas.width, canvas.height); }
     function adapt(dt) {
       if (rsLock) return; ft.push(dt); if (ft.length < 5) return; var avg = ft.reduce(function (a, b) { return a + b; }, 0) / ft.length; ft = [];
       if (avg > 45 && rs > 0.5) { rs = Math.max(0.5, rs * 0.75); resize(); } else if (avg < 20 && rs < 1) { rs = Math.min(1, rs / 0.85); resize(); }
@@ -2768,7 +2771,7 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
       },
       lightW: function (q, n, m) { return lightW(q, n, m); },
       roomOf: function (q) { return roomOf(q); },
-      state: function () { return { frames: drawCount, p: p, ps: ps, ready: ready, running: running, mode: mode, destroyed: destroyed, listeners: disposers.length, expo: expoCur, wind: !!windTimer || (running && windOn(win.performance.now())), scan: { state: scan.state, start: scan.start, end: scan.end, count: scan.count }, hi: hiNow, pulseLast: pulse.last }; }
+      state: function () { return { frames: drawCount, p: p, ps: ps, ready: ready, running: running, mode: mode, destroyed: destroyed, listeners: disposers.length, expo: expoCur, wind: !!windTimer || (running && windOn(win.performance.now())), scan: { state: scan.state, start: scan.start, end: scan.end, count: scan.count }, hi: hiNow, pulseLast: pulse.last, canvas: canvas ? [canvas.width, canvas.height] : null, css: [w, h], dpr: dpr, rs: rs, pxCap: pxCap }; }
     };
   }
 

@@ -25,7 +25,7 @@ function buildForm(){
     h+='<div class="f" aria-hidden="true" style="position:absolute;left:-9999px"><label for="website">Website</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>';
   h+='<p class="privacy">Wir verwenden Ihre Angaben und Fotos nur, um Ihre Anfrage zu bearbeiten und mit Ihnen Kontakt aufzunehmen. Keine Weitergabe zu Werbezwecken, keine Newsletter-Anmeldung. Mehr dazu in der <a href="#datenschutz">Datenschutzerklärung</a>.</p>';
   h+='</div></div>';
-  h+='<div class="fnav"><span class="review-only" style="font-size:.85rem"><label style="display:inline-flex;gap:8px;align-items:center;cursor:pointer"><input type="checkbox" id="simFail"> Demo: Übermittlungsfehler testen</label></span><button type="submit" class="btn inkb" id="next" data-primary>Unverbindliche Offerte anfragen <span class="spin" aria-hidden="true"></span><i class="a"></i></button><span class="sr" id="busyMsg" aria-live="polite"></span></div>';
+  h+='<div class="fnav"><span class="review-only" style="font-size:.85rem"><label style="display:inline-flex;gap:8px;align-items:center;cursor:pointer"><input type="checkbox" id="simFail"> Demo: Übermittlungsfehler testen</label></span><button type="submit" class="btn inkb" id="next" data-primary>Unverbindliche Offerte anfragen <span class="spin" aria-hidden="true"></span><i class="a" aria-hidden="true"></i></button><span class="sr" id="busyMsg" aria-live="polite"></span></div>';
   h+='</form><div id="result" class="result" hidden tabindex="-1"></div>';
   var root=document.getElementById('formRoot');root.innerHTML=h;paintArrows(root);wireForm();
 }

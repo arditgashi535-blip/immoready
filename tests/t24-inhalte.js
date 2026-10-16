@@ -59,7 +59,7 @@ const plain = f => fs.readFileSync(path.join(ROOT, f), 'utf8').replace(/data:[a-
   ok(JSON.stringify(st.nums) === JSON.stringify(['01', '02', '03', '04', '05', '06', '07']), 'Nummerierung lückenlos 01–07 (' + st.nums.join(',') + ')');
   ok(/Zürich und Aargau/.test(st.hero) && /Zürich/.test(st.foot) && /Aargau/.test(st.foot) && /Zürich und Aargau/.test(st.finale), 'Zürich und Aargau kompakt im Einstieg, Kontaktbereich und Footer');
   ok(st.h1.length === 1 && st.h1[0] === 'einstieg', 'genau eine h1, im Foto-Einstieg');
-  ok(/Ihr Familienbetrieb für Immobilienservice in Zürich und Aargau/.test(st.hero) && /Wir kümmern uns um Ihre Liegenschaft\./.test(st.hero) && /Offerte anfragen/.test(st.hero) && /Leistungen entdecken/.test(st.hero), 'Einstieg mit Überzeile, Überschrift und zwei Aktionen');
+  ok(/Ihre Liegenschaft\.\s*Unsere Verantwortung\./.test(st.hero) && /Ihr Familienbetrieb für Hauswartung, Sanitär und Unterhalt in Zürich und Aargau\./.test(st.hero) && /Offerte anfragen/.test(st.hero) && /Gebäude entdecken/.test(st.hero), 'Einstieg mit Überschrift, Beschreibung und zwei Aktionen');
   const tour = await p.evaluate(() => { const r = document.getElementById('reise'); return { h: r.querySelector('#h-hero').textContent, tag: r.querySelector('.jr-tag').textContent, skip: r.querySelector('.jr-skip-a').getAttribute('href') }; });
   ok(/Leistungen am Gebäude entdecken/.test(tour.h) && /Illustrative Visualisierung/.test(tour.tag) && tour.skip === '#ablauf', 'Rundgang: «Leistungen am Gebäude entdecken», als Illustration gekennzeichnet, «Tour überspringen» führt zum Ablauf');
 

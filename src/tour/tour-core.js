@@ -804,7 +804,10 @@
     function dist2(a, b) { var x = a[0] - b[0], y = a[1] - b[1], z = a[2] - b[2]; return x * x + y * y + z * z; }
     /* Renderauflösung: Gerätepixel begrenzt (max. 1,5), bei langsamen Bildern adaptiv bis 0,5 reduziert */
     var rs = 1, ft = [], rsLock = false;
-    function resize() { if (!stage) return; var r = stage.getBoundingClientRect(); w = Math.max(1, r.width); h = Math.max(1, r.height); if (canvas) { canvas.width = Math.max(1, Math.round(w * dpr * rs)); canvas.height = Math.max(1, Math.round(h * dpr * rs)); } if (gl) gl.viewport(0, 0, canvas.width, canvas.height); }
+    /* Pixelbudget: höchstens MAXPX Bildpunkte je Bild (grosse Bildschirme, z. B. 1920×1080 bei Pixeldichte 1,5),
+       Seitenverhältnis bleibt. Projektion (w/h), Zeichenfläche und Spiegelziel folgen jeder Grössenänderung. */
+    var MAXPX = opts.maxPixels || 2e6, pxCap = 1;
+    function resize() { if (!stage) return; var r = stage.getBoundingClientRect(); w = Math.max(1, r.width); h = Math.max(1, r.height); if (canvas) { var f = dpr * rs; pxCap = Math.min(1, Math.sqrt(MAXPX / Math.max(1, w * h * f * f))); f *= pxCap; var cw = Math.max(1, Math.round(w * f)), ch = Math.max(1, Math.round(h * f)); if (canvas.width !== cw) canvas.width = cw; if (canvas.height !== ch) canvas.height = ch; } if (gl) gl.viewport(0, 0, canvas.width, canvas.height); }
     function adapt(dt) {
       if (rsLock) return; ft.push(dt); if (ft.length < 5) return; var avg = ft.reduce(function (a, b) { return a + b; }, 0) / ft.length; ft = [];
       if (avg > 45 && rs > 0.5) { rs = Math.max(0.5, rs * 0.75); resize(); } else if (avg < 20 && rs < 1) { rs = Math.min(1, rs / 0.85); resize(); }
@@ -1201,7 +1204,7 @@
       },
       lightW: function (q, n, m) { return lightW(q, n, m); },
       roomOf: function (q) { return roomOf(q); },
-      state: function () { return { frames: drawCount, p: p, ps: ps, ready: ready, running: running, mode: mode, destroyed: destroyed, listeners: disposers.length, expo: expoCur, wind: !!windTimer || (running && windOn(win.performance.now())), scan: { state: scan.state, start: scan.start, end: scan.end, count: scan.count }, hi: hiNow, pulseLast: pulse.last }; }
+      state: function () { return { frames: drawCount, p: p, ps: ps, ready: ready, running: running, mode: mode, destroyed: destroyed, listeners: disposers.length, expo: expoCur, wind: !!windTimer || (running && windOn(win.performance.now())), scan: { state: scan.state, start: scan.start, end: scan.end, count: scan.count }, hi: hiNow, pulseLast: pulse.last, canvas: canvas ? [canvas.width, canvas.height] : null, css: [w, h], dpr: dpr, rs: rs, pxCap: pxCap }; }
     };
   }
 
