@@ -40,3 +40,29 @@ Stand: 15. Oktober 2026
 ## Für Stockfotos in einer späteren Sitzung
 
 Die Umgebungseinstellung «Netzwerkzugriff» muss die Bildquelle erlauben, zum Beispiel `unsplash.com`, `images.unsplash.com`, `api.unsplash.com` oder `www.pexels.com`, `images.pexels.com`. Die Änderung wirkt erst in einer neuen Sitzung. Danach lassen sich je Motiv Bild-ID, Urheber und Lizenz dokumentieren. Kostenpflichtige Käufe nur nach Ihrer Freigabe.
+
+## Videos zum Rundgang (vorbereitet, Stand 16. Oktober 2026)
+
+Neben dem 3D-Rundgang ist ein Abschnitt **«Im Alltag»** vorbereitet. Er steht direkt vor dem Rundgang und zeigt je Station einen kurzen, stummen Clip. Jeder Clip hat eine Pause-Taste und die Aktionen «Im Rundgang ansehen» (springt zur Station) sowie «… anfragen» (mit Vorauswahl der Leistung).
+
+- **Stand:** keine Videodatei vorhanden. Alle Videoquellen sind in dieser Arbeitsumgebung gesperrt (403 des Proxys): Pexels, Pixabay, Mixkit, Coverr, Videvo, Wikimedia Commons und archive.org. Öffentlich erscheint der Abschnitt erst mit einer Datei. Bis dahin sehen Sie mit «Prüfhinweise anzeigen» die offenen Motive.
+- **Motive (`rise.json → assets.videos`):**
+
+| ID | Station | Motiv |
+|---|---|---|
+| `garten` | Garten | Heckenschnitt oder Rasenmähen, ohne erkennbare Gesichter |
+| `treppenhaus` | Eingang | Reinigung eines Treppenhauses, Boden wischen, Handlauf abwischen |
+| `wohnung` | Wohnung | leere, helle Wohnung nach Räumung oder Reinigung, ruhige Kamerafahrt |
+| `sanitaer` | Bad | Nahaufnahme: Hände mit Werkzeug an Armatur oder Siphon |
+
+- **So setzen Sie einen Clip ein:**
+  1. Datei unter `assets/videos/<id>.mp4` (H.264) oder `.webm` ablegen: stumm, höchstens 12 s, höchstens 4 MB. Ein Standbild als `assets/videos/<id>.jpg` ist optional.
+  2. In `rise.json` diese Felder setzen: `status: "stock"`, `file`, `source` (Plattform), `sourceId` (Video-ID oder Link), `author`, `license`, `credit`. Optional zusätzlich `poster`.
+  3. `python3 build.py` ausführen.
+- **Was der Build dann erzeugt:**
+  - die Kennzeichnung «Symbolvideo»;
+  - den Bildnachweis im Impressum;
+  - in der Produktionsform `dist/site/assets/videos/` (keine Einbettung).
+- **Prüfung:** Ohne vollständigen Nachweis bricht der Build ab. KI-Videos sind nicht vorgesehen.
+- **Inhaltliche Regel:** Stockclips zeigen typische Arbeiten, nie «unsere Mitarbeitenden», «unsere Objekte» oder Referenzen. Der Abschnitt sagt das ausdrücklich.
+- **Prüfung:** `npm run test:videos` (t26). Dafür wird ein synthetisches Testbild aus ffmpeg verwendet (`tests/fixtures/testclip.webm`, nur für den Test, nie in der Seite).

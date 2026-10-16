@@ -117,6 +117,20 @@ def _photo_career_rules(d):
             e.append('Eigenes Foto %s: Datei fehlt' % sl['id'])
         if sl['id'] == 'portraet' and st not in ('eigen', 'fehlt'):
             e.append('Porträt nur als eigenes Foto (kein Stock- oder KI-Bild)')
+    for v in d['assets'].get('videos', {}).get('slots', []):
+        st = v['status']
+        if st not in ('fehlt', 'stock', 'eigen'):
+            e.append('Video %s: unbekannter Status %s (KI-Videos sind nicht vorgesehen)' % (v['id'], st))
+        if st == 'stock':
+            miss = [k for k in ('file', 'source', 'sourceId', 'license', 'credit') if UNSPEC(v.get(k, '[UNSPECIFIED]'))]
+            if miss:
+                e.append('Fremdvideo %s: Nachweis fehlt (%s)' % (v['id'], ', '.join(miss)))
+        if st in ('stock', 'eigen') and UNSPEC(v.get('file', '[UNSPECIFIED]')):
+            e.append('Video %s: Datei fehlt' % v['id'])
+        if v.get('service') and v['service'] not in [x['key'] for x in d['services']]:
+            e.append('Video %s: unbekannte Leistung %s' % (v['id'], v['service']))
+        if not (0 < int(v.get('station', 0)) < len(d['tour']['stations'])):
+            e.append('Video %s: Station ausserhalb des Rundgangs' % v['id'])
     c = d.get('careers', {})
     if c.get('vacancies'):
         e.append('Keine Stellen ohne Bestätigung des Inhabers eintragen (careers.vacancies)')
@@ -193,6 +207,9 @@ def photo_credits(d):
         parts.append('%s: %s, %s (%s).' % (_e(x['motive'].split(' (')[0]), _e(x['credit']), _e(x['source']), _e(x['license'])))
     if ki:
         parts.append('Symbolbilder: mit Canva erstellt (KI-generiert) – sie zeigen keine realen Objekte, Kundenliegenschaften oder Mitarbeitenden.')
+    for v in video_slots(d):
+        if v['status'] == 'stock':
+            parts.append('Symbolvideo %s: %s, %s (%s).' % (_e(v['title']), _e(v['credit']), _e(v['source']), _e(v['license'])))
     parts.append('3D-Rundgang: illustrative Visualisierung, eigene Erstellung, kein Referenzobjekt.')
     h = '<p>%s</p>' % ' '.join(parts)
     if ki:
@@ -200,6 +217,53 @@ def photo_credits(d):
               'Ersetzen durch eigene oder nachweislich lizenzierte Fotos (rise.json → assets.photos); Nutzungsbedingungen der Canva-Bilder prüfen, solange sie verwendet werden.</p>') % (
             len(ki), ', '.join(x['id'] for x in ki))
     return h
+
+
+def video_slots(d, exists=None):
+    """Videoflächen mit vorhandener Datei (status stock/eigen). exists: Prüffunktion für den Dateipfad (Build)."""
+    import os
+    ex = exists or os.path.exists
+    return [v for v in d['assets'].get('videos', {}).get('slots', [])
+            if v['status'] in ('stock', 'eigen') and not UNSPEC(v.get('file', '[UNSPECIFIED]')) and ex(v['file'])]
+
+
+def videos_markup(d):
+    """Abschnitt «Im Alltag» direkt vor dem Rundgang: kurze Clips je Station (stumm, Endlosschleife, mit Pause),
+    «Im Rundgang ansehen» springt zur Station, «… anfragen» mit Leistungsschlüssel. Ohne Datei: nur Prüfhinweis.
+    Platzhalter im Markup: {{VSRC:id}} und {{VPOSTER:id}} (vom Build ersetzt)."""
+    slots = d['assets'].get('videos', {}).get('slots', [])
+    real = video_slots(d)
+    st = d['tour']['stations']
+    lab = {x['key']: x['label'] for x in d['services']}
+    if not real:
+        rows = ''.join('<li><b>%s</b> (Station %d · %s): %s</li>' % (_e(v['id']), v['station'] + 1, _e(st[v['station']]['nav']), _e(v['motive'])) for v in slots)
+        return ('<section class="sec review-only vclips-open" aria-label="Offene Videoflächen"><div class="wrap"><div class="placeholder-box">'
+                '<p class="mono">Prüfhinweis · nicht öffentlich</p><p><b>Videos zum Rundgang vorbereitet, noch keine Datei.</b> '
+                'Stockvideos konnten in dieser Arbeitsumgebung nicht geladen werden (Videoquellen gesperrt). '
+                'Datei unter <code>assets/videos/&lt;id&gt;.mp4</code> ablegen und Quelle, ID, Lizenz und Bildnachweis in '
+                '<code>rise.json → assets.videos</code> eintragen. Motive:</p><ul>%s</ul></div></div></section>') % rows
+    cards = []
+    for v in real:
+        tag = 'Symbolvideo' if v['status'] == 'stock' else 'Eigenes Video'
+        cred = ('<span class="vclip-cred">%s · %s</span>' % (_e(v['credit']), _e(v['source']))) if v['status'] == 'stock' else ''
+        poster = ' poster="{{VPOSTER:%s}}"' % v['id'] if not UNSPEC(v.get('poster', '[UNSPECIFIED]')) else ''
+        cards.append(
+            '<figure class="vclip reveal" data-vid="%s">'
+            '<div class="vclip-media"><video muted loop playsinline preload="none"%s data-src="{{VSRC:%s}}" aria-label="%s"></video>'
+            '<span class="ph-tag">%s</span>'
+            '<button type="button" class="vclip-play" aria-pressed="false" aria-label="Video abspielen"><span aria-hidden="true"></span></button></div>'
+            '<figcaption><p class="mono">Station %d · %s</p><h3>%s</h3>%s'
+            '<div class="vclip-acts"><a class="btn sm ghost" href="#reise" data-jr-go="%d">Im Rundgang ansehen</a>'
+            '<a class="btn sm" href="#offerte" data-pre="%s">%s anfragen</a></div></figcaption></figure>' % (
+                _e(v['id']), poster, _e(v['id']), _e(v['alt']), tag, v['station'] + 1, _e(st[v['station']]['nav']), _e(v['title']), cred,
+                v['station'], _e(v['service']), _e(lab.get(v['service'], v['title']).split(' (')[0])))
+    return ('<section class="sec dark vclips" id="einblicke" aria-labelledby="h-vclips"><div class="wrap">'
+            '<p class="num reveal"><span>Im Alltag</span>Kurze Einblicke zu den Stationen des Rundgangs</p>'
+            '<h2 class="display reveal" id="h-vclips">Was an den Stationen <b>anfällt.</b></h2>'
+            '<p class="lead reveal">%s</p>'
+            '<div class="vclips-grid">%s</div></div></section>') % (
+        'Symbolvideos zeigen typische Arbeiten. Sie stammen nicht aus unseren Aufträgen und zeigen keine Mitarbeitenden von ImmoReady.'
+        if any(v['status'] == 'stock' for v in real) else 'Kurze Einblicke in typische Arbeiten an den Stationen des Rundgangs.', ''.join(cards))
 
 
 def careers_markup(d):

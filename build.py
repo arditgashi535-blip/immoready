@@ -15,9 +15,11 @@ import base64, json, os, re, shutil, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 os.chdir(HERE)
 sys.path.insert(0, HERE)
-from tools.rise import load, tour_config, tour_markup, firm_markup, launch_check, careers_markup, photo_credits  # noqa: E402
+from tools.rise import load, tour_config, tour_markup, firm_markup, launch_check, careers_markup, photo_credits, videos_markup, video_slots  # noqa: E402
 
-RISE = load()  # bricht bei Schemafehlern ab
+# IR_RISE / IR_DIST nur für Prüfungen (andere Quelldatei, anderer Ausgabeordner); normal: rise.json → dist/
+RISE = load(os.environ.get('IR_RISE'))  # bricht bei Schemafehlern ab
+DIST = os.environ.get('IR_DIST', 'dist').rstrip('/') + '/'
 # Veröffentlichungsstand nur nach bestätigter GmbH-Eintragung und ausdrücklicher Freigabe (docs/VEROEFFENTLICHUNG.md).
 # Ohne --release entsteht immer die private Vorschau (noindex, Prüfhinweise, Demo-Hinweis).
 if '--release' in sys.argv:
@@ -43,6 +45,8 @@ def read(p):
 
 
 def write(p, s):
+    if p.startswith('dist/'):
+        p = DIST + p[5:]
     os.makedirs(os.path.dirname(p), exist_ok=True)
     with open(p, 'w', encoding='utf-8') as f:
         f.write(s)
@@ -97,6 +101,25 @@ def firm(h):
     h = h.replace('<!--{{FIRM_PRIVACY}}-->', FIRM['privacy']).replace('<!--{{FIRM_ADDRESS_NOTE}}-->', FIRM['address_note'])
     h = h.replace('<!--{{FIRM_FOOTER}}-->', FIRM['footer']).replace('{{FIRM_ROLE}}', RISE['firm']['role'])
     h = h.replace('<!--{{CAREERS}}-->', careers_markup(RISE)).replace('<!--{{PHOTO_CREDITS}}-->', photo_credits(RISE))
+    h = h.replace('<!--{{TOUR_VIDEOS}}-->', videos_markup(RISE))
+    return h
+
+
+# ---------------- Videos zum Rundgang (rise.json → assets.videos) ----------------
+# Einzeldatei: als data-URI (Clips ≤ 4 MB, sonst Abbruch); Produktionsform: Dateien unter assets/videos/.
+VIDEOS = video_slots(RISE)
+
+
+def videos(h, site=False):
+    for v in VIDEOS:
+        if site:
+            src = 'assets/videos/' + os.path.basename(v['file'])
+        else:
+            assert os.path.getsize(v['file']) <= 4 * 1024 * 1024, 'Video %s grösser als 4 MB – kürzen oder stärker komprimieren' % v['id']
+            src = b64(v['file'], 'video/webm' if v['file'].endswith('.webm') else 'video/mp4')
+        h = h.replace('{{VSRC:%s}}' % v['id'], src)
+        if '{{VPOSTER:%s}}' % v['id'] in h:
+            h = h.replace('{{VPOSTER:%s}}' % v['id'], ('assets/videos/' + os.path.basename(v['poster'])) if site else _photo_uri(v['poster']))
     return h
 
 
@@ -144,7 +167,7 @@ def photos(h):
     return (h[:i] + 'var PH=' + json.dumps(ph) + ';var PHSLOT=' + json.dumps({'alt': alt, 'pos': pos, 'tag': tag, 'src': src}, ensure_ascii=False) + h[j + 1:])
 
 
-html = photos(html)
+html = videos(photos(html))
 html = html.replace('{{LOGOO}}', b64('assets/logo_orig.png', 'image/png')).replace('{{FAV}}', b64('assets/fav.png', 'image/png'))
 html = html.replace('window.IR_RISE={{CFG}};', 'window.IR_RISE=' + CFG_JS + ';', 1)
 assert '{{' not in html, 'Platzhalter übrig: ' + html[html.index('{{'):html.index('{{') + 40]
@@ -198,20 +221,20 @@ def bundle(inline):
 
 write('dist/component/immoready-tour.js', bundle(False))
 write('dist/component/immoready-tour.inline.js', bundle(True))
-os.makedirs('dist/component/assets/tour', exist_ok=True)
+os.makedirs(DIST + 'component/assets/tour', exist_ok=True)
 for f in sorted(set(STILL_FILES + PORTRAIT_FILES + TEX_FILES)):
-    shutil.copy(f, 'dist/component/assets/tour/')
+    shutil.copy(f, DIST + 'component/assets/tour/')
 if BAKE:
-    shutil.copy(BAKE_FILE, 'dist/component/assets/tour/licht.json')
+    shutil.copy(BAKE_FILE, DIST + 'component/assets/tour/licht.json')
 write('dist/component/demo.html', read('src/tour/demo.html'))
-print('Komponente:', os.path.getsize('dist/component/immoready-tour.js'), 'Bytes (inline:', os.path.getsize('dist/component/immoready-tour.inline.js'), ')')
+print('Komponente:', os.path.getsize(DIST + 'component/immoready-tour.js'), 'Bytes (inline:', os.path.getsize(DIST + 'component/immoready-tour.inline.js'), ')')
 
 
 # ---------------- Produktionsform: getrennte Dateien (dist/site/) ----------------
 # Dieselbe Seite wie die Vorschau, aber ohne eingebettete Base64-Blöcke: HTML, site.css, site.js und assets/
 # (Stationsbilder, Texturen und Lichtdaten werden erst bei Bedarf geladen; Fotos als eigene Dateien).
 def build_site():
-    out = 'dist/site/'
+    out = DIST + 'site/'
     if os.path.isdir(out):
         shutil.rmtree(out)
     for d in ('assets/tour', 'assets/tex', 'assets/img', 'assets/bake'):
@@ -219,7 +242,7 @@ def build_site():
     h = ''.join(read('src/' + p) for p in PARTS[:2]) + '<script>window.IR_RISE={{CFG}};</script>' + ''.join(read('src/' + p) for p in PARTS[2:])
     h = h.replace('<!--{{RISE_TOUR}} (erzeugt aus rise.json durch build.py)-->',
                   tour_markup(RISE, lambda i, s, portrait: 'assets/tour/' + os.path.basename(PORTRAIT_FILES[i] if portrait else STILL_FILES[i])))
-    h = photos(firm(h.replace('/*{{TOUR_CORE}}*/', CORE))).replace('{{LOGOO}}', 'assets/logo_orig.png').replace('{{FAV}}', 'assets/fav.png')
+    h = videos(photos(firm(h.replace('/*{{TOUR_CORE}}*/', CORE))), site=True).replace('{{LOGOO}}', 'assets/logo_orig.png').replace('{{FAV}}', 'assets/fav.png')
     h = h.replace('window.IR_RISE={{CFG}};', 'window.IR_RISE=' + CFG_JS + ';', 1)
     i = h.index('var PH=')
     j = h.index('};', i)
@@ -253,6 +276,11 @@ def build_site():
         shutil.copy(f, out + 'assets/tex/')
     if BAKE:
         shutil.copy(BAKE_FILE, out + 'assets/bake/licht.json')
+    for v in VIDEOS:
+        os.makedirs(out + 'assets/videos', exist_ok=True)
+        shutil.copy(v['file'], out + 'assets/videos/')
+        if not v['poster'].startswith('[') and os.path.exists(v['poster']):
+            shutil.copy(v['poster'], out + 'assets/videos/')
     shutil.copy('assets/logo_orig.png', out + 'assets/')
     shutil.copy('assets/fav.png', out + 'assets/')
     tot = sum(os.path.getsize(os.path.join(r, x)) for r, _, fs in os.walk(out) for x in fs)

@@ -240,3 +240,16 @@ document.addEventListener('click',function(e){var c=e.target.closest('.fchip,[da
   if(r){r.checked=true;r.dispatchEvent(new Event('change',{bubbles:true}));var lab=r.closest('label');if(lab){lab.classList.remove('pulse');void lab.offsetWidth;lab.classList.add('pulse');}}
   var form=document.getElementById('qf');if(form){var rm=window.matchMedia('(prefers-reduced-motion: reduce)').matches;form.scrollIntoView({behavior:rm?'auto':'smooth',block:'start'});setTimeout(function(){var o=document.getElementById('ort');if(o)o.focus({preventScroll:true});},rm?0:450);}
 });
+
+/* Premium: Videos «Im Alltag» (rise.json → assets.videos) – laden und spielen erst im Sichtbereich, stumm, mit Pause-Taste;
+   bei «Bewegung reduzieren» kein automatisches Abspielen. «Im Rundgang ansehen» springt zur Station. */
+(function(){var cl=document.querySelectorAll('.vclip');if(!cl.length)return;var RM=window.matchMedia('(prefers-reduced-motion: reduce)');
+  function set(f,on){var v=f.querySelector('video'),b=f.querySelector('.vclip-play');if(on){if(!v.src)v.src=v.dataset.src;var pr=v.play();if(pr&&pr.catch)pr.catch(function(){set(f,false);});}else v.pause();
+    b.setAttribute('aria-pressed',String(on));b.setAttribute('aria-label',on?'Video anhalten':'Video abspielen');f.classList.toggle('playing',on);}
+  var io='IntersectionObserver' in window?new IntersectionObserver(function(es){es.forEach(function(e){var f=e.target;if(e.isIntersecting){if(!RM.matches&&!f.dataset.user)set(f,true);}else if(f.classList.contains('playing'))set(f,false);});},{threshold:.35}):null;
+  cl.forEach(function(f){f.querySelector('.vclip-play').addEventListener('click',function(){var on=!f.classList.contains('playing');f.dataset.user=on?'':'paused';set(f,on);});if(io)io.observe(f);});
+  document.addEventListener('visibilitychange',function(){if(document.hidden)cl.forEach(function(f){if(f.classList.contains('playing'))set(f,false);});});
+})();
+document.addEventListener('click',function(e){var a=e.target.closest('a[data-jr-go]');if(!a)return;e.preventDefault();var i=+a.dataset.jrGo,r=document.getElementById('reise');if(!r)return;
+  var rm=window.matchMedia('(prefers-reduced-motion: reduce)').matches;r.scrollIntoView({behavior:rm?'auto':'smooth',block:'start'});
+  var t0=Date.now();(function go(){/* erst wenn der Rundgang bereit ist (3D oder Bildmodus), sonst setzt der Scrollstand den Fortschritt wieder auf den Anfang */if(window.__JR&&(window.__jr===true||r.classList.contains('jr-static'))){window.__JR.goStation(i);return;}if(Date.now()-t0<60000)setTimeout(go,200);})();});
