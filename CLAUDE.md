@@ -54,6 +54,8 @@ Kontakt/Offerte `#anfrage` · Footer (Link «Karriere»). Kein eigener Abschnitt
 Geeignet für · Das hilft bei Ihrer Anfrage (`INFO` in `p3b`) · So geht es weiter. Formularbestätigung in Stufen (übermittelt, gespeichert,
 Benachrichtigung nur bei `notified: true`). Prüfung: `tests/t24-inhalte.js`.
 
+**Premium (16.10.2026):** Einstieg «Ihre Liegenschaft. / Unsere Verantwortung.», «Gebäude entdecken» → `#reise`. Tokens `--page-max/--page-gutter/--space-section/--radius-media/--dur-*` (Schicht «V14 Premium» in `p1`; `--max`/`--gut` zeigen darauf). Aktionen ≥ 48 px, Hover nur als Schatten (keine Verschiebung). Pixelbudget im Kern (`opts.maxPixels`, 2 Mio.). Videos «Im Alltag» vor `#reise` aus `rise.json → assets.videos` (`videos_markup`, nur mit Datei öffentlich, Stock = «Symbolvideo» mit Nachweis). Aufnahme: `npm run aufnahme`, Abnahme: `node tools/abnahme-premium.js` + `python3 tools/abnahme-premium-collage.py`. Prüfbuild in anderem Ordner: `IR_RISE=<json> IR_DIST=<ordner> python3 build.py`.
+
 **Einzige Quelle für Fakten und Tour: `rise.json`** (geprüft gegen `rise.schema.json` und die Regeln in
 `tools/rise.py`). Firmen-/Kontaktdaten, Leistungsschlüssel, Stationen und Texte, Kameraroute, Türen,
 Hervorhebung, Ereignisse und Wix-Regeln werden **nur dort** geändert, nie direkt im erzeugten Code.
@@ -298,7 +300,7 @@ Ausgaben in `dist/`:
 python3 tools/rise.py             # rise.json prüfen
 python3 build.py                  # baut dist/ (prüft rise.json zuerst)
 npm install && npx playwright install chromium
-npm test                          # Build, RISE, Velo (t15), t7 Seite, t9 Interaktionen, t11 Rundgang, t14 V13/V14, t16 V14, t17 V15, t18 V16, t19 V17, t20 V17.1, t21 Fertigstellung, t22 Handy, t23 GmbH/Startsperre, t24 Inhalte
+npm test                          # Build, RISE, Velo (t15), t7 Seite, t9 Interaktionen, t11 Rundgang, t14 V13/V14, t16 V14, t17 V15, t18 V16, t19 V17, t20 V17.1, t21 Fertigstellung, t22 Handy, t23 GmbH/Startsperre, t24 Inhalte, t25 Premium, t26 Videos
 npm run abnahme                   # 32 Abnahmebilder + Übersicht/Vergleich → docs/v171/
 npm run bake                      # Build → Licht vorab rechnen → Build (nach Geometrieänderungen Pflicht)
 npm run perf                      # Ladeleistung gedrosselt (Server: python3 -m http.server 8702)
@@ -315,7 +317,7 @@ node tests/bench-frames.js <html> …  # Bildzeiten (Testumgebung)
 
 - Tests mit WebGL starten Chromium mit SwiftShader (Software-GPU, V15 ≈0,5–1,8 s je Bild); zeitkritische Prüfungen
   warten deshalb auf Bedingungen bzw. auf gezeichnete Bilder (`state().frames`) statt auf feste Zeiten.
-- Stand Fertigstellung (Branch `v17.1-release-candidate`, 15.10.2026): Gesamtlauf 495/0 ohne Wiederholung (inkl. t21–t24). Früher V17.1: 356 bestehende Prüfungen + t20 43/43 = 399 (Details und ehrliche
+- Stand Premium-Durchgang (16.10.2026): Gesamtlauf 539/0 ohne Wiederholung (inkl. t25/t26), Bericht `docs/premium/BERICHT-PREMIUM.md`. Stand Fertigstellung (15.10.2026): 495/0. Früher V17.1: 356 bestehende Prüfungen + t20 43/43 = 399 (Details und ehrliche
   Einordnung eines einmaligen Zeitausreissers in t11: `docs/TESTBERICHT-V17.1.md`, Leistung: `docs/PERFORMANCE-V17.1.md`).
 - Stand V17 (Branch `v17-final-realism`, Tag `v17-stand`; Sicherung des V16-Stands: Tag `v16-stand`):
   RISE 21/21, t15 10/10, t7 68/68, t9 18/18, t11 37/37, t12 14/14, t13 24/24, t14 28/28, t16 19/19, t17 18/18,

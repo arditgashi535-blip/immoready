@@ -19,6 +19,10 @@ laufendes Bild der Software-GPU, ≈0,7–0,8 s je Bild, fiel in das 1-s-Messfen
 37/37 bestanden. Im vorherigen Gesamtlauf am fast identischen Stand bestand die Prüfung ebenfalls. Kein Code-Fehler
 gefunden; auf echter GPU ist ein Bild um Grössenordnungen kürzer.
 
+## Premium-Durchgang «realistische 3D-Gebäudereise» (16. Oktober 2026)
+
+Gesamtlauf `sh tests/alle.sh` ohne Wiederholung: **539 bestanden, 0 fehlgeschlagen** (npm test exit 0, t12 exit 0, t13 exit 0). Neu: t25 Premium (26) und t26 Videos (18). Details, Sichtprüfung und offene Punkte: `docs/premium/BERICHT-PREMIUM.md`.
+
 ## Fertigstellung Inhalte «Familienbetrieb» (15. Oktober 2026)
 
 **Gesamtlauf am finalen Build, ohne Wiederholung:** `sh tests/alle.sh` → **495 bestanden, 0 fehlgeschlagen**
