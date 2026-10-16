@@ -48,7 +48,7 @@ for n, title in (('4', 'Handy · Wohnung'), ('5', 'Handy · Bad')):
     a = os.path.join(ROOT, 'shots', 'handy-vorher', 'm-bild-%s.png' % n)
     b = os.path.join(ROOT, 'shots', 'handy-3d', 'm-3d-%s.png' % n)
     if os.path.exists(a) and os.path.exists(b):
-        im = pair(a, b, title + ' (vorher Bild, nachher 3D)', w=420)
+        im = pair(a, b, title, w=420)  # vorher: Bild, nachher: 3D im Bildrahmen
         im.save(os.path.join(OUT, 'vergleich-handy-%s.jpg' % n), quality=86)
 if tiles:
     W = 1100
