@@ -70,3 +70,9 @@ Ein Bedarf entstünde erst bei fotografischen Materialscans (zum Beispiel lizenz
   - Handy-3D (Start, Ausschnitt, Station, kein Festhalten, zurück, erneuter Start);
   - Rückfall bei zu langsamer Darstellung;
   - Bewegung reduzieren und ohne WebGL.
+
+## 6 Gesamtlauf
+
+`sh tests/alle.sh` ohne Wiederholung: **562 bestanden, 0 fehlgeschlagen** (npm test exit 0 mit RISE, t15, t7, t9, t11, t14, t16–t27; dazu t12 und t13 mit lokalen Servern; t27 23/23).
+
+Ein Lauf davor ergab 561/1. Der Fehler lag in der neuen Prüfung t27 selbst: Sie erwartete noch den Blickpunkt des ersten, zu ruckartigen Treppenschwenks. Sie prüft jetzt fachlich, ob der Blickpunkt im Treppenlauf liegt. Der neue Schwenk zielt mit x −1,9 dorthin und besteht damit. An der Seite wurde dafür nichts geändert.
