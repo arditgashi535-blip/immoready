@@ -1959,7 +1959,9 @@ body.hdr-compact .hdr{background:var(--ivory)}
 .btn{min-height:48px}
 .btn.sm{min-height:48px}
 .btn:disabled,.btn[aria-disabled="true"]{opacity:.55;cursor:not-allowed;box-shadow:none;transform:none}
-@media (hover:hover) and (pointer:fine){.btn:not(:disabled):hover{transform:translateY(-1px)}}
+/* «Anheben» nur optisch über den Schatten: die Schaltfläche bleibt unter dem Zeiger stehen (kein Magnet-Effekt, keine Verschiebung) */
+@media (hover:hover) and (pointer:fine){.btn:not(:disabled):not(.ghost):hover{box-shadow:0 10px 24px -14px rgba(37,35,33,.55)}}
+@media (max-width:760px){.mbar a{min-height:48px}body.has-mbar{padding-bottom:calc(61px + env(safe-area-inset-bottom,0px))}}
 .btn:not(:disabled):active{transform:translateY(0) scale(.98)}
 @media (prefers-reduced-motion:reduce){.btn,.btn:hover,.btn:active{transform:none!important;transition:none!important}}
 .jr-static .jr-stage{border-radius:var(--radius-media);overflow:hidden}

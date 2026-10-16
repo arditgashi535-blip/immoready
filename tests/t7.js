@@ -33,7 +33,10 @@ const { chromium } = require('playwright');
     // schnelles Überfahren: kein Flackern, am Ende gilt die zuletzt ruhende Zeile
     await p.mouse.move(0,0);let flips=0;
     await p.evaluate(()=>{window.__flips=0;new MutationObserver(m=>{window.__flips+=m.length}).observe(document.querySelector('.sx-stage'),{attributes:true,subtree:true,attributeFilter:['class']});});
-    for(let i=0;i<8;i++){const bx=await p.locator(`.sx-item[data-i="${i}"] .sx-head`).boundingBox();await p.mouse.move(bx.x+60,bx.y+bx.height/2);await p.waitForTimeout(15);}
+    /* Positionen vorab messen: die Bewegung selbst soll schnell und durchgehend sein (wie eine echte Maus) – sonst hängt ihr Tempo
+       von der Messzeit je Zeile ab (mit laufendem Rundgang im Hintergrund > 55 ms Absichtsverzögerung) */
+    const bxs=await p.evaluate(()=>[...Array(8).keys()].map(i=>{const r=document.querySelector(`.sx-item[data-i="${i}"] .sx-head`).getBoundingClientRect();return [r.x+60,r.y+r.height/2];}));
+    for(const [x,y] of bxs){await p.mouse.move(x,y,{steps:2});}
     await p.waitForTimeout(400);
     ok(await p.evaluate(()=>document.querySelector('.sx-layer[data-i="7"]').classList.contains('on')&&window.__flips<=4),`${vp.n} schnelles Überfahren ohne Bildflackern (Wechsel: ${await p.evaluate(()=>window.__flips)})`);
     // Dropdown

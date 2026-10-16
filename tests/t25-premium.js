@@ -2,7 +2,7 @@
 //  · Einstieg: Überschrift, Beschreibung, «Offerte anfragen» und «Gebäude entdecken» (→ Rundgang), Zürich und Aargau sichtbar
 //  · «Gebäude entdecken» startet den 3D-Rundgang erst beim Erreichen (verzögerter Start), das Foto ist sofort da
 //  · Aktionen: sichtbare .btn mind. 48 px hoch; dekorative Pfeile aria-hidden; Navigation als Link, Aktion als Button
-//  · Anheben bei Hover nur mit feinem Zeiger; bei «Bewegung reduzieren» keine Transformation
+//  · Hover-Rückmeldung nur mit feinem Zeiger, ohne Verschiebung (kein Magnet-Effekt); bei «Bewegung reduzieren» keine Transformation
 //  · Rundgang: sechs Stationen mit Bezeichnung, Text und Leistungsaktion; Eingang mit Hauswartung und Reinigung
 //  · Pixelbudget: Zeichenfläche höchstens 2 Mio. Bildpunkte (1920×1080); Grössenänderung passt Zeichenfläche und Seitenverhältnis an
 //  · request-quote mit Leistungsschlüssel aus rise.json
@@ -23,14 +23,14 @@ const GPU = ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore
     await p.goto(url); await p.waitForTimeout(500);
     const h = await p.evaluate(() => {
       const s = document.querySelector('#einstieg'), h1 = s.querySelector('h1'), a = [...s.querySelectorAll('.hero3-ctas a')];
-      return { h1: h1.innerText.replace(/­/g, '').replace(/\s+/g, ' ').trim(), sub: s.querySelector('.hero3-sub').textContent.trim(), a: a.map(x => [x.textContent.trim(), x.getAttribute('href')]),
+      return { h1: h1.innerText.replace(/­/g, '').replace(/\s+/g, ' ').trim(), sub: s.querySelector('.hero3-sub').textContent.replace(/\u00ad/g, '').replace(/\s+/g, ' ').trim(), a: a.map(x => [x.textContent.trim(), x.getAttribute('href')]),
         img: !!s.querySelector('.hero3-media .ph, .hero3-media img, .hero3-media [style*="background"]') || getComputedStyle(s.querySelector('.hero3-media .illu') || s).backgroundImage !== 'none',
-        jr: !!window.__jr, h1n: document.querySelectorAll('h1').length };
+        jr: !!window.__jr, h1n: document.querySelectorAll('[data-page="start"] h1').length, h1all: [...document.querySelectorAll('[data-page]')].map(pg => pg.querySelectorAll('h1').length) };
     });
     ok(/^Ihre Liegenschaft\. Unsere Verantwortung\.$/i.test(h.h1), 'h1 «Ihre Liegenschaft. Unsere Verantwortung.» (' + h.h1 + ')');
     ok(h.sub === 'Ihr Familienbetrieb für Hauswartung, Sanitär und Unterhalt in Zürich und Aargau.', 'Beschreibung wie vorgegeben, Zürich und Aargau im Einstieg');
     ok(h.a.length === 2 && h.a[0][0] === 'Offerte anfragen' && h.a[0][1] === '#offerte' && h.a[1][0] === 'Gebäude entdecken' && h.a[1][1] === '#reise', 'Aktionen «Offerte anfragen» → #offerte, «Gebäude entdecken» → #reise');
-    ok(h.h1n === 1, 'genau eine h1');
+    ok(h.h1n === 1 && h.h1all.every(n => n <= 1), 'genau eine h1 auf der Startseite, höchstens eine je Seite');
     ok(!h.jr, 'Rundgang beim Laden noch nicht gestartet (3D erst bei Annäherung)');
     /* 2 Aktionen */
     const btn = await p.evaluate(() => {
@@ -43,17 +43,19 @@ const GPU = ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore
     ok(btn.n > 0 && btn.small.length === 0, 'sichtbare Aktionen mind. 48 px hoch (' + btn.n + ')' + (btn.small.length ? ': ' + btn.small.join(' | ') : ''));
     ok(btn.arrows === 0, 'dekorative Pfeile mit aria-hidden="true"');
     ok(btn.navBtn === 0, 'keine Buttons, die nur navigieren');
-    const sel = '#einstieg .hero3-ctas .btn.ghost';
-    const bb = await p.locator(sel).boundingBox(); await p.mouse.move(bb.x + bb.width / 2, bb.y + bb.height / 2); await p.waitForTimeout(450);
-    const tf = await p.evaluate(s => getComputedStyle(document.querySelector(s)).transform, sel);
-    ok(/matrix\(1, 0, 0, 1, 0, -1\)/.test(tf), 'Hover mit Maus: leichtes Anheben (' + tf + ')');
+    const sel = '#einstieg .hero3-ctas .btn.ghost', selS = '#einstieg .hero3-ctas .btn.sand';
+    const sh0 = await p.evaluate(s => getComputedStyle(document.querySelector(s)).boxShadow, selS);
+    const bb = await p.locator(selS).boundingBox(); await p.mouse.move(bb.x + bb.width / 2, bb.y + bb.height / 2); await p.waitForTimeout(450);
+    const hv = await p.evaluate(s => { const e = document.querySelector(s); return { tf: getComputedStyle(e).transform, sh: getComputedStyle(e).boxShadow }; }, selS);
+    const bb1 = await p.locator(selS).boundingBox();
+    ok(hv.sh !== sh0 && hv.tf === 'none' && Math.abs(bb1.y - bb.y) < 0.5, 'Hover mit Maus: Rückmeldung über Schatten, Schaltfläche bleibt unter dem Zeiger stehen');
     /* 3 «Gebäude entdecken» → Rundgang startet */
     await p.click(sel);
     await p.waitForFunction(() => window.__jr === true, null, { timeout: 120000 }).catch(() => {});
-    const t = await p.evaluate(() => ({ jr: window.__jr === true, hash: location.hash, top: Math.round(document.getElementById('reise').getBoundingClientRect().top) }));
-    ok(t.jr && t.hash === '#reise' && Math.abs(t.top) < 140, '«Gebäude entdecken» führt zum Rundgang und startet 3D (Abstand ' + t.top + ' px)');
+    const t = await p.evaluate(() => ({ jr: window.__jr === true, hash: location.hash, top: Math.round(document.getElementById('reise').getBoundingClientRect().top), hdr: Math.round(parseFloat(getComputedStyle(document.getElementById('reise')).scrollMarginTop) || document.querySelector('.hdr').getBoundingClientRect().height) }));
+    ok(t.jr && t.hash === '#reise' && t.top >= -2 && t.top <= t.hdr + 4, '«Gebäude entdecken» führt zum Rundgang (Oberkante unter dem Kopf: ' + t.top + ' px, Abstand oben ' + t.hdr + ' px) und startet 3D');
     /* 4 Stationen */
-    const st = await p.evaluate(() => [...document.querySelectorAll('#reise .jr-st')].map(s => ({ k: (s.querySelector('.jr-kick, .mono') || {}).textContent || '', h: (s.querySelector('h2,h3') || {}).textContent || '', p: (s.querySelector('p:not(.mono):not(.jr-kick)') || {}).textContent || '', pre: [...s.querySelectorAll('[data-pre]')].map(a => a.dataset.pre), nav: '' })));
+    const st = await p.evaluate(() => [...document.querySelectorAll('#reise .jr-st')].map(s => ({ k: ((s.querySelector('p.mono') || {}).textContent || '').replace(/\u00ad/g, ''), h: (s.querySelector('h2,h3') || {}).textContent || '', p: (s.querySelector('p:not(.mono):not(.jr-kick)') || {}).textContent || '', pre: [...s.querySelectorAll('[data-pre],[data-choice]')].map(a => a.dataset.pre || a.dataset.choice), nav: '' })));
     const nav = await p.evaluate(() => [...document.querySelectorAll('#reise .jr-nav button')].map(b => b.textContent.trim()));
     ok(st.length === 6 && nav.length === 6, '6 Stationen, 6 Navigationspunkte');
     ok(st.every(s => s.h.trim() && s.k.trim()), 'jede Station mit Überzeile und Titel');
@@ -86,7 +88,8 @@ const GPU = ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore
     ok(s1.dpr <= 1.5, 'Pixeldichte höchstens 1,5');
     const a1 = s1.canvas[0] / s1.canvas[1], c1 = s1.css[0] / s1.css[1];
     ok(Math.abs(a1 - c1) < 0.01, 'Seitenverhältnis der Zeichenfläche = Bühne');
-    await p.setViewportSize({ width: 900, height: 1000 }); await p.waitForTimeout(1500);
+    await p.setViewportSize({ width: 900, height: 1000 });
+    await p.waitForFunction(w0 => { const s = window.__JR.state(); return s.canvas && s.canvas[0] !== w0; }, s1.canvas[0], { timeout: 20000, polling: 200 }).catch(() => {});
     const s2 = await p.evaluate(() => window.__JR.state());
     ok(s2.canvas && Math.abs(s2.canvas[0] / s2.canvas[1] - s2.css[0] / s2.css[1]) < 0.01 && s2.canvas[0] !== s1.canvas[0], 'nach Grössenänderung: neue Zeichenfläche mit passendem Seitenverhältnis (' + s2.canvas.join('×') + ')');
     await p.close();
