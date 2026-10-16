@@ -11,7 +11,7 @@ const qs = process.env.QS ? process.env.QS.split(',').map(Number) : [...Array(N 
   const p = await b.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: 1 });
   await p.addInitScript(() => { window.IR_FORCE_HQ = true; });
   await p.goto(file);
-  await p.addStyleTag({ content: '#reise .jr-ui,#reise .jr-skip,#reise .jr-hot,.hdr,.demo,.mbar{visibility:hidden!important}' });
+  await p.addStyleTag({ content: '#reise .jr-ui,#reise .jr-skip,#reise .jr-hot,#reise .jr-tech,#reise .jr-tag,.hdr,.demo,.mbar{opacity:0!important}' });
   await p.evaluate(() => document.getElementById('reise').scrollIntoView({ block: 'start', behavior: 'instant' }));
   await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 180000 });
   await p.evaluate(() => window.__JR.setScale(1, true));
@@ -20,7 +20,8 @@ const qs = process.env.QS ? process.env.QS.split(',').map(Number) : [...Array(N 
     await p.evaluate(q => { window.__JR.jump(q); }, q);
     await p.waitForFunction(f => window.__JR.state().frames > f, f0, { timeout: 60000 }).catch(() => {});
     await p.waitForTimeout(50);
-    await p.screenshot({ path: path.join(out, 'r-' + q.toFixed(3) + '.png') });
+    const st = await p.evaluate(() => { const r = document.querySelector('#reise .jr-stage').getBoundingClientRect(); return [Math.max(0, r.top), Math.min(innerHeight, r.bottom)]; });
+    await p.screenshot({ path: path.join(out, 'r-' + q.toFixed(3) + '.png'), clip: { x: 0, y: st[0], width: W, height: st[1] - st[0] }, timeout: 180000 });
   }
   const col = await p.evaluate(() => window.__JR.checkRoute ? window.__JR.checkRoute(400) : null);
   console.log('checkRoute:', JSON.stringify(col));

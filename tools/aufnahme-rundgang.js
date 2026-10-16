@@ -1,14 +1,19 @@
-// Kurze Aufnahme des 3D-Rundgangs aus der echten Vorschauseite (nicht aus einer Testseite):
-// Die Seite wird im Browser schrittweise durch den Abschnitt #reise gescrollt (Scrollmodus, wie beim Lesen).
-// Nach jedem Schritt wird die Kamera auf den Fortschritt der Seite gesetzt und ein neues Bild abgewartet; dann Bildschirmfoto.
-// Die Einzelbilder setzt ffmpeg zu einem Video zusammen (gleichmässige Bildfolge, keine Echtzeitaufnahme –
-// die Testumgebung rendert mit Software-Grafik deutlich langsamer als eine echte GPU).
-// Aufruf: node tools/aufnahme-rundgang.js [html] [ausgabe.mp4] [bilder] [breite] [höhe]
+// Aufnahme der gesamten 3D-Reise aus der echten Vorschauseite: Gebäude → Garten → Eingang/Treppenhaus → Wohnung →
+// Bad (Raum, Waschtisch, WC) → Rückkehr zur Gesamtansicht.
+// Die Seite wird schrittweise durch den Abschnitt #reise gescrollt (Scrollmodus wie beim Lesen). Nach jedem Schritt wird die
+// Kamera auf den Fortschritt der Seite gesetzt (ohne Glättung, sonst bräuchte die Software-Grafik je Schritt viele Bilder)
+// und ein neues Bild abgewartet. An jedem Stationshalt und an den Nahansichten im Bad steht das Bild HALT Sekunden.
+// ffmpeg setzt die Einzelbilder zu einem Video zusammen (gleichmässige Bildfolge, keine Echtzeitaufnahme).
+// Aufruf: node tools/aufnahme-rundgang.js [html] [ausgabe.mp4] [schritte] [breite] [höhe]   (Umgebung: HALT=1.6, FPS=24)
 const { chromium } = require('playwright');
 const path = require('path'), fs = require('fs'), { execFileSync } = require('child_process');
 const file = 'file://' + path.resolve(process.argv[2] || 'dist/immoready-vorschau.html');
-const out = path.resolve(process.argv[3] || 'docs/premium/rundgang-aufnahme.mp4');
-const N = +(process.argv[4] || 180), W = +(process.argv[5] || 1280), H = +(process.argv[6] || 720);
+const out = path.resolve(process.argv[3] || 'docs/reise/rundgang-gesamt.mp4');
+const N = +(process.argv[4] || 420), W = +(process.argv[5] || 1280), H = +(process.argv[6] || 720);
+const FPS = +(process.env.FPS || 24), HALT = +(process.env.HALT || 1.6);
+const RISE = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../rise.json'), 'utf8')).tour;
+const holds = RISE.stations.map(s => s.hold).concat(...RISE.stations.map(s => (s.details || []).map(d => d.q)));
+const qs = [...new Set([...Array(N + 1).keys()].map(i => +(i / N).toFixed(4)).concat(holds))].sort((a, b) => a - b);
 const tmp = path.join(path.dirname(out), '.frames'); fs.rmSync(tmp, { recursive: true, force: true }); fs.mkdirSync(tmp, { recursive: true });
 (async () => {
   const b = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
@@ -18,23 +23,22 @@ const tmp = path.join(path.dirname(out), '.frames'); fs.rmSync(tmp, { recursive:
   await p.evaluate(() => document.getElementById('reise').scrollIntoView({ block: 'start', behavior: 'instant' }));
   await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 180000 });
   const span = await p.evaluate(() => { const r = document.getElementById('reise'), t = r.getBoundingClientRect().top + scrollY; return { t, len: r.offsetHeight - innerHeight }; });
-  for (let i = 0; i < N; i++) {
-    /* weich beschleunigt und abgebremst, kurze Halte an Anfang und Ende */
-    const k = Math.min(1, Math.max(0, (i / (N - 1) - 0.04) / 0.92)), e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
-    const f0 = await p.evaluate(() => window.__JR.state().frames);
-    await p.evaluate(y => scrollTo({ top: y, behavior: 'instant' }), Math.round(span.t + e * span.len));
-    /* die Seite setzt den Fortschritt aus dem Scrollstand; die Glättung wird für die Aufnahme übersprungen
-       (sonst bräuchte die Software-Grafik je Schritt viele Bilder), Kamera = Zielwert der Seite */
-    await p.waitForFunction(() => { const s = window.__JR.state(); return s.p > 0; }, null, { timeout: 5000 }).catch(() => {});
-    await p.waitForTimeout(40);
-    await p.evaluate(() => { const s = window.__JR.state(); window.__JR.jump(s.p); });
-    await p.waitForFunction(f => window.__JR.state().frames > f, f0, { timeout: 60000, polling: 100 }).catch(() => {});
+  let n = 0;
+  const save = async () => { const f = path.join(tmp, String(n++).padStart(5, '0') + '.png'); await p.screenshot({ path: f, timeout: 180000 }); return f; };
+  for (let i = 0; i < qs.length; i++) {
+    const q = qs[i], f0 = await p.evaluate(() => window.__JR.state().frames);
+    await p.evaluate(y => scrollTo({ top: y, behavior: 'instant' }), Math.round(span.t + q * span.len));
     await p.waitForTimeout(60);
-    await p.screenshot({ path: path.join(tmp, String(i).padStart(4, '0') + '.png') });
-    if (i % 20 === 0) console.log('Bild', i, '/', N);
+    /* Zielwert genau setzen (die Seite rundet den Scrollstand auf ganze Pixel) */
+    await p.evaluate(q => window.__JR.jump(q), q);
+    await p.waitForFunction(f => window.__JR.state().frames > f, f0, { timeout: 60000, polling: 100 }).catch(() => {});
+    await p.waitForTimeout(holds.includes(q) ? 700 : 60); /* Einblendungen der Station abwarten */
+    const f = await save();
+    if (holds.includes(q)) for (let k = 1; k < Math.round(HALT * FPS); k++) fs.copyFileSync(f, path.join(tmp, String(n++).padStart(5, '0') + '.png'));
+    if (i % 40 === 0) console.log('Schritt', i, '/', qs.length);
   }
   await b.close();
-  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-framerate', '24', '-i', path.join(tmp, '%04d.png'), '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '23', '-movflags', '+faststart', out]);
+  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-framerate', String(FPS), '-i', path.join(tmp, '%05d.png'), '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '22', '-movflags', '+faststart', out]);
   fs.rmSync(tmp, { recursive: true, force: true });
-  console.log('Video:', path.relative(process.cwd(), out), (fs.statSync(out).size / 1e6).toFixed(1), 'MB,', N, 'Bilder, 24 Bilder/s');
+  console.log('Video:', path.relative(process.cwd(), out), (fs.statSync(out).size / 1e6).toFixed(1), 'MB,', (n / FPS).toFixed(1), 's,', qs.length, 'gerenderte Schritte,', holds.length, 'Halte');
 })();

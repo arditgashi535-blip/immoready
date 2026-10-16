@@ -25,7 +25,7 @@
     "test:inhalte": "node tests/t24-inhalte.js",
     "test:premium": "node tests/t25-premium.js",
     "test:videos": "node tests/t26-videos.js && node tests/t27-reise.js",
-    "aufnahme": "node tools/aufnahme-rundgang.js dist/immoready-vorschau.html docs/premium/rundgang-aufnahme.mp4",
+    "aufnahme": "node tools/aufnahme-rundgang.js dist/immoready-vorschau.html docs/reise/rundgang-gesamt.mp4",
     "launch:check": "python3 tools/rise.py --launch",
     "abnahme": "node tools/abnahme-final.js dist/immoready-vorschau.html shots/v171-abnahme alle && python3 tools/abnahme-final-collage.py",
     "test:alle": "sh tests/alle.sh"
