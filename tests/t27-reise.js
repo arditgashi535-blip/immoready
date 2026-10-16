@@ -30,7 +30,7 @@ const mob = { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: t
     }, RT);
     ok(r.route.length === 0, 'Kamerafahrt kollisionsfrei über 600 Schritte (checkRoute: ' + JSON.stringify(r.route.slice(0, 4)) + ')');
     ok(r.stations.join() === 'aussen,garten,eingang,wohnung,bad,zurueck' && r.kf >= 32, 'zusammenhängende Reise in 6 Stationen, ' + r.kf + ' Stützpunkte');
-    ok(r.stair !== null && r.stair < -2, 'zwischen Haustür und Halt «Eingang» schwenkt die Kamera zur Treppe');
+    ok(r.stair !== null && r.stair >= -2.94 && r.stair <= -1.77, 'zwischen Haustür und Halt «Eingang» schwenkt die Kamera zur Treppe (Blickpunkt x ' + r.stair + ' im Treppenlauf x −2,94…−1,77)');
     ok(r.doors.join() === 'haustuer,wohnungstuer,terrassentuer', 'drei Türen: Haustür, Wohnungstür, Terrassentür');
     /* Spiegel: Kamera in der Wohnung mit Blick durch die Badtür → echte Spiegelung */
     const m0 = await p.evaluate(() => window.__JR.sceneStats().mirrorFrames);
