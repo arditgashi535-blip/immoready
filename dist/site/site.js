@@ -1883,17 +1883,19 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
     grp('Sanitaer_Waschtisch_Armatur_Siphon_Eckventile',INT);
     /* Möbelwaschtisch (Keramik 62 × 47 cm, Oberkante 0,86 m, Schürze 15 cm) auf wandhängendem Unterschrank (Sand matt);
        Siphon und Eckventile liegen verdeckt im Unterschrank (Schemamarkierung nur an der Front) */
-    var bY=FLOOR+0.86,hx=0.235,hz=0.31,bcx=3.08+hx,bcz=0.8,NB=72,icx=bcx+0.03,ihx=hx-0.075,ihz=hz-0.05,bD=0.15;
+    /* Korrektur 3D-Reise: schlanker Keramikrand (vorne 2,5 cm, seitlich 3 cm, hinten Armaturenbank 9 cm), Becken mit steileren
+       Wänden und flachem Boden, Aussenecken knapper gerundet – vorher wirkte der Waschtisch in der Nahansicht wie eine Wanne */
+    var bY=FLOOR+0.86,hx=0.235,hz=0.31,bcx=3.08+hx,bcz=0.8,NB=72,icx=bcx+0.03,ihx=hx-0.055,ihz=hz-0.03,bD=0.15;
     MAT=KER;var bc='#f4f3f0';
     /* Aussenkontur mit gerader Rückseite (liegt satt an der Wand), vorne gerundet */
-    function bring(y,s){var o=[];for(var j=0;j<NB;j++){var t=j/NB*Math.PI*2,c=Math.cos(t),si=Math.sin(t),e=c<0?0.12:0.5,ex=c<0?0.12:0.5;o.push([bcx+hx*(c<0?1:s)*Math.sign(c)*Math.pow(Math.abs(c),ex)-(c<0?0:0),y,bcz+hz*s*Math.sign(si)*Math.pow(Math.abs(si),e)]);}return o;}
+    function bring(y,s){var o=[];for(var j=0;j<NB;j++){var t=j/NB*Math.PI*2,c=Math.cos(t),si=Math.sin(t),e=c<0?0.12:0.3,ex=c<0?0.12:0.3;o.push([bcx+hx*(c<0?1:s)*Math.sign(c)*Math.pow(Math.abs(c),ex)-(c<0?0:0),y,bcz+hz*s*Math.sign(si)*Math.pow(Math.abs(si),e)]);}return o;}
     surf([bring(bY,0.975),bring(bY-0.003,0.995),bring(bY-0.012,1),bring(bY-bD+0.006,1),bring(bY-bD,0.985),bring(bY-bD,0.0001)],bc,0,function(q,n){return dot(n,sub(q,[bcx,bY-0.07,bcz]))<0;});
     surf([bring(bY,0.975),sring(icx,bY,bcz,ihx,ihz,1,NB)],bc,0,function(q,n){return n[1]<0;});
-    surf([sring(icx,bY,bcz,ihx,ihz,1,NB),sring(icx,bY-0.005,bcz,ihx,ihz,0.985,NB),sring(icx,bY-0.035,bcz,ihx,ihz,0.95,NB),sring(icx,bY-0.08,bcz,ihx,ihz,0.84,NB),sring(icx,bY-0.112,bcz,ihx,ihz,0.64,NB),sring(icx,bY-0.128,bcz,ihx,ihz,0.42,NB),sring(icx,bY-0.135,bcz,ihx,ihz,0.18,NB),sring(icx,bY-0.136,bcz,ihx,ihz,0.0,NB)],bc,0,function(q,n){return dot(n,sub([icx,bY+0.2,bcz],q))<0;});
+    surf([sring(icx,bY,bcz,ihx,ihz,1,NB),sring(icx,bY-0.004,bcz,ihx,ihz,0.99,NB),sring(icx,bY-0.03,bcz,ihx,ihz,0.975,NB),sring(icx,bY-0.075,bcz,ihx,ihz,0.94,NB),sring(icx,bY-0.108,bcz,ihx,ihz,0.86,NB),sring(icx,bY-0.126,bcz,ihx,ihz,0.66,NB),sring(icx,bY-0.133,bcz,ihx,ihz,0.34,NB),sring(icx,bY-0.136,bcz,ihx,ihz,0.0,NB)],bc,0,function(q,n){return dot(n,sub([icx,bY+0.2,bcz],q))<0;});
     var rimO=bring(bY,0.975),rimI=sring(icx,bY,bcz,ihx,ihz,1,NB);for(var rj=0;rj<NB;rj++){line(rimO[rj],rimO[(rj+1)%NB],0.35);line(rimI[rj],rimI[(rj+1)%NB],0.25);}
     /* Ablaufventil (Chromkappe mit Ring), Überlauf mit Chromblende in der Beckenrückwand, Silikonfuge zur Wand */
     MAT=TEX;cyl(icx,bY-0.1348,bcz,0.0245,0.0012,28,'#3a3836',0,0);MAT=CHR;cyl(icx,bY-0.1345,bcz,0.0225,0.0018,32,ac,0,0);cyl(icx,bY-0.1335,bcz,0.019,0.0035,32,ac,0,-1,0.0165);
-    withBev(0.0015,function(){box(3.1965,bY-0.052,bcz,0.004,0.018,0.046,ac,0,0);});MAT=TEX;box(3.199,bY-0.047,bcz,0.002,0.008,0.03,'#3d3b39',0,0);
+    /* Überlauf auf der (jetzt steileren) Beckenrückwand */withBev(0.0015,function(){box(3.1745,bY-0.052,bcz,0.004,0.018,0.046,ac,0,0);});MAT=TEX;box(3.1768,bY-0.047,bcz,0.002,0.008,0.03,'#3d3b39',0,0);
     MAT=KER;tube([3.0745,bY+0.0008,bcz-hz+0.012],[3.0745,bY+0.0008,bcz+hz-0.012],0.0032,8,'#dcdad6',0,0,undefined,false);
     WALLS.push([3.08,3.56,bY-bD,bY,bcz-hz,bcz+hz]);
     /* Unterschrank: Korpus und Front Sand matt lackiert, Front mit 3 mm Schattenfuge, Griffmulde unter der Keramik, 38 cm Bodenfreiheit */

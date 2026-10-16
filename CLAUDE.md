@@ -56,6 +56,13 @@ Benachrichtigung nur bei `notified: true`). Prüfung: `tests/t24-inhalte.js`.
 
 **Premium (16.10.2026):** Einstieg «Ihre Liegenschaft. / Unsere Verantwortung.», «Gebäude entdecken» → `#reise`. Tokens `--page-max/--page-gutter/--space-section/--radius-media/--dur-*` (Schicht «V14 Premium» in `p1`; `--max`/`--gut` zeigen darauf). Aktionen ≥ 48 px, Hover nur als Schatten (keine Verschiebung). Pixelbudget im Kern (`opts.maxPixels`, 2 Mio.). Videos «Im Alltag» vor `#reise` aus `rise.json → assets.videos` (`videos_markup`, nur mit Datei öffentlich, Stock = «Symbolvideo» mit Nachweis). Aufnahme: `npm run aufnahme`, Abnahme: `node tools/abnahme-premium.js` + `python3 tools/abnahme-premium-collage.py`. Prüfbuild in anderem Ordner: `IR_RISE=<json> IR_DIST=<ordner> python3 build.py`.
 
+**Korrektur 3D-Reise (16.10.2026):** Route seit V17 unverändert zusammenhängend (jetzt 32 Stützpunkte: neuer Schwenk p 0,405 auf den
+Treppenlauf, ≤ 35° je 1 % – `routeStats`). Spiegel: echte Spiegelung auch durch die Badtür (`mirrorVisible` bis x 7,6, mit Hülle und
+Himmel, GPU volle Auflösung). Belichtung Wohnung gezielt angehoben (`expoTarget(ins, e)`). Waschtisch mit schlankem Rand (Licht neu
+gebacken, alle Stationsbilder neu). Handy/niedrige Bildschirme: Bilder zuerst, «3D-Ansicht starten» (`[data-3d]`, `start3D()`/`stop3D()`,
+Klasse `jr-3d`, Stationsmodus im Bildrahmen); Rückfall bei Bildzeit-Median > 60 ms (`TOO_SLOW`; Tests: `IR_PERF_MS`, `IR_NO_PERF_FALLBACK`).
+Letzte Station: «Tour erneut starten» (`goTo: 0`), keine automatische Wiederholung. Bericht `docs/reise/BERICHT-REISE.md`, Prüfung t27.
+
 **Einzige Quelle für Fakten und Tour: `rise.json`** (geprüft gegen `rise.schema.json` und die Regeln in
 `tools/rise.py`). Firmen-/Kontaktdaten, Leistungsschlüssel, Stationen und Texte, Kameraroute, Türen,
 Hervorhebung, Ereignisse und Wix-Regeln werden **nur dort** geändert, nie direkt im erzeugten Code.
@@ -300,7 +307,7 @@ Ausgaben in `dist/`:
 python3 tools/rise.py             # rise.json prüfen
 python3 build.py                  # baut dist/ (prüft rise.json zuerst)
 npm install && npx playwright install chromium
-npm test                          # Build, RISE, Velo (t15), t7 Seite, t9 Interaktionen, t11 Rundgang, t14 V13/V14, t16 V14, t17 V15, t18 V16, t19 V17, t20 V17.1, t21 Fertigstellung, t22 Handy, t23 GmbH/Startsperre, t24 Inhalte, t25 Premium, t26 Videos
+npm test                          # Build, RISE, Velo (t15), t7 Seite, t9 Interaktionen, t11 Rundgang, t14 V13/V14, t16 V14, t17 V15, t18 V16, t19 V17, t20 V17.1, t21 Fertigstellung, t22 Handy, t23 GmbH/Startsperre, t24 Inhalte, t25 Premium, t26 Videos, t27 Reise
 npm run abnahme                   # 32 Abnahmebilder + Übersicht/Vergleich → docs/v171/
 npm run bake                      # Build → Licht vorab rechnen → Build (nach Geometrieänderungen Pflicht)
 npm run perf                      # Ladeleistung gedrosselt (Server: python3 -m http.server 8702)
