@@ -331,6 +331,7 @@ def tour_config(d):
         'doors': {x['id']: dict({'open': x['open'], 'close': x['close']}, **({'angle': x['angleRad']} if 'angleRad' in x else {'slide': x['slideM']})) for x in t['doors']},
         'highlights': {x['id']: {'in': x['in'], 'out': x['out']} for x in t['highlights']},
         'smoothing': t['smoothing'],
+        'cleaning': {'zones': [{k: z[k] for k in ('id', 'st', 'type', 'label', 'box', 'dir', 'edge', 'mat', 'strength', 'seed', 'p')} for z in t.get('cleaning', {}).get('zones', [])]},
         'routeClearance': t['routeClearance'],
         'wind': {'idleMs': t['wind']['idleMs'], 'maxFps': t['wind']['maxFps']},
         'label': t['scene']['label'],
@@ -359,6 +360,16 @@ def _cta(c, inline_arrow, small):
     return '<a class="%s" href="#offerte"%s>%s %s</a>' % (cls, attrs, _e(c['label']), a)
 
 
+def _cmp(s, t):
+    """Vergleich «Vorher / Nachher» und Regler «Reinigungsfortschritt» (Tastatur und Touch, kein Autoplay)."""
+    lab = ', '.join(z['label'] for z in t['cleaning']['zones'] if z['st'] == s['key'])
+    return ('<div class="jr-cmp" role="group" aria-label="Reinigung vergleichen: %s">'
+            '<button type="button" class="jr-cmpb" data-cmp="0" aria-pressed="false">Vorher</button>'
+            '<button type="button" class="jr-cmpb" data-cmp="1" aria-pressed="false">Nachher</button>'
+            '<label class="jr-cmpr"><span>Reinigungsfortschritt</span><input type="range" min="0" max="100" step="5" value="100" data-cmpr></label>'
+            '<p class="jr-cmpn">Illustration eines Arbeitsablaufs, kein Kundenergebnis.</p></div>') % _e(lab)
+
+
 def _title(t):
     """Zwei Sätze → zweiter Satz in heller Schrift (Stationen 2–5)."""
     parts = [p.strip() for p in t.split('. ') if p.strip()]
@@ -380,7 +391,7 @@ def _choices(s, inline_arrow):
             % (opts, texts, ch[0]['service'], _e(ch[0]['cta']), a))
 
 
-def tour_markup(d, still_src, inline_arrow=False, page=True):
+def tour_markup(d, still_src, inline_arrow=False, page=True, vorher_src=None):
     """Erzeugt die komplette <section id="reise"> aus rise.json.
     still_src(i, station, portrait) -> URL bzw. data-URI des Stationsbildes (quer bzw. hoch).
     page=True: Links auf Seiten der Vorschau (Details, Überspringen); page=False: nur Rundgang (Komponente)."""
@@ -389,6 +400,7 @@ def tour_markup(d, still_src, inline_arrow=False, page=True):
     a = ARR if inline_arrow else '<i class="a" aria-hidden="true"></i>'
     routes = {s['key']: s.get('route', '#' + s['key']) for s in d['services']}
     hl = t['highlights'][0]
+    clean_st = {z['st'] for z in t.get('cleaning', {}).get('zones', [])}
     out = ['<section class="jr" id="reise" aria-labelledby="h-hero" data-st="0">']
     if page:
         # Modus-Klasse sofort beim Parsen setzen (vor dem Hauptskript) – verhindert eine Layoutverschiebung beim Laden
@@ -396,14 +408,24 @@ def tour_markup(d, still_src, inline_arrow=False, page=True):
                    'if(s||(m&&!window.IR_EMBED))r.classList.add("jr-static");else{r.classList.add("jr-live");if(window.IR_EMBED)r.classList.add("jr-button");}}catch(e){}})(document.currentScript.parentNode);</script>')
     out += ['<div class="jr-sticky">', '<div class="jr-stage">']
     for i, s in enumerate(st):
-        out.append('<picture class="jr-pic"><source media="(max-width:700px)" srcset="%s"><img class="jr-still%s" src="%s" alt="Illustrative Visualisierung: %s – kein Referenzobjekt" width="1440" height="900" decoding="async"></picture>'
-                   % (still_src(i, s, True), ' on' if i == 0 else '', still_src(i, s, False), _e(s['stillAlt'])))
+        out.append('<picture class="jr-pic"><source media="(max-width:700px)" srcset="%s"><img class="jr-still%s" data-n="%s" src="%s" alt="Illustrative Visualisierung: %s – kein Referenzobjekt" width="1440" height="900" decoding="async"></picture>'
+                   % (still_src(i, s, True), ' on' if i == 0 else '', _e(s['still']), still_src(i, s, False), _e(s['stillAlt'])))
     k = len(st)
     for s in st:
         for j, dt in enumerate(s.get('details', [])):
-            out.append('<picture class="jr-pic"><source media="(max-width:700px)" srcset="%s"><img class="jr-still jr-still-det" data-det-still="%d" src="%s" alt="Illustrative Visualisierung: %s – kein Referenzobjekt" width="1440" height="900" decoding="async" loading="lazy"></picture>'
-                       % (still_src(k, dt, True), k - len(st), still_src(k, dt, False), _e(dt['stillAlt'])))
+            out.append('<picture class="jr-pic"><source media="(max-width:700px)" srcset="%s"><img class="jr-still jr-still-det" data-det-still="%d" data-n="%s" src="%s" alt="Illustrative Visualisierung: %s – kein Referenzobjekt" width="1440" height="900" decoding="async" loading="lazy"></picture>'
+                       % (still_src(k, dt, True), k - len(st), _e(dt['still']), still_src(k, dt, False), _e(dt['stillAlt'])))
             k += 1
+    # Realismus-Auftrag: Bilder «Vorher» derselben Kamera (nur Bildmodus; im 3D steuert der Vergleich die Schmutzschicht)
+    if vorher_src:
+        for s in st:
+            if s['key'] not in clean_st:
+                continue
+            for n, alt in [(s['still'], s['stillAlt'])] + [(dt['still'], dt['stillAlt']) for dt in s.get('details', [])]:
+                l, pt = vorher_src(n, False), vorher_src(n, True)
+                if l:
+                    out.append('<picture class="jr-pic"><source media="(max-width:700px)" srcset="%s"><img class="jr-still jr-still-v" data-v="%s" src="%s" alt="Illustrative Visualisierung, Zustand vorher: %s – kein Referenzobjekt" width="1440" height="900" decoding="async" loading="lazy"></picture>'
+                               % (pt or l, _e(n), l, _e(alt)))
     out.append('<canvas class="jr-canvas" aria-hidden="true"></canvas>')
     # V17: Beschriftung nur als Attribut (CSS attr()) – kein loser Text im Dokument, falls Stile fehlen oder Text extrahiert wird;
     # die Bildunterschrift «Schematische Kennzeichnung» setzt der Rundgang direkt unter die Markierungen.
@@ -437,6 +459,8 @@ def tour_markup(d, still_src, inline_arrow=False, page=True):
             out.append('<div class="jr-acts">%s</div></div>' % ''.join(_cta(c, inline_arrow, False) for c in s['ctas']))
         else:
             out.append('<div class="jr-st" data-k="%s"><p class="jr-k mono">%s</p><h2 class="jr-t">%s</h2><p class="jr-d">%s</p>' % (s['key'], _e(s['kicker']), _title(s['title']), _e(s['text'])))
+            if s['key'] in clean_st:
+                out.append(_cmp(s, t))
             if s.get('choices'):
                 out.append(_choices(s, inline_arrow) + '</div>')
                 continue

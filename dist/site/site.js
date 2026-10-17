@@ -2043,10 +2043,78 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
       'if(wp.y<0.25){float rr=length(wp.xz-vec2(-1.0,5.0));float g=smoothstep(40.0,120.0,rr);vec3 land=mix(fc*0.36,fc*0.58,smoothstep(140.0,430.0,rr));fc=mix(fc,land,g);f=max(f,g);}vf=vec4(fc,f);}');
     /* mode: 0 normal · 1 Reflexionsaufnahme (nur diffus, Ausgabe √linear) · 2 Spiegelbild (ohne Spiegel-Rekursion) */
     /* lite: Software-Grafik ohne IR_FORCE_HQ – ohne Relief und ohne Reflexionsaufnahme (gemessen: Bildzeit ≈ −…%, siehe Testbericht) */
+    /* ---------- Schmutz → sauber (Realismus-Auftrag): bis zu 6 Zonen in Weltkoordinaten ----------
+       dzA = Box min + Art (1 Kalk · 2 Wasserränder · 3 Staub/Schuhspuren · 4 Laub/Moos) · dzB = Box max + Reinigungsstand (0 … 1)
+       dzC = Wischrichtung + Kantenbreite (Anteil der Zone) · dzD = zwei zulässige Materialnummern (−1 = keine) + Stärke + Startwert.
+       Muster aus festem Rauschen in Weltkoordinaten: der Schmutz sitzt auf dem Objekt und wandert nicht mit der Kamera; gleicher
+       Fortschritt = gleiches Bild. Die gereinigte Fläche wächst entlang der Wischrichtung mit unregelmässiger, kurz feuchter Kante. */
+    var DIRTF = 'uniform vec4 dzA[6];uniform vec4 dzB[6];uniform vec4 dzC[6];uniform vec4 dzD[6];uniform sampler2D nz;' +
+      'float dh3(vec3 q){vec3 h=fract(q*0.1031);h+=dot(h,h.zyx+31.32);return fract((h.x+h.y)*h.z);}' +
+      /* Rauschen aus der kachelbaren Textur nz (R grob, G mittel, B fein, A Zufall): ein Zugriff statt vieler Rechenschritte */
+      'vec4 dzn(vec2 u){return texture2D(nz,u);}';
+    var DIRTM = 'vec3 dCol=vec3(0.0);float dAmt=0.0,dR=0.0,dWet=0.0,dMt=0.0;vec2 wu=abs(N.y)>0.5?P.xz:(abs(N.x)>0.5?P.zy:P.xy);' +
+      /* ohne continue (ANGLE/SwiftShader übersetzten die Schleife mit continue fehlerhaft: Zonen blieben wirkungslos) */
+      'for(int i=0;i<6;i++){vec4 A=dzA[i],B=dzB[i],Cw=dzC[i],Dd=dzD[i];' +
+      'vec3 q=P-A.xyz,ext=B.xyz-A.xyz,o=min(q,ext-q);float inb=smoothstep(-0.004,0.012,min(min(o.x,o.y),o.z));' +
+      'bool okm=Dd.x<-0.5||abs(vd.a-Dd.x)<0.5||abs(vd.a-Dd.y)<0.5;if(A.w>0.5&&okm&&inb>0.0){' +
+      'float mn=min(0.0,Cw.x*ext.x)+min(0.0,Cw.y*ext.y)+min(0.0,Cw.z*ext.z),rg=abs(Cw.x*ext.x)+abs(Cw.y*ext.y)+abs(Cw.z*ext.z);' +
+      'vec2 su=wu+Dd.w*0.37;vec4 n1=dzn(su*1.6),n2=dzn(su*7.0+0.31);' +
+      'float sv=(dot(q,Cw.xyz)-mn)/max(rg,0.001)+(n1.g-0.5)*0.16;' +
+      'float fr=B.w*(1.0+2.0*Cw.w+0.18)-Cw.w-0.09;float cl=1.0-smoothstep(fr-Cw.w,fr,sv);' +
+      'float act=step(0.001,B.w)*(1.0-smoothstep(0.9,1.0,B.w));float wt=max(exp(-pow((sv-fr)/(Cw.w*1.3),2.0)),cl*exp(-max(fr-sv,0.0)/0.16)*0.65)*act;' +
+      'float d=0.0;vec3 kc=vec3(0.0);float kr=0.0,km=0.0;' +
+      /* 1 Kalk: matter, grauweisser Belag, am Fuss und am Auslauf dichter */
+      'if(A.w<1.5){float ft=exp(-q.y/0.018)+exp(-pow((q.x-ext.x)/0.025,2.0))*0.8;' +
+      'd=clamp(smoothstep(0.55,0.8,n2.g)*0.14+ft*smoothstep(0.3,0.62,n2.b),0.0,1.0);kc=vec3(0.80,0.79,0.75);kr=0.65;km=1.0;}' +
+      /* 2 Wasserränder und Spritzflecken auf Keramik */
+      /* eingetrocknete Tropfenränder (1–2 cm) als einzelne Kreise in 4-cm-Zellen, gegen den Ablauf dichter, dazu ein matter Film */
+      'else if(A.w<2.5){vec2 cg=wu*25.0+Dd.w;vec2 ci=floor(cg),cf=fract(cg);vec2 cc=vec2(dh3(vec3(ci,5.0)),dh3(vec3(ci,6.0)))*0.5+0.25;float cr=0.18+0.16*dh3(vec3(ci,7.0));' +
+      'vec2 dv=cf-cc;float dc=length(dv)*(1.0+(n2.r-0.5)*0.55)+(n2.b-0.5)*0.05;float rp=dh3(vec3(ci,8.0));' +
+      'float ring=step(0.58,rp)*(smoothstep(cr-0.06,cr-0.012,dc)-smoothstep(cr,cr+0.03,dc))*(0.25+0.75*smoothstep(0.3,0.75,n1.g))*(0.45+0.55*rp)' +
+      '+smoothstep(0.74,0.84,n2.g)*smoothstep(0.4,0.7,n1.b)*0.4;' +
+      'float dr=length((q.xz-ext.xz*0.5)/max(ext.xz*0.5,vec2(0.01)));float flm=(1.0-smoothstep(0.15,0.75,dr))*smoothstep(0.35,0.7,n1.r)*0.55;' +
+      'd=clamp(max(ring*0.85,flm),0.0,1.0);kc=vec3(0.70,0.69,0.65);kr=0.45;}' +
+      /* 3 Staub und Schuhspuren auf Böden */
+      /* Staub sammelt sich an den Wandkanten, leichter Film in der Fläche; Schuhspuren als Gehspur (links/rechts im Schritt 34 cm)
+         entlang der Wischrichtung, mit Sohlenprofil, zwei Spuren je Zone */
+      'else if(A.w<3.5){float wk=1.0-smoothstep(0.02,0.4,min(o.x,o.z));float du=(wk*0.75+0.22)*smoothstep(0.3,0.8,n1.r);' +
+      'vec2 ax=abs(Cw.x)>0.5?vec2(q.z-ext.z*0.5,q.x):vec2(q.x-ext.x*0.5,q.z);float pr=0.0;' +
+      'for(int tk=0;tk<2;tk++){float off=tk==0?-0.35:0.5;float kz=floor(ax.y/0.34+float(tk)*0.5);float sd=mod(kz,2.0)<0.5?-1.0:1.0;' +
+      'vec2 lc=vec2(ax.x-off-sd*0.11-(dh3(vec3(kz,float(tk),9.0))-0.5)*0.05,fract(ax.y/0.34+float(tk)*0.5)*0.34-0.17);' +
+      'float sole=smoothstep(1.0,0.82,length(lc*vec2(1.0/0.052,1.0/0.13)))*(0.55+0.45*step(0.5,fract(lc.y*55.0)));pr=max(pr,sole*step(0.25,dh3(vec3(kz,float(tk),11.0))));}' +
+      'd=clamp(max(du*0.6,pr*(0.5+0.5*n2.g)*0.85),0.0,1.0);kc=pr>du?vec3(0.13,0.12,0.11):vec3(0.24,0.22,0.2);kr=0.3;}' +
+      /* 4 Laub, Moos an den Rändern und in Fugen */
+      'else{vec2 lg=P.xz*3.6+Dd.w;vec2 li=floor(lg),lf=fract(lg)-0.5;float lh=dh3(vec3(li,2.0));float lr=dh3(vec3(li,3.0))*6.283;vec2 lr2=vec2(cos(lr)*lf.x-sin(lr)*lf.y,sin(lr)*lf.x+cos(lr)*lf.y);' +
+      'float lf2=step(0.5,lh)*smoothstep(0.3,0.16,length(lr2*vec2(1.0,2.0)));float ed=smoothstep(0.5,0.8,abs(q.x-ext.x*0.5)/(ext.x*0.5));' +
+      'float ms=max(ed,gr*4.0)*smoothstep(0.42,0.7,n2.g);d=clamp(max(lf2,ms*0.85),0.0,1.0);' +
+      'kc=lf2>ms?mix(vec3(0.36,0.16,0.04),vec3(0.62,0.38,0.08),dh3(vec3(li,4.0))):vec3(0.12,0.2,0.05);kr=0.25;}' +
+      'd*=Dd.z*inb*(1.0-cl);dCol+=kc*d;dAmt+=d;dR+=kr*d;dMt+=km*d;dWet=max(dWet,wt*inb);}}' +
+      'if(dAmt>0.0001){vec3 Lr=vd.rgb/max(va,vec3(0.03));base=mix(base,(dCol/dAmt)*Lr*fac,clamp(dAmt,0.0,0.92));}base*=1.0-0.22*dWet;';
+    /* kachelbare Rauschtextur 128² für die Schmutzschicht (eigene Erzeugung, fester Startwert): Wertrauschen mit 8/16/32 Zellen
+       je Kachel in R/G/B, weisses Rauschen in A. Ohne Mipmaps (Zugriffe stehen in einer Schleife, keine Ableitungen nötig). */
+    function mkNoise() {
+      var N = 128, px = new Uint8Array(N * N * 4), seed = 1234567;
+      function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+      [8, 16, 32].forEach(function (cells, ch) {
+        var g = []; for (var k = 0; k < cells * cells; k++) g.push(rnd());
+        for (var y = 0; y < N; y++) for (var x = 0; x < N; x++) {
+          var fx = x / N * cells, fy = y / N * cells, ix = Math.floor(fx), iy = Math.floor(fy), tx = fx - ix, ty = fy - iy;
+          tx = tx * tx * (3 - 2 * tx); ty = ty * ty * (3 - 2 * ty);
+          var a = g[(iy % cells) * cells + ix % cells], b = g[(iy % cells) * cells + (ix + 1) % cells], c = g[((iy + 1) % cells) * cells + ix % cells], d = g[((iy + 1) % cells) * cells + (ix + 1) % cells];
+          px[(y * N + x) * 4 + ch] = Math.round(255 * ((a * (1 - tx) + b * tx) * (1 - ty) + (c * (1 - tx) + d * tx) * ty));
+        }
+      });
+      for (var i = 0; i < N * N; i++) px[i * 4 + 3] = Math.round(255 * rnd());
+      var t = gl.createTexture(); textures.push(t); gl.activeTexture(gl.TEXTURE6); gl.bindTexture(gl.TEXTURE_2D, t);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, N, N, 0, gl.RGBA, gl.UNSIGNED_BYTE, px);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+      gl.activeTexture(gl.TEXTURE0); return t;
+    }
     function FSM(der, lite) {
       return PH(der) + 'varying vec4 vd;varying vec4 vs;varying vec4 vu;varying vec4 vq;varying vec4 vp;varying vec4 vn;varying vec4 vl;varying vec3 va;' + (lite ? 'varying vec4 vf;' : '') +
         'uniform sampler2D t1;uniform sampler2D t2;uniform sampler2D lut;uniform samplerCube pr;uniform sampler2D mr;' +
-        'uniform float sw;uniform float expo;uniform vec3 eye;uniform vec4 clip;uniform float mode;uniform float hasPr;uniform vec3 prC;uniform vec3 prA;uniform vec3 prB;uniform vec4 mrv;' + SKYF + TMF +
+        'uniform float sw;uniform float expo;uniform vec3 eye;uniform vec4 clip;uniform float mode;uniform float hasPr;uniform vec3 prC;uniform vec3 prA;uniform vec3 prB;uniform vec4 mrv;' + SKYF + TMF + DIRTF +
         'void main(){if(dot(vec4(vp.xyz,1.0),clip)<0.0)discard;' +
         'vec4 a=texture2D(t1,vu.xy),b=texture2D(t2,vu.xy);vec4 c4=vec4(vu.z);vec4 m1=1.0-step(0.5,abs(c4-vec4(0.0,1.0,2.0,3.0))),m2=1.0-step(0.5,abs(c4-vec4(4.0,5.0,6.0,7.0)));' +
         'float tv=dot(a,m1)+dot(b,m2)+0.5*(1.0-dot(m1+m2,vec4(1.0)));float fac=1.0+(tv*2.0-1.0)*vu.w;' +
@@ -2063,9 +2131,9 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
         'vec3 Ld,Lc;float ar;if(vp.w<0.5){vec3 l=vl.xyz-P;float d=max(length(l),0.001);Ld=l/d;float q=clamp(1.0-d/max(vn.w,0.01),0.0,1.0);Lc=((P.x>3.0&&P.x<5.45&&P.z>-1.0&&P.z<2.4)?vec3(1.0,0.9,0.8):vec3(1.0,0.74,0.5))*vl.w*q*q;ar=0.05/(d+0.25);}' +
         'else{Ld=normalize(vec3(-0.857,0.302,0.423));Lc=vec3(0.42,0.24,0.12);ar=0.45;}' +
         'float ndl0=max(dot(N,Ld),0.0),ndl=max(dot(Nb,Ld),0.0);float bs=clamp((ndl+0.3)/(ndl0+0.3),0.75,1.25);' +
-        'vec3 base=vd.rgb*fac*(1.0-gr)*bs;vec3 col=base;' +
+        'vec3 base=vd.rgb*fac*(1.0-gr)*bs;' + DIRTM + 'vec3 col=base;' +
         /* sehr raue, nichtmetallische Flächen (Putz, Anstrich, Rasen, Textil: Rauheit > 0,76) haben keinen sichtbaren Glanz – Rechnung entfällt */
-        'if(abs(mode-1.0)>0.5&&mp.g>0.004&&(mp.r<0.76||mp.b>0.5)){float r=max(mp.r,0.05),mt=mp.b,al=r*r,a2=clamp(al+ar,0.0,1.0);vec3 F0=mix(vec3(mp.g),clamp(va,0.0,1.0),mt);' +
+        'if(abs(mode-1.0)>0.5&&(mp.g>0.004||dWet>0.05)&&(mp.r<0.76||mp.b>0.5||dWet>0.05)){float r=clamp(max(mp.r,0.05)+dR-dWet*0.45,0.05,1.0),mt=mp.b*(1.0-clamp(dMt,0.0,1.0)),al=r*r,a2=clamp(al+ar,0.0,1.0);vec3 F0=mix(vec3(max(mp.g,0.02*dWet)),clamp(va,0.0,1.0),mt);' +
         'vec3 H=normalize(Ld+V);float nh=max(dot(Nb,H),0.0),nv=max(dot(Nb,V),0.001);float sp=2.0/max(a2*a2,0.0004)-2.0;float D=min((sp+8.0)*0.0398*pow(nh,sp),40.0);' +
         /* Metall: F0 = Grundfarbe (unbeleuchtet, linear) – Chrom neutral, Aluminium matter, keine Lichtfarbe im Reflex */
         'vec3 Fs=F0+(1.0-F0)*pow(1.0-max(dot(H,V),0.0),5.0);vec3 tint=vec3(1.0);' +
@@ -2289,6 +2357,23 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
     }
     var curProbe = null, mirOn = false, NOCLIP = [0, 0, 0, 1];
     /* o.x: {mode, clip, lm} – Sonderdurchgänge (Reflexionsaufnahme, Spiegelbild) */
+    /* Reinigungsstand je Zone: aus dem tatsächlichen Kamerafortschritt (smoothstep über z.p) – vorwärts und rückwärts gleich.
+       Ein manueller Vergleich (Vorher/Nachher/Regler) gilt nur für die Zonen seiner Station und endet beim Stationswechsel. */
+    var NZ = null;
+    var DZT = { kalk: 1, wasser: 2, staub: 3, laub: 4 }, DZ = ((C.cleaning && C.cleaning.zones) || []).slice(0, 6), dzOv = null;
+    var DZU = { A: new Float32Array(24), B: new Float32Array(24), C: new Float32Array(24), D: new Float32Array(24) };
+    function dzClean(z, q) {
+      if (dzOv && dzOv.st === z.st) return dzOv.v;
+      var a = z.p[0], b = z.p[1], t = Math.max(0, Math.min(1, (q - a) / (b - a))); return t * t * (3 - 2 * t);
+    }
+    function dzFill(q) {
+      for (var i = 0; i < 6; i++) {
+        var z = DZ[i], o = i * 4;
+        if (!z) { DZU.A[o + 3] = 0; continue; }
+        DZU.A.set([z.box[0][0], z.box[0][1], z.box[0][2], DZT[z.type] || 0], o); DZU.B.set([z.box[1][0], z.box[1][1], z.box[1][2], dzClean(z, q)], o);
+        DZU.C.set([z.dir[0], z.dir[1], z.dir[2], z.edge], o); DZU.D.set([z.mat[0], z.mat[1], z.strength, z.seed], o);
+      }
+    }
     function drawSet(o, Mx, e, mdl, expo, ein, x) {
       x = x || {}; var mode = x.mode || 0, pb = mode === 1 ? null : curProbe;
       gl.useProgram(PM); attr(PM, 'p', o.p, 3); attr(PM, 'n', o.n, 3); attr(PM, 'c', o.c, 3); attr(PM, 'em', o.em, 2); attr(PM, 'lt', o.lt, 3); attr(PM, 'lt2', o.lt2, 3); attr(PM, 'sl', o.sl, 4); attr(PM, 'sc', o.sc, 3);
@@ -2298,6 +2383,8 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
       gl.activeTexture(gl.TEXTURE4); gl.bindTexture(gl.TEXTURE_CUBE_MAP, pb && pb.tex ? pb.tex : CUBE0); gl.activeTexture(gl.TEXTURE0);
       gl.uniform1f(U(PM, 'hasPr'), pb && pb.tex ? 1 : 0); if (pb) { gl.uniform3fv(U(PM, 'prC'), pb.c); gl.uniform3fv(U(PM, 'prA'), pb.a); gl.uniform3fv(U(PM, 'prB'), pb.b); }
       gl.uniform4f(U(PM, 'mrv'), 1 / canvas.width, 1 / canvas.height, mode === 0 && mirOn ? 1 : 0, 0);
+      gl.uniform1i(U(PM, 'nz'), 6); gl.activeTexture(gl.TEXTURE6); gl.bindTexture(gl.TEXTURE_2D, NZ); gl.activeTexture(gl.TEXTURE0);
+      gl.uniform4fv(U(PM, 'dzA[0]'), DZU.A); gl.uniform4fv(U(PM, 'dzB[0]'), DZU.B); gl.uniform4fv(U(PM, 'dzC[0]'), DZU.C); gl.uniform4fv(U(PM, 'dzD[0]'), DZU.D);
       gl.disable(gl.BLEND); gl.depthMask(true);
       if (o.ranges && !win.IR_NO_CULL) { var F = frustumOf(Mx), st0 = -1, en = -1;
         for (var r = 0; r < o.ranges.length; r++) { var R = o.ranges[r]; if (!boxIn(F, R.mn, R.mx)) continue; cullStats.drawn += R.n;
@@ -2327,6 +2414,7 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
     function draw() {
       drawCount++; cullStats.drawn = 0; cullStats.total = 0;
       var mm = matrix(ps), Mx = mm.m, ein = mm.ins > 0.5 ? 1 : 0, expo = expoCur > 0 ? expoCur : expoTarget(mm.ins, mm.e), q = ps;
+      dzFill(ps);
       var by = {}; sets.forEach(function (o) { by[o.name] = o; });
       /* Reflexionsaufnahme des Raums, in dem die Kamera steht (einmalig erzeugt) */
       curProbe = camOverride && camOverride.noProbe ? null : probeFor(mm.e); if (curProbe && !curProbe.tex) { bindTex(); captureProbe(curProbe); }
@@ -2464,7 +2552,7 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
     function ui(q) {
       var i = stationOf(q);
       if (i !== lastSt) {
-        lastSt = i; cur = i; root.dataset.st = i;
+        lastSt = i; cur = i; root.dataset.st = i; dzOv = null; root.querySelectorAll('.jr-still-v').forEach(function (x) { x.classList.remove('on'); });
         root.querySelectorAll('.jr-st').forEach(function (el, j) { var on = j === i; el.classList.toggle('on', on); el.setAttribute('aria-hidden', String(!on)); if (on) el.removeAttribute('inert'); else el.setAttribute('inert', ''); });
         root.querySelectorAll('.jr-nav button').forEach(function (b, j) { b.classList.toggle('on', j === i); if (j === i) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
         /* V17: waagrecht scrollbare Stationsleiste (Smartphone) – aktive Station mittig sichtbar, ohne die Seite zu verschieben */
@@ -2473,6 +2561,7 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
         if (started) emit('station-change', { station: ST[i].k, index: i, progress: Math.round(q * 1000) / 1000 });
       }
       var bar = root.querySelector('.jr-bar i'); if (bar) bar.style.transform = 'scaleY(' + q.toFixed(4) + ')';
+      if (!dzOv) cmpUi(null);
       if (mode !== 'static') syncDet(q);
     }
     function setProgress(q) { if (destroyed) return; q = Math.max(0, Math.min(1, q)); if (Math.abs(q - p) < 0.00001) return; p = q; lastInput = win.performance.now(); ui(q); if (running) request(); }
@@ -2504,7 +2593,7 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
         NATTR = Math.min(8, gl.getParameter(gl.MAX_VERTEX_ATTRIBS) || 8);
         TX.n1 = mkTex(1, new Uint8Array([128, 128, 128, 128]));
       } catch (e) { if (win.console) win.console.warn('ImmoReady-Rundgang:', e && e.message); return 'WEBGL_INIT_FAILED'; }
-      LUT = mkLut(); CUBE0 = mkCube(1); TEX0 = mkTex(1, new Uint8Array([20, 20, 22, 255]));
+      LUT = mkLut(); CUBE0 = mkCube(1); TEX0 = mkTex(1, new Uint8Array([20, 20, 22, 255])); NZ = mkNoise();
       sets = [upload(G, null, null, 4), upload(INT, null, null, 3), upload(ENV, null, null, 30), upload(D, doorM, function (q) { return doorAngle(q) / D_HT.angle; }), upload(A, aptM, function (q) { return aptAngle(q) / D_WT.angle; }), upload(TT, terM, function (q) { return terSlide(q) / D_TT.slide; }), upload(SKY)];
       extra = {
         gz: { p: vbo(GZ.P), n: vbo(GZ.N), wc: vbo(GZ.WC), ws: vbo(GZ.WS), nm: GZ.P.length / 3 },
@@ -2542,7 +2631,7 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
           var ext = gl.getExtension('WEBGL_lose_context'); if (ext && !gl.isContextLost()) ext.loseContext();
         } catch (e) {}
       }
-      probeFB = probeRB = null; probeN = 0; PROBES.forEach(function (pb) { pb.tex = null; }); MIR.fb = MIR.rb = MIR.tex = null; MIR.w = MIR.h = 0; LUT = CUBE0 = TEX0 = null; curProbe = null;
+      probeFB = probeRB = null; probeN = 0; PROBES.forEach(function (pb) { pb.tex = null; }); MIR.fb = MIR.rb = MIR.tex = null; MIR.w = MIR.h = 0; LUT = CUBE0 = TEX0 = NZ = null; curProbe = null;
       buffers = []; shaders = []; textures = []; progs = []; sets = []; extra = null; gl = null; PM = PL = PS = PG = PF = PH_ = PT = null; TX.t1 = TX.t2 = TX.lb = TX.n1 = null; ready = false; root.classList.remove('jr-ready');
       if (scan.state !== 'done') { scan.state = 'done'; sweep = 1e4; }
     }
@@ -2574,6 +2663,25 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
       if (med > (win.IR_PERF_MS || PERF_MS) && !win.IR_NO_PERF_FALLBACK) { emit('tour-error', { code: 'TOO_SLOW', fallback: 'stills' }); end3d('3D läuft auf diesem Gerät nicht flüssig. Sie sehen Bilder derselben Szene.'); }
     }
     function scrollProg() { var r = root.getBoundingClientRect(); var span = root.offsetHeight - win.innerHeight; return span > 0 ? (-r.top) / span : 0; }
+    /* Vergleich an der Station: im 3D setzt er den Reinigungsstand der Zonen dieser Station (Vorrang vor dem Fortschritt),
+       im Bildmodus zeigt «Vorher» das Bild derselben Kamera im Ausgangszustand. Stationswechsel stellt den Fortschrittszustand her. */
+    function cmpUi(v) {
+      var stEl = root.querySelectorAll('.jr-st')[cur]; if (!stEl) return;
+      stEl.querySelectorAll('[data-cmp]').forEach(function (b) { b.setAttribute('aria-pressed', String(v !== null && +b.dataset.cmp === (v >= 0.5 ? 1 : 0) && (v === 0 || v === 1))); });
+      var r = stEl.querySelector('[data-cmpr]'); if (r) { var val = Math.round((v === null ? cmpAuto() : v) * 100); r.value = val; r.setAttribute('aria-valuetext', val + ' % gereinigt'); }
+    }
+    function cmpAuto() { var k = ST[cur].k, z = DZ.filter(function (x) { return x.st === k; })[0]; return z ? dzClean(z, mode === 'static' ? ST[cur].hold : ps) : 1; }
+    function compare(v, snap) {
+      var k = ST[cur].k; if (!DZ.some(function (z) { return z.st === k; })) return;
+      if (mode === 'static') {
+        var vor = v < 0.5, img = root.querySelector('.jr-still.on:not(.jr-still-v)') || root.querySelector('.jr-still-v.on');
+        var n = img && (img.dataset.n || img.dataset.v), vi = n && root.querySelector('.jr-still-v[data-v="' + n + '"]');
+        root.querySelectorAll('.jr-still-v').forEach(function (x) { x.classList.remove('on'); });
+        if (vi) { var base = root.querySelector('.jr-still[data-n="' + n + '"]'); if (base) base.classList.toggle('on', !vor); vi.classList.toggle('on', vor); }
+        cmpUi(vor ? 0 : 1); return;
+      }
+      dzOv = { st: k, v: Math.max(0, Math.min(1, v)) }; cmpUi(snap ? v : dzOv.v); lastInput = win.performance.now(); if (running) request();
+    }
     function goStation(i) {
       if (destroyed) return; i = Math.max(0, Math.min(ST.length - 1, i | 0)); var q = ST[i].hold; cur = i;
       if (mode === 'live') { var top = root.getBoundingClientRect().top + win.scrollY; var span = root.offsetHeight - win.innerHeight; glide(q, C.smoothing.jumpTauMs); win.scrollTo({ top: Math.round(top + q * span + (i === ST.length - 1 ? -2 : 0)), behavior: 'instant' }); }
@@ -2607,6 +2715,7 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
     }
     on(root, 'click', function (e) {
       var ch = e.target.closest('[data-choice]'); if (ch && root.contains(ch)) { e.preventDefault(); choose(ch, false); return; }
+      var cb = e.target.closest('[data-cmp]'); if (cb && root.contains(cb)) { e.preventDefault(); compare(+cb.dataset.cmp, true); return; }
       var b3 = e.target.closest('[data-3d]'); if (b3 && root.contains(b3)) { e.preventDefault(); if (inline3d) end3d(); else start3D(); return; }
       var dtb = e.target.closest('[data-det]'); if (dtb && root.contains(dtb)) { e.preventDefault(); goDetail(dtb); return; }
       var g = e.target.closest('[data-go]'); if (g && root.contains(g)) { e.preventDefault(); goStation(+g.dataset.go); return; }
@@ -2627,6 +2736,7 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
         if (opts.interceptQuote && opts.interceptQuote(detail)) { e.preventDefault(); e.stopPropagation(); }
       }
     });
+    on(root, 'input', function (e) { var r = e.target.closest && e.target.closest('[data-cmpr]'); if (r && root.contains(r)) compare(+r.value / 100, false); });
     on(root, 'keydown', function (e) {
       var d = (e.key === 'ArrowRight' || e.key === 'ArrowDown') ? 1 : (e.key === 'ArrowLeft' || e.key === 'ArrowUp') ? -1 : 0;
       var og = e.target.closest && e.target.closest('.jr-choice-opts');
@@ -2751,7 +2861,7 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
     }
 
     return {
-      goStation: goStation, setProgress: setProgress, glide: glide, destroy: destroy, start3D: start3D, stop3D: function () { end3d(); },
+      goStation: goStation, setProgress: setProgress, glide: glide, destroy: destroy, start3D: start3D, stop3D: function () { end3d(); }, setClean: function (st, v) { dzOv = (v === null || v === undefined) ? null : { st: st, v: Math.max(0, Math.min(1, +v)) }; if (running) request(); }, cleanZones: function () { return DZ.map(function (z) { return { id: z.id, st: z.st, v: dzClean(z, ps) }; }); },
       progress: function () { return p; }, mode: function () { return mode; }, station: function () { return currentIndex(); },
       jump: function (q) { p = ps = q; expoCur = -1; if (scan.state !== 'done') { scan.state = 'done'; } sweep = 1e4; ui(q); if (running) request(); },
       ui: ui, stationOf: stationOf, checkRoute: checkRoute, checkFrustum: checkFrustum, routeStats: routeStats, camAt: camAt, doorAngle: doorAngle, aptAngle: aptAngle, terSlide: terSlide,

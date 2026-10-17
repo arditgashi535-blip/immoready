@@ -1995,3 +1995,17 @@ body.hdr-compact .hdr{background:var(--ivory)}
 .jr-static.jr-3d.jr-ready .jr-still{opacity:0!important}
 .jr-static.jr-3d .jr-tech{display:block}
 .jr-3d-wait .jr-stage::after{content:"3D wird geladen …";position:absolute;left:12px;top:12px;z-index:3;font-size:.8rem;letter-spacing:.06em;color:var(--ivory);background:rgba(37,35,33,.7);padding:6px 10px;border-radius:999px}
+
+/* Realismus-Auftrag: Vergleich «Vorher / Nachher» und Reinigungsfortschritt an den Stationen */
+.jr-cmp{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:4px 0 14px}
+.jr-cmpb{min-height:44px;padding:8px 16px;border-radius:999px;border:1px solid rgba(252,248,245,.42);background:rgba(20,22,28,.3);color:var(--ivory);font:inherit;font-weight:600;cursor:pointer}
+.jr-cmpb[aria-pressed="true"]{background:var(--lime);border-color:var(--lime);color:var(--ink)}
+.jr-cmpb:focus-visible,.jr-cmpr input:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
+.jr-cmpr{display:flex;align-items:center;gap:10px;flex:1 1 220px;min-width:0;font-size:.85rem;color:#E3DDD6}
+.jr-cmpr input{flex:1 1 auto;min-width:0;min-height:44px;accent-color:var(--lime)}
+.jr-cmpn{flex:1 1 100%;margin:0;font-size:.75rem;color:rgba(252,248,245,.62)}
+.jr-static .jr-cmpr{display:none}
+.jr-static.jr-3d .jr-cmpr{display:flex}
+.jr-still-v{opacity:0}
+.jr-still-v.on{opacity:1}
+@media (prefers-reduced-motion:reduce){.jr-cmpb{transition:none}}

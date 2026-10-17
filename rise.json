@@ -280,6 +280,17 @@
         "stillAlt": "Wohnblock in der Gesamtansicht am Abend"
       }
     ],
+    "cleaning": {
+      "_note": "Schmutz → sauber (Realismus-Auftrag). Je Zone: Box in Weltkoordinaten (m), Art kalk|wasser|staub|laub, Wischrichtung, Kantenbreite (Anteil), Materialnummern (−1 = keine), Stärke, fester Startwert, Fortschrittsbereich p, in dem die Reinigung geschieht (davor schmutzig, danach sauber). Grundsatz: jeder Stationshalt zeigt den Zustand «Nachher», «Vorher» ist über den Vergleich erreichbar. Illustration eines komprimierten Arbeitsablaufs, keine echte Bearbeitungsdauer und kein Kundenergebnis.",
+      "zones": [
+        {"id": "garten-weg", "st": "garten", "type": "laub", "label": "Laub und Moos auf dem Weg", "box": [[-0.9, -0.12, 7.6], [0.9, 0.09, 19.3]], "dir": [0, 0, -1], "edge": 0.05, "mat": [21, 6], "strength": 1.0, "seed": 2.2, "p": [0.2, 0.232]},
+        {"id": "eingang-boden", "st": "eingang", "type": "staub", "label": "Schuhspuren und Staub in der Eingangshalle", "box": [[-2.95, 0.46, 1.55], [2.95, 0.52, 5.1]], "dir": [0, 0, -1], "edge": 0.06, "mat": [9, -1], "strength": 1.0, "seed": 6.6, "p": [0.372, 0.428]},
+        {"id": "wohnung-boden", "st": "wohnung", "type": "staub", "label": "Staub und Spuren auf dem Parkett", "box": [[5.46, 0.46, -0.94], [8.6, 0.52, 5.1]], "dir": [1, 0, 0], "edge": 0.05, "mat": [7, -1], "strength": 0.8, "seed": 9.4, "p": [0.545, 0.585]},
+        {"id": "bad-armatur", "st": "bad", "type": "kalk", "label": "Kalk an der Armatur", "box": [[3.085, 1.352, 0.752], [3.338, 1.566, 0.848]], "dir": [0, -1, 0], "edge": 0.07, "mat": [22, -1], "strength": 1.0, "seed": 3.7, "p": [0.7, 0.724]},
+        {"id": "bad-auslauf", "st": "bad", "type": "kalk", "label": "Kalk am Strahlregler", "box": [[3.284, 1.436, 0.784], [3.316, 1.47, 0.816]], "dir": [0, -1, 0], "edge": 0.08, "mat": [22, 12], "strength": 1.0, "seed": 5.3, "p": [0.7, 0.724]},
+        {"id": "bad-waschtisch", "st": "bad", "type": "wasser", "label": "Wasserränder im Becken und auf der Ablage", "box": [[3.08, 1.215, 0.515], [3.528, 1.368, 1.085]], "dir": [0, 0, -1], "edge": 0.07, "mat": [1, 22], "strength": 1.0, "seed": 8.1, "p": [0.702, 0.726]}
+      ]
+    },
     "keyframes": [
       {"p": 0.0, "pos": [38, 18, 50], "lookAt": [-10, 4.5, 5.5], "fovRad": 0.55},
       {"p": 0.1, "pos": [24, 11, 35], "lookAt": [-8, 4, 5], "fovRad": 0.64},

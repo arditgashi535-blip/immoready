@@ -65,6 +65,13 @@ for _i, _f in enumerate(PORTRAIT_FILES):
         print('Hinweis: Hochformat-Bild fehlt, verwende Querformat:', _f)
         PORTRAIT_FILES[_i] = STILL_FILES[_i]
 STILL_DATA = [b64(f, 'image/webp') for f in STILL_FILES]
+# Realismus-Auftrag: «Vorher»-Bilder derselben Kamera (nur vorhanden, wenn tools/render-stills.js sie erzeugt hat)
+VORHER = {}
+for _n in STILL_NAMES:
+    for _pt in (False, True):
+        _f = 'assets/tour/%s-vorher%s.webp' % (_n, '-hoch' if _pt else '')
+        if os.path.exists(_f):
+            VORHER[(_n, _pt)] = _f
 PORTRAIT_DATA = [b64(f, 'image/webp') for f in PORTRAIT_FILES]
 
 # Materialtexturen (prozedural, tools/make-textures.py) und vorab gerechnetes Licht (tools/bake-light.js)
@@ -86,7 +93,8 @@ CFG_JS = json.dumps(CFG, ensure_ascii=False, separators=(',', ':'))
 PARTS = ['p1.html', 'p2.html', 'p3a.html', 'p3b.html', 'p3c.html', 'p3e.html', 'p3f.html', 'p3g.html', 'p3d.html']
 # Konfiguration direkt vor dem Hauptskript (p3a), damit <title> und CSS aus p1 am Anfang bleiben
 html = ''.join(read('src/' + p) for p in PARTS[:2]) + '<script>window.IR_RISE={{CFG}};</script>' + ''.join(read('src/' + p) for p in PARTS[2:])
-html = html.replace('<!--{{RISE_TOUR}} (erzeugt aus rise.json durch build.py)-->', tour_markup(RISE, lambda i, s, portrait: PORTRAIT_DATA[i] if portrait else STILL_DATA[i]))
+html = html.replace('<!--{{RISE_TOUR}} (erzeugt aus rise.json durch build.py)-->', tour_markup(RISE, lambda i, s, portrait: PORTRAIT_DATA[i] if portrait else STILL_DATA[i],
+                    vorher_src=lambda n, pt: b64(VORHER[(n, pt)], 'image/webp') if (n, pt) in VORHER else None))
 html = html.replace('/*{{TOUR_CORE}}*/', CORE)
 # Unternehmensangaben (GmbH in Gründung bzw. eingetragen) überall aus rise.json → firm.company
 FIRM = firm_markup(RISE)
@@ -241,7 +249,8 @@ def build_site():
         os.makedirs(out + d, exist_ok=True)
     h = ''.join(read('src/' + p) for p in PARTS[:2]) + '<script>window.IR_RISE={{CFG}};</script>' + ''.join(read('src/' + p) for p in PARTS[2:])
     h = h.replace('<!--{{RISE_TOUR}} (erzeugt aus rise.json durch build.py)-->',
-                  tour_markup(RISE, lambda i, s, portrait: 'assets/tour/' + os.path.basename(PORTRAIT_FILES[i] if portrait else STILL_FILES[i])))
+                  tour_markup(RISE, lambda i, s, portrait: 'assets/tour/' + os.path.basename(PORTRAIT_FILES[i] if portrait else STILL_FILES[i]),
+                              vorher_src=lambda n, pt: 'assets/tour/' + os.path.basename(VORHER[(n, pt)]) if (n, pt) in VORHER else None))
     h = videos(photos(firm(h.replace('/*{{TOUR_CORE}}*/', CORE))), site=True).replace('{{LOGOO}}', 'assets/logo_orig.png').replace('{{FAV}}', 'assets/fav.png')
     h = h.replace('window.IR_RISE={{CFG}};', 'window.IR_RISE=' + CFG_JS + ';', 1)
     i = h.index('var PH=')
@@ -270,7 +279,7 @@ def build_site():
           + ROBOTS + head + '<link rel="stylesheet" href="site.css"></head><body>' + body + '</body></html>')
     if not LIVE_OK:
         write(out + 'robots.txt', 'User-agent: *\nDisallow: /\n')
-    for f in sorted(set(STILL_FILES + PORTRAIT_FILES)):
+    for f in sorted(set(STILL_FILES + PORTRAIT_FILES + list(VORHER.values()))):
         shutil.copy(f, out + 'assets/tour/')
     for f in TEX_FILES:
         shutil.copy(f, out + 'assets/tex/')
