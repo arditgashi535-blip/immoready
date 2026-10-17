@@ -868,7 +868,7 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
 
     /* ---------- Zustand ---------- */
     var stage = root.querySelector('.jr-stage'), canvas = stage && stage.querySelector('canvas');
-    var gl = null, PM, PL, sets = [], w = 0, h = 0, dpr = 1, running = false, raf = 0, visible = true, ready = false;
+    var gl = null, PMN, PL, sets = [], w = 0, h = 0, dpr = 1, running = false, raf = 0, visible = true, ready = false;
     var p = 0, ps = 0, sweep = 1e4, lastSt = -1, capEl = null, labels = [], hots = [], lastT = 0, tau = C.smoothing.tauMs;
     /* Leistungspunkte (Markup aus rise.json, data-hot = Weltpunkt): sichtbar, wenn die Kamera an ihrer Station ruht */
     function hotOn(l, q) { return stationOf(q) === l.st && Math.abs(q - ST[l.st].hold) < 0.03; }
@@ -2061,60 +2061,79 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
        dzC = Wischrichtung + Kantenbreite (Anteil der Zone) · dzD = zwei zulässige Materialnummern (−1 = keine) + Stärke + Startwert.
        Muster aus festem Rauschen in Weltkoordinaten: der Schmutz sitzt auf dem Objekt und wandert nicht mit der Kamera; gleicher
        Fortschritt = gleiches Bild. Die gereinigte Fläche wächst entlang der Wischrichtung mit unregelmässiger, kurz feuchter Kante. */
-    var DIRTF = 'uniform vec4 dzA[6];uniform vec4 dzB[6];uniform vec4 dzC[6];uniform vec4 dzD[6];uniform sampler2D nz;' +
+    /* Schmutzschicht (Realismus-Auftrag): Der Shader wird aus den Zonen in rise.json erzeugt – je Zone nur der Code ihrer Art, Box,
+       Wischrichtung, Materialien, Startwert und Stärke als Konstanten, dazu ein Uniform je Zone (Reinigungsstand dzv). Die Software-Grafik
+       (SwiftShader) führt Verzweigungsrümpfe für jedes Pixel aus; eine allgemeine Schleife über alle Arten kostete dort das 4- bis 5-Fache
+       der Bildzeit, auch ohne aktive Zone. Zusätzlich zeichnet drawSet mit einem Programm ohne Schmutzschicht, solange keine sichtbare
+       Zone schmutzig ist (dzAny). */
+    var DIRTF = 'uniform float dzv[6];uniform sampler2D nz;' +
       'float dh3(vec3 q){vec3 h=fract(q*0.1031);h+=dot(h,h.zyx+31.32);return fract((h.x+h.y)*h.z);}' +
       /* Rauschen aus der kachelbaren Textur nz (R grob, G mittel, B fein, A Zufall): ein Zugriff statt vieler Rechenschritte */
       'vec4 dzn(vec2 u){return texture2D(nz,u);}';
-    var DIRTM = 'vec3 dCol=vec3(0.0);float dAmt=0.0,dR=0.0,dWet=0.0,dMt=0.0;vec2 wu=abs(N.y)>0.5?P.xz:(abs(N.x)>0.5?P.zy:P.xy);' +
-      /* ohne continue (ANGLE/SwiftShader übersetzten die Schleife mit continue fehlerhaft: Zonen blieben wirkungslos) */
-      'for(int i=0;i<6;i++){vec4 A=dzA[i],B=dzB[i],Cw=dzC[i],Dd=dzD[i];' +
-      'vec3 q=P-A.xyz,ext=B.xyz-A.xyz,o=min(q,ext-q);float inb=smoothstep(-0.004,0.012,min(min(o.x,o.y),o.z));' +
-      'bool okm=Dd.x<-0.5||abs(vd.a-Dd.x)<0.5||abs(vd.a-Dd.y)<0.5;if(A.w>0.5&&okm&&inb>0.0){' +
-      'float mn=min(0.0,Cw.x*ext.x)+min(0.0,Cw.y*ext.y)+min(0.0,Cw.z*ext.z),rg=abs(Cw.x*ext.x)+abs(Cw.y*ext.y)+abs(Cw.z*ext.z);' +
-      'vec2 su=wu+Dd.w*0.37;vec4 n1=dzn(su*1.6),n2=dzn(su*7.0+0.31);' +
-      'float sv=(dot(q,Cw.xyz)-mn)/max(rg,0.001)+(n1.g-0.5)*0.16;' +
-      'float fr=B.w*(1.0+2.0*Cw.w+0.18)-Cw.w-0.09;float cl=1.0-smoothstep(fr-Cw.w,fr,sv);' +
-      'float act=step(0.001,B.w)*(1.0-smoothstep(0.9,1.0,B.w));float wt=max(exp(-pow((sv-fr)/(Cw.w*1.3),2.0)),cl*exp(-max(fr-sv,0.0)/0.16)*0.65)*act;' +
-      'float d=0.0;vec3 kc=vec3(0.0);float kr=0.0,km=0.0;' +
-      /* 1 Kalk: matter, grauweisser Belag, am Fuss und am Auslauf dichter */
-      'if(A.w<1.5){float ft=exp(-q.y/0.018)+exp(-pow((q.x-ext.x)/0.025,2.0))*0.8;' +
-      'd=clamp(smoothstep(0.62,0.88,n2.b)*0.22+ft*smoothstep(0.3,0.62,n2.b),0.0,1.0);kc=vec3(0.80,0.79,0.75);kr=0.65;km=1.0;}' +
-      /* 2 Wasserränder und Spritzflecken auf Keramik */
-      /* eingetrocknete Tropfenränder (1–2 cm) als einzelne Kreise in 4-cm-Zellen, gegen den Ablauf dichter, dazu ein matter Film */
-      'else if(A.w<2.5){vec2 cg=wu*25.0+Dd.w;vec2 ci=floor(cg),cf=fract(cg);vec2 cc=vec2(dh3(vec3(ci,5.0)),dh3(vec3(ci,6.0)))*0.5+0.25;float cr=0.18+0.16*dh3(vec3(ci,7.0));' +
+    var DIRT0 = 'float dAmt=0.0,dR=0.0,dWet=0.0,dMt=0.0;';
+    /* Arten als GLSL-Bausteine: q (Punkt in der Box), ext (Boxmass), o (Abstand zu den Seiten), n1/n2 (Rauschen), su/wu (Flächenkoordinaten),
+       sdw (Startwert), Cw (Wischrichtung, Kante) → d (Deckung), kc (Farbe, linear), kr (Rauheit), km (Metall weg) */
+    var DZTYPE = {
+      /* Kalk: matter, grauweisser Belag, am Fuss und am Auslauf dichter */
+      kalk: 'float ft=exp(-q.y/0.018)+exp(-pow((q.x-ext.x)/0.025,2.0))*0.8;' +
+      'd=clamp(smoothstep(0.62,0.88,n2.b)*0.22+ft*smoothstep(0.3,0.62,n2.b),0.0,1.0);kc=vec3(0.80,0.79,0.75);kr=0.65;km=1.0;' +
+        '',
+      /* Wasserränder auf Keramik – Runde 4: im Tageslicht auf weisser Keramik sichtbar, aber nicht grafisch: unterbrochene, verzogene
+         Ränder (1–2 cm) in 4-cm-Zellen, kleine runde Tropfenpunkte, beides zum Ablauf hin dichter; matter Film beige-grau */
+      wasser: 'vec2 cg=wu*25.0+sdw;vec2 ci=floor(cg),cf=fract(cg);vec2 cc=vec2(dh3(vec3(ci,5.0)),dh3(vec3(ci,6.0)))*0.5+0.25;float cr=0.18+0.16*dh3(vec3(ci,7.0));' +
       'vec2 dv=cf-cc;float dc=length(dv)*(1.0+(n2.r-0.5)*0.75)+(n2.b-0.5)*0.06;float rp=dh3(vec3(ci,8.0));' +
-      /* Runde 4: im Tageslicht auf weisser Keramik sichtbar, aber nicht grafisch – unterbrochene, verzogene Ränder, kleine runde
-         Tropfenpunkte, beides zum Ablauf hin dichter; matter Film beige-grau */
       'float dr=length((q.xz-ext.xz*0.5)/max(ext.xz*0.5,vec2(0.01)));float nr=0.45+0.55*(1.0-smoothstep(0.1,0.95,dr));' +
       'float ang=atan(dv.y,dv.x);float arc=smoothstep(0.25,0.7,0.5+0.5*sin(ang*2.0+rp*19.0)+(n1.g-0.5)*0.8);' +
       'float ring=step(0.55,rp)*(smoothstep(cr-0.05,cr-0.014,dc)-smoothstep(cr,cr+0.022,dc))*arc*(0.45+0.55*rp)*nr;' +
       'float dt=step(0.28,rp)*step(rp,0.55)*(1.0-smoothstep(cr*0.22,cr*0.42,dc))*0.6*nr;' +
       'float flm=(1.0-smoothstep(0.15,0.8,dr))*smoothstep(0.3,0.7,n1.r)*0.45;' +
-      'd=clamp(max(max(ring,dt)*0.9,flm),0.0,1.0);kc=max(ring,dt)*0.9>flm?vec3(0.47,0.45,0.41):vec3(0.58,0.56,0.51);kr=0.45;}' +
-      /* 3 Staub und Schuhspuren auf Böden */
-      /* Staub sammelt sich an den Wandkanten, leichter Film in der Fläche; Schuhspuren als Gehspur (links/rechts im Schritt 34 cm)
-         entlang der Wischrichtung, mit Sohlenprofil, zwei Spuren je Zone */
-      /* Runde 4: auch auf waagrechten Möbelflächen in der Zone (Tisch, Sitzflächen), Schuhspuren und Wandkanten nur am Boden */
-      'else if(A.w<3.5){float fl0=1.0-smoothstep(0.03,0.08,q.y);float wk=(1.0-smoothstep(0.02,0.4,min(o.x,o.z)))*fl0;float du=((wk*0.75+0.2+0.2*(1.0-fl0))*(0.62+0.38*n1.g)+smoothstep(0.55,0.95,n2.b)*0.18)*smoothstep(0.55,0.9,N.y);' +
+      'd=clamp(max(max(ring,dt)*0.9,flm),0.0,1.0);kc=max(ring,dt)*0.9>flm?vec3(0.47,0.45,0.41):vec3(0.58,0.56,0.51);kr=0.45;' +
+        '',
+      /* Staub und Schuhspuren: Staub an den Wandkanten und als Film, Gehspuren (Schritt 34 cm, Sohlenprofil) nur am Boden;
+         Runde 4: auch auf waagrechten Möbelflächen, Farbe aus der Grundhelligkeit (auf dunklem Parkett hell und grau) */
+      staub: 'float fl0=1.0-smoothstep(0.03,0.08,q.y);float wk=(1.0-smoothstep(0.02,0.4,min(o.x,o.z)))*fl0;float du=((wk*0.75+0.2+0.2*(1.0-fl0))*(0.62+0.38*n1.g)+smoothstep(0.55,0.95,n2.b)*0.18)*smoothstep(0.55,0.9,N.y);' +
       'vec2 ax=abs(Cw.x)>0.5?vec2(q.z-ext.z*0.5,q.x):vec2(q.x-ext.x*0.5,q.z);float pr=0.0;' +
       'for(int tk=0;tk<2;tk++){float off=tk==0?-0.35:0.5;float kz=floor(ax.y/0.34+float(tk)*0.5);float sd=mod(kz,2.0)<0.5?-1.0:1.0;' +
       'vec2 lc=vec2(ax.x-off-sd*0.11-(dh3(vec3(kz,float(tk),9.0))-0.5)*0.05,fract(ax.y/0.34+float(tk)*0.5)*0.34-0.17);' +
       'float sole=smoothstep(1.0,0.82,length(lc*vec2(1.0/0.052,1.0/0.13)))*(0.55+0.45*step(0.5,fract(lc.y*55.0)));pr=max(pr,sole*step(0.25,dh3(vec3(kz,float(tk),11.0))));}pr*=fl0;' +
       /* Runde 4: Staub wirkt auf dunklem Parkett hell und grau, auf hellen Platten dunkler (Farbe aus der Grundhelligkeit vd.rgb) */
       'float al=smoothstep(0.12,0.42,dot(vd.rgb,vec3(0.3,0.59,0.11)));' +
-      'd=clamp(max(du*mix(0.85,0.6,al),pr*(0.5+0.5*n2.g)*0.85),0.0,1.0);kc=pr>du?mix(vec3(0.34,0.32,0.29),vec3(0.13,0.12,0.11),al):mix(vec3(0.46,0.44,0.41),vec3(0.24,0.22,0.2),al);kr=0.3;}' +
-      /* 4 Laub, Moos an den Rändern und in Fugen */
-      /* Runde 4: zwei Blattgrössen (≈ 6 und 3 cm), gehäuft in Wolken und zu den Rändern hin, gedämpfte Brauntöne (trocken bis nass),
-         spitz zulaufende Blattform; dazu ein grünlich-grauer Schmutzfilm in Wolken und Moos an den Rändern und in den Fugen */
-      'else{float ed=smoothstep(0.5,0.85,abs(q.x-ext.x*0.5)/(ext.x*0.5));float cw=smoothstep(0.3,0.78,n1.r)*0.7+ed*0.45;float lf2=0.0;vec3 lcol=vec3(0.0);' +
-      'for(int ly=0;ly<2;ly++){float sc=ly==0?3.2:6.5;vec2 lg=P.xz*sc+Dd.w+float(ly)*7.1;vec2 li=floor(lg),lf=fract(lg)-0.5;float lh=dh3(vec3(li,2.0+float(ly)));float lr=dh3(vec3(li,3.0+float(ly)))*6.283;' +
+      'd=clamp(max(du*mix(0.85,0.6,al),pr*(0.5+0.5*n2.g)*0.85),0.0,1.0);kc=pr>du?mix(vec3(0.34,0.32,0.29),vec3(0.13,0.12,0.11),al):mix(vec3(0.46,0.44,0.41),vec3(0.24,0.22,0.2),al);kr=0.3;' +
+        '',
+      /* Laub, Moos und Schmutzfilm – Runde 4: zwei Blattgrössen (≈ 6 und 3 cm) gehäuft in Wolken und zu den Rändern hin, gedämpfte
+         Brauntöne, spitz zulaufende Blattform; grünlich-grauer Film in Wolken, Moos an den Rändern und in den Fugen */
+      laub: 'float ed=smoothstep(0.5,0.85,abs(q.x-ext.x*0.5)/(ext.x*0.5));float cw=smoothstep(0.3,0.78,n1.r)*0.7+ed*0.45;float lf2=0.0;vec3 lcol=vec3(0.0);' +
+      'for(int ly=0;ly<2;ly++){float sc=ly==0?3.2:6.5;vec2 lg=P.xz*sc+sdw+float(ly)*7.1;vec2 li=floor(lg),lf=fract(lg)-0.5;float lh=dh3(vec3(li,2.0+float(ly)));float lr=dh3(vec3(li,3.0+float(ly)))*6.283;' +
       'lf+=(vec2(dh3(vec3(li,12.0)),dh3(vec3(li,13.0)))-0.5)*0.36;vec2 lr2=vec2(cos(lr)*lf.x-sin(lr)*lf.y,sin(lr)*lf.x+cos(lr)*lf.y);' +
       'float sh=length(lr2*vec2(1.0,2.1))+abs(lr2.x)*0.35;float on=step(1.0-cw*0.75,lh)*smoothstep(0.31,0.2,sh);' +
       'if(on>lf2){lf2=on;float tn=dh3(vec3(li,4.0+float(ly)));lcol=tn<0.45?mix(vec3(0.13,0.065,0.025),vec3(0.24,0.12,0.04),tn/0.45):mix(vec3(0.3,0.16,0.05),vec3(0.46,0.3,0.08),(tn-0.45)/0.55);}}' +
       'float fl=smoothstep(0.42,0.8,dzn(su*0.35).r)*0.36;float ms=max(ed,gr*4.0)*smoothstep(0.42,0.7,n2.g);d=clamp(max(max(lf2,ms*0.85),fl),0.0,1.0);' +
-      'kc=lf2>max(ms,fl)?lcol:ms>fl?vec3(0.1,0.17,0.045):vec3(0.11,0.115,0.08);kr=0.25;}' +
-      'd*=Dd.z*inb*(1.0-cl);dCol+=kc*d;dAmt+=d;dR+=kr*d;dMt+=km*d;dWet=max(dWet,wt*inb);}}' +
-      'if(dAmt>0.0001){vec3 Lr=vd.rgb/max(va,vec3(0.03));base=mix(base,(dCol/dAmt)*Lr*fac,clamp(dAmt,0.0,0.92));}base*=1.0-0.22*dWet;';
+      'kc=lf2>max(ms,fl)?lcol:ms>fl?vec3(0.1,0.17,0.045):vec3(0.11,0.115,0.08);kr=0.25;' +
+        ''
+    };
+    /* Sichtweite je Zone: Feinheiten sind darüber hinaus nicht mehr erkennbar; der Shader blendet zwischen 75 % und 100 % weich aus,
+       drawSet schaltet jenseits davon auf das Programm ohne Schmutzschicht (kein sichtbarer Wechsel) */
+    function dzR(z) { return z.range || (z.type === 'laub' ? 30 : z.type === 'staub' ? 9 : 4); }
+    function gf(v) { var t = (+v).toFixed(4); return t.indexOf('.') < 0 ? t + '.0' : t; }
+    function gv(a) { return 'vec' + a.length + '(' + a.map(gf).join(',') + ')'; }
+    function dirtSrc(zones, mask) {
+      var s = 'vec3 dCol=vec3(0.0);float dAmt=0.0,dR=0.0,dWet=0.0,dMt=0.0;vec2 wu=abs(N.y)>0.5?P.xz:(abs(N.x)>0.5?P.zy:P.xy);';
+      zones.forEach(function (z, i) {
+        if (!(mask & (1 << i))) return;
+        var mats = z.mat.filter(function (m) { return m >= 0; }).map(function (m) { return 'abs(vd.a-' + gf(m) + ')<0.5'; }).join('||') || 'true';
+        var ext = [0, 1, 2].map(function (k) { return z.box[1][k] - z.box[0][k]; });
+        s += '{float bw=dzv[' + i + '];vec3 q=P-' + gv(z.box[0]) + ',ext=' + gv(ext) + ',o=min(q,ext-q);float inb=smoothstep(-0.004,0.012,min(min(o.x,o.y),o.z))*(1.0-smoothstep(' + gf(dzR(z) * 0.75) + ',' + gf(dzR(z)) + ',dist));' +
+          'if(bw<0.999&&inb>0.0&&(' + mats + ')){vec4 Cw=' + gv(z.dir.concat([z.edge])) + ';float sdw=' + gf(z.seed) + ';' +
+          'float mn=min(0.0,Cw.x*ext.x)+min(0.0,Cw.y*ext.y)+min(0.0,Cw.z*ext.z),rg=abs(Cw.x*ext.x)+abs(Cw.y*ext.y)+abs(Cw.z*ext.z);' +
+          'vec2 su=wu+sdw*0.37;vec4 n1=dzn(su*1.6),n2=dzn(su*7.0+0.31);' +
+          'float sv=(dot(q,Cw.xyz)-mn)/max(rg,0.001)+(n1.g-0.5)*0.16;' +
+          'float fr=bw*(1.0+2.0*Cw.w+0.18)-Cw.w-0.09;float cl=1.0-smoothstep(fr-Cw.w,fr,sv);' +
+          'float act=step(0.001,bw)*(1.0-smoothstep(0.9,1.0,bw));float wt=max(exp(-pow((sv-fr)/(Cw.w*1.3),2.0)),cl*exp(-max(fr-sv,0.0)/0.16)*0.65)*act;' +
+          'float d=0.0;vec3 kc=vec3(0.0);float kr=0.0,km=0.0;' + DZTYPE[z.type] +
+          'd*=' + gf(z.strength) + '*inb*(1.0-cl);dCol+=kc*d;dAmt+=d;dR+=kr*d;dMt+=km*d;dWet=max(dWet,wt*inb);}}';
+      });
+      return s + 'if(dAmt>0.0001){vec3 Lr=vd.rgb/max(va,vec3(0.03));base=mix(base,(dCol/dAmt)*Lr*fac,clamp(dAmt,0.0,0.92));}base*=1.0-0.22*dWet;';
+    }
     /* kachelbare Rauschtextur 128² für die Schmutzschicht (eigene Erzeugung, fester Startwert): Wertrauschen mit 8/16/32 Zellen
        je Kachel in R/G/B, weisses Rauschen in A. Ohne Mipmaps (Zugriffe stehen in einer Schleife, keine Ableitungen nötig). */
     function mkNoise() {
@@ -2136,10 +2155,10 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
       gl.activeTexture(gl.TEXTURE0); return t;
     }
-    function FSM(der, lite) {
+    function FSM(der, lite, dirt) {
       return PH(der) + 'varying vec4 vd;varying vec4 vs;varying vec4 vu;varying vec4 vq;varying vec4 vp;varying vec4 vn;varying vec4 vl;varying vec3 va;' + (lite ? 'varying vec4 vf;' : '') +
         'uniform sampler2D t1;uniform sampler2D t2;uniform sampler2D lut;uniform samplerCube pr;uniform sampler2D mr;' +
-        'uniform float sw;uniform float expo;uniform vec3 eye;uniform vec4 clip;uniform float mode;uniform float hasPr;uniform vec3 prC;uniform vec3 prA;uniform vec3 prB;uniform vec4 mrv;' + skyf('day') + TMF + DIRTF +
+        'uniform float sw;uniform float expo;uniform vec3 eye;uniform vec4 clip;uniform float mode;uniform float hasPr;uniform vec3 prC;uniform vec3 prA;uniform vec3 prB;uniform vec4 mrv;' + skyf('day') + TMF + (dirt ? DIRTF : '') +
         'void main(){if(dot(vec4(vp.xyz,1.0),clip)<0.0)discard;' +
         'vec4 a=texture2D(t1,vu.xy),b=texture2D(t2,vu.xy);vec4 c4=vec4(vu.z);vec4 m1=1.0-step(0.5,abs(c4-vec4(0.0,1.0,2.0,3.0))),m2=1.0-step(0.5,abs(c4-vec4(4.0,5.0,6.0,7.0)));' +
         'float tv=dot(a,m1)+dot(b,m2)+0.5*(1.0-dot(m1+m2,vec4(1.0)));float fac=1.0+(tv*2.0-1.0)*vu.w;' +
@@ -2156,7 +2175,7 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
         'vec3 Ld,Lc;float ar;if(vp.w<0.5){vec3 l=vl.xyz-P;float d=max(length(l),0.001);Ld=l/d;float q=clamp(1.0-d/max(vn.w,0.01),0.0,1.0);Lc=((P.x>3.0&&P.x<5.45&&P.z>-1.0&&P.z<2.4)?vec3(1.0,0.9,0.8):vec3(1.0,0.74,0.5))*vl.w*q*q;ar=0.05/(d+0.25);}' +
         'else{Ld=normalize(mix(vec3(-0.857,0.302,0.423),vec3(0.35,0.85,0.4),day));Lc=mix(vec3(0.42,0.24,0.12),vec3(0.3,0.31,0.33),day);ar=mix(0.45,0.9,day);}' +
         'float ndl0=max(dot(N,Ld),0.0),ndl=max(dot(Nb,Ld),0.0);float bs=clamp((ndl+0.3)/(ndl0+0.3),0.75,1.25);' +
-        'vec3 base=vd.rgb*fac*(1.0-gr)*bs;' + DIRTM + 'vec3 col=base;' +
+        'vec3 base=vd.rgb*fac*(1.0-gr)*bs;' + (dirt ? dirtSrc(DZ, dirt) : DIRT0) + 'vec3 col=base;' +
         /* sehr raue, nichtmetallische Flächen (Putz, Anstrich, Rasen, Textil: Rauheit > 0,76) haben keinen sichtbaren Glanz – Rechnung entfällt */
         'if(abs(mode-1.0)>0.5&&(mp.g>0.004||dWet>0.05)&&(mp.r<0.76||mp.b>0.5||dWet>0.05)){float r=clamp(max(mp.r,0.05)+dR-dWet*0.45,0.05,1.0),mt=mp.b*(1.0-clamp(dMt,0.0,1.0)),al=r*r,a2=clamp(al+ar,0.0,1.0);vec3 F0=mix(vec3(max(mp.g,0.02*dWet)),clamp(va,0.0,1.0),mt);' +
         'vec3 H=normalize(Ld+V);float nh=max(dot(Nb,H),0.0),nv=max(dot(Nb,V),0.001);float sp=2.0/max(a2*a2,0.0004)-2.0;float D=min((sp+8.0)*0.0398*pow(nh,sp),40.0);' +
@@ -2385,20 +2404,35 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
     /* Reinigungsstand je Zone: aus dem tatsächlichen Kamerafortschritt (smoothstep über z.p) – vorwärts und rückwärts gleich.
        Ein manueller Vergleich (Vorher/Nachher/Regler) gilt nur für die Zonen seiner Station und endet beim Stationswechsel. */
     var NZ = null;
-    var DZT = { kalk: 1, wasser: 2, staub: 3, laub: 4 }, DZ = ((C.cleaning && C.cleaning.zones) || []).slice(0, 6), dzOv = null;
-    var DZU = { A: new Float32Array(24), B: new Float32Array(24), C: new Float32Array(24), D: new Float32Array(24) };
+    var DZ = ((C.cleaning && C.cleaning.zones) || []).slice(0, 6), dzOv = null, DZV = new Float32Array(6), PMDV = {};
     function dzClean(z, q) {
       if (dzOv && dzOv.st === z.st) return dzOv.v;
       if (dzDemo && dzDemo[z.st] !== undefined) return dzDemo[z.st];
       var a = z.p[0], b = z.p[1], t = Math.max(0, Math.min(1, (q - a) / (b - a))); return t * t * (3 - 2 * t);
     }
-    function dzFill(q) {
-      for (var i = 0; i < 6; i++) {
-        var z = DZ[i], o = i * 4;
-        if (!z) { DZU.A[o + 3] = 0; continue; }
-        DZU.A.set([z.box[0][0], z.box[0][1], z.box[0][2], DZT[z.type] || 0], o); DZU.B.set([z.box[1][0], z.box[1][1], z.box[1][2], dzClean(z, q)], o);
-        DZU.C.set([z.dir[0], z.dir[1], z.dir[2], z.edge], o); DZU.D.set([z.mat[0], z.mat[1], z.strength, z.seed], o);
-      }
+    function dzFill(q) { for (var i = 0; i < 6; i++) DZV[i] = DZ[i] ? dzClean(DZ[i], q) : 1; }
+    /* sichtbare, nicht ganz saubere Zone im Bildausschnitt F? Sonst zeichnet drawSet ohne Schmutzschicht (schneller) */
+    function dzDist(e, b) { var x = Math.max(b[0][0] - e[0], 0, e[0] - b[1][0]), y = Math.max(b[0][1] - e[1], 0, e[1] - b[1][1]), z = Math.max(b[0][2] - e[2], 0, e[2] - b[1][2]); return Math.sqrt(x * x + y * y + z * z); }
+    /* Programmvariante je Satz naher, nicht sauberer Zonen (Bitmaske): Zonen ausser Sichtweite kosten nichts. Im Bildausschnitt muss
+       mindestens eine davon liegen, sonst ohne Schmutzschicht. Auf GPUs werden die Varianten entlang Route und Demo im Leerlauf vorab
+       übersetzt (dzWarm), in der Software-Grafik erst bei Bedarf. */
+    function dzKey(e, vs) { var k = 0; for (var i = 0; i < DZ.length; i++) if (vs[i] < 0.999 && dzDist(e, DZ[i].box) < dzR(DZ[i])) k |= 1 << i; return k; }
+    function dzProg(F, e) {
+      var k = dzKey(e, DZV), vis = false; if (!k) return PMN;
+      for (var i = 0; i < DZ.length && !vis; i++) if ((k & (1 << i)) && boxIn(F, DZ[i].box[0], DZ[i].box[1])) vis = true;
+      if (!vis) return PMN;
+      if (!PMDV[k]) { try { PMDV[k] = progM(k); } catch (er) { if (win.console) win.console.warn('ImmoReady-Rundgang: Schmutzschicht nicht verfügbar', er && er.message); PMDV[k] = PMN; } }
+      return PMDV[k];
+    }
+    function progM(dirt) { return EXT.sw === true ? prog(VSML, FSM(false, true, dirt)) : prog(VSM, FSM(EXT.der, false, dirt)); }
+    var warmId = 0;
+    function dzWarm() {
+      if (!DZ.length || EXT.sw) return; var keys = {}, vs = new Float32Array(6), i, j;
+      for (i = 0; i <= 200; i++) { var q = i / 200; for (j = 0; j < DZ.length; j++) vs[j] = dzClean(DZ[j], q); keys[dzKey(camAt(q).e, vs)] = 1; }
+      if (DM) for (i = 0; i < DM.duration * 4; i++) { var d = demoAt(i / 4); for (j = 0; j < DZ.length; j++) vs[j] = d.clean[DZ[j].st] !== undefined ? d.clean[DZ[j].st] : dzClean(DZ[j], d.q); keys[dzKey((d.cam || camAt(d.q)).e, vs)] = 1; }
+      var list = Object.keys(keys).map(Number).filter(function (k) { return k && !PMDV[k]; });
+      (function next() { warmId = 0; if (!gl || !running || !list.length) return; var k = list.shift(); try { PMDV[k] = progM(k); } catch (er) { PMDV[k] = PMN; }
+        warmId = win.requestIdleCallback ? win.requestIdleCallback(next, { timeout: 2000 }) : win.setTimeout(next, 120); })();
     }
     /* Lichtfassungen: «tag» (Standard, weiches Tageslicht für den Materialvergleich) und «nacht» (Dämmerung als zweite Gestaltung).
        Der Aufbau rechnet die Startfassung; die andere entsteht einmalig beim ersten Umschalten und wird in die vorhandenen Puffer geladen. */
@@ -2431,7 +2465,8 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
     }
     function dayU(pg) { var a = U(pg, 'day'), b = U(pg, 'dayv'); if (a) gl.uniform1f(a, DAY); if (b) gl.uniform1f(b, DAY); }
     function drawSet(o, Mx, e, mdl, expo, ein, x) {
-      x = x || {}; var mode = x.mode || 0, pb = mode === 1 ? null : curProbe;
+      x = x || {}; var mode = x.mode || 0, pb = mode === 1 ? null : curProbe, F = frustumOf(Mx), PM = PMN;
+      if (DZ.length) PM = dzProg(F, e);
       gl.useProgram(PM); dayU(PM); attr(PM, 'p', o.p, 3); attr(PM, 'n', o.n, 3); attr(PM, 'c', o.c, 3); attr(PM, 'em', o.em, 2); attr(PM, 'lt', o.lt, 3); attr(PM, 'lt2', o.lt2, 3); attr(PM, 'sl', o.sl, 4); attr(PM, 'sc', o.sc, 3);
       gl.uniformMatrix4fv(U(PM, 'm'), false, Mx); gl.uniformMatrix4fv(U(PM, 'mdl'), false, mdl); gl.uniform3fv(U(PM, 'eye'), e); gl.uniform1f(U(PM, 'sw'), sweep); gl.uniform1f(U(PM, 'expo'), expo); gl.uniform1f(U(PM, 'ein'), ein);
       gl.uniform1f(U(PM, 'lm'), x.lm !== undefined ? x.lm : (o.LM ? o.LM(ps) : 0)); gl.uniform1f(U(PM, 'mode'), mode); gl.uniform4fv(U(PM, 'clip'), x.clip || NOCLIP);
@@ -2440,9 +2475,9 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
       gl.uniform1f(U(PM, 'hasPr'), pb && pb.tex ? 1 : 0); if (pb) { gl.uniform3fv(U(PM, 'prC'), pb.c); gl.uniform3fv(U(PM, 'prA'), pb.a); gl.uniform3fv(U(PM, 'prB'), pb.b); }
       gl.uniform4f(U(PM, 'mrv'), 1 / canvas.width, 1 / canvas.height, mode === 0 && mirOn ? 1 : 0, 0);
       gl.uniform1i(U(PM, 'nz'), 6); gl.activeTexture(gl.TEXTURE6); gl.bindTexture(gl.TEXTURE_2D, NZ); gl.activeTexture(gl.TEXTURE0);
-      gl.uniform4fv(U(PM, 'dzA[0]'), DZU.A); gl.uniform4fv(U(PM, 'dzB[0]'), DZU.B); gl.uniform4fv(U(PM, 'dzC[0]'), DZU.C); gl.uniform4fv(U(PM, 'dzD[0]'), DZU.D);
+      if (PM !== PMN) gl.uniform1fv(U(PM, 'dzv[0]'), DZV);
       gl.disable(gl.BLEND); gl.depthMask(true);
-      if (o.ranges && !win.IR_NO_CULL) { var F = frustumOf(Mx), st0 = -1, en = -1;
+      if (o.ranges && !win.IR_NO_CULL) { var st0 = -1, en = -1;
         for (var r = 0; r < o.ranges.length; r++) { var R = o.ranges[r]; if (!boxIn(F, R.mn, R.mx)) continue; cullStats.drawn += R.n;
           if (R.s === en) en += R.n; else { if (st0 >= 0) gl.drawArrays(gl.TRIANGLES, st0, en - st0); st0 = R.s; en = R.s + R.n; } }
         if (st0 >= 0) gl.drawArrays(gl.TRIANGLES, st0, en - st0); cullStats.total += o.nm;
@@ -2713,7 +2748,7 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
         EXT.sw = /swiftshader|llvmpipe|softpipe|software|basic render/i.test(rn);
         if (EXT.sw && !win.IR_FORCE_HQ) { EXT.an = null; EXT.anMax = 1; if (!rsLock) rs = 0.5; } else EXT.sw = EXT.sw ? 'hq' : false;
         var ca = gl.getContextAttributes(); A2C = !!(ca && ca.antialias) && (gl.getParameter(gl.SAMPLES) || 0) > 1;
-        PM = EXT.sw === true ? prog(VSML, FSM(false, true)) : prog(VSM, FSM(EXT.der, false)); PL = prog(VSL, FSL); PS = prog(VSS, FSS); PG = prog(VSG, FSG); PF = prog(VSF, FSF(EXT.der, A2C)); PH_ = prog(VSH, FSH); PT = prog(VST, FST);
+        PMN = progM(false); PMDV = {}; PL = prog(VSL, FSL); PS = prog(VSS, FSS); PG = prog(VSG, FSG); PF = prog(VSF, FSF(EXT.der, A2C)); PH_ = prog(VSH, FSH); PT = prog(VST, FST);
         NATTR = Math.min(8, gl.getParameter(gl.MAX_VERTEX_ATTRIBS) || 8);
         TX.n1 = mkTex(1, new Uint8Array([128, 128, 128, 128]));
       } catch (e) { if (win.console) win.console.warn('ImmoReady-Rundgang:', e && e.message); return 'WEBGL_INIT_FAILED'; }
@@ -2757,7 +2792,7 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
         } catch (e) {}
       }
       probeFB = probeRB = null; probeN = 0; PROBES.forEach(function (pb) { pb.tex = null; }); MIR.fb = MIR.rb = MIR.tex = null; MIR.w = MIR.h = 0; LUT = CUBE0 = TEX0 = NZ = null; curProbe = null;
-      buffers = []; shaders = []; textures = []; progs = []; sets = []; extra = null; gl = null; PM = PL = PS = PG = PF = PH_ = PT = null; TX.t1 = TX.t2 = TX.lb = TX.n1 = null; ready = false; root.classList.remove('jr-ready');
+      buffers = []; shaders = []; textures = []; progs = []; sets = []; extra = null; gl = null; PMN = PL = PS = PG = PF = PH_ = PT = null; PMDV = {}; if (warmId) { if (win.cancelIdleCallback) win.cancelIdleCallback(warmId); win.clearTimeout(warmId); warmId = 0; } TX.t1 = TX.t2 = TX.lb = TX.n1 = null; ready = false; root.classList.remove('jr-ready');
       if (scan.state !== 'done') { scan.state = 'done'; sweep = 1e4; }
     }
 
@@ -2906,7 +2941,7 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
       if (mode === 'live') { p = Math.max(0, Math.min(1, scrollProg())); ui(p); } else p = ST[cur].hold;
       var err = initGL();
       if (err) { stopGL(); if (inline3d) end3d(); setStatic(); emit('tour-error', { code: err, fallback: 'stills' }); ready_('stills'); return; }
-      ps = p; ui(p); setDaylight(DAY); demoUi();
+      ps = p; ui(p); setDaylight(DAY); demoUi(); dzWarm();
       if (inline3d) { perf = []; root.classList.remove('jr-3d-wait'); set3dBtn(true); }
       ready_('webgl');
     }
@@ -3081,7 +3116,7 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
       },
       lightW: function (q, n, m) { return lightW(q, n, m); },
       roomOf: function (q) { return roomOf(q); },
-      state: function () { return { frames: drawCount, p: p, ps: ps, ready: ready, running: running, mode: mode, destroyed: destroyed, listeners: disposers.length, expo: expoCur, wind: !!windTimer || (running && windOn(win.performance.now())), scan: { state: scan.state, start: scan.start, end: scan.end, count: scan.count }, hi: hiNow, pulseLast: pulse.last, canvas: canvas ? [canvas.width, canvas.height] : null, css: [w, h], inline3d: inline3d, dpr: dpr, rs: rs, pxCap: pxCap, source: demo ? 'demo' : mode === 'live' ? 'scroll' : mode === 'button' ? 'stations' : 'stills', raf: !!raf }; }
+      state: function () { return { frames: drawCount, p: p, ps: ps, ready: ready, running: running, mode: mode, destroyed: destroyed, listeners: disposers.length, expo: expoCur, wind: !!windTimer || (running && windOn(win.performance.now())), scan: { state: scan.state, start: scan.start, end: scan.end, count: scan.count }, hi: hiNow, pulseLast: pulse.last, canvas: canvas ? [canvas.width, canvas.height] : null, css: [w, h], inline3d: inline3d, dpr: dpr, rs: rs, pxCap: pxCap, source: demo ? 'demo' : mode === 'live' ? 'scroll' : mode === 'button' ? 'stations' : 'stills', raf: !!raf, cam: camNow(ps).e.map(function (v) { return +v.toFixed(3); }) }; }
     };
   }
 

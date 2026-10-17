@@ -474,7 +474,7 @@ def tour_markup(d, still_src, inline_arrow=False, page=True, vorher_src=None):
             for n, alt in [(s['still'], s['stillAlt'])] + [(dt['still'], dt['stillAlt']) for dt in s.get('details', [])]:
                 l, pt = vorher_src(n, False), vorher_src(n, True)
                 if l:
-                    out.append('<picture class="jr-pic"><source media="(max-width:700px)" srcset="%s"><img class="jr-still jr-still-v" data-v="%s" src="%s" alt="Illustrative Visualisierung, Zustand vorher: %s – kein Referenzobjekt" width="1440" height="900" decoding="async" loading="lazy"></picture>'
+                    out.append('<picture class="jr-pic"><source media="(max-width:700px)" srcset="%s"><img class="jr-still jr-still-v" data-v="%s" src="%s" alt="Illustrative Visualisierung: %s, Zustand vorher – kein Referenzobjekt" width="1440" height="900" decoding="async" loading="lazy"></picture>'
                                % (pt or l, _e(n), l, _e(alt)))
     out.append('<canvas class="jr-canvas" aria-hidden="true"></canvas>')
     # V17: Beschriftung nur als Attribut (CSS attr()) – kein loser Text im Dokument, falls Stile fehlen oder Text extrahiert wird;
