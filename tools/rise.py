@@ -100,6 +100,54 @@ def validate(d):
         errors.append('Hauswartung muss die wichtigste Leistung bleiben (Priorität 1)')
     errors += _company_rules(d)
     errors += _photo_career_rules(d)
+    errors += _demo_rules(t)
+    return errors
+
+
+def _demo_rules(t):
+    """Realismus-Auftrag: Reinigungszonen und Demo-Rundlauf (lückenloser Zeitplan, Naht an beiden Enden, Reinigung nur im Halt)."""
+    errors = []
+    keys = [s['key'] for s in t['stations']]
+    zones = (t.get('cleaning') or {}).get('zones', [])
+    if len(zones) > 6:
+        errors.append('Reinigung: höchstens 6 Zonen (Shader-Grenze)')
+    for z in zones:
+        if z.get('st') not in keys:
+            errors.append('Reinigungszone %s: unbekannte Station' % z.get('id'))
+        if z.get('type') not in ('kalk', 'wasser', 'staub', 'laub'):
+            errors.append('Reinigungszone %s: Art muss kalk|wasser|staub|laub sein' % z.get('id'))
+        lo, hi = z.get('box', [[0, 0, 0], [0, 0, 0]])
+        if not all(a < b for a, b in zip(lo, hi)):
+            errors.append('Reinigungszone %s: Box nicht aufsteigend' % z.get('id'))
+        if not (0 <= z['p'][0] < z['p'][1] <= 1):
+            errors.append('Reinigungszone %s: Fortschrittsbereich ungültig' % z.get('id'))
+    if t.get('light', 'tag') not in ('tag', 'nacht'):
+        errors.append('tour.light muss tag oder nacht sein')
+    dm = t.get('demo')
+    if not dm:
+        return errors
+    T, sg = dm['duration'], dm['segments']
+    if not 30 <= T <= 90:
+        errors.append('Demo: Dauer %s s ausserhalb 30–90 s' % T)
+    if sg[0]['t'][0] != 0 or abs(sg[-1]['t'][1] - T) > 1e-9:
+        errors.append('Demo: Zeitplan muss bei 0 beginnen und bei der Dauer enden')
+    for a, b in zip(sg, sg[1:]):
+        if abs(a['t'][1] - b['t'][0]) > 1e-9:
+            errors.append('Demo: Lücke/Überlappung bei %s s' % a['t'][1])
+    if sg[0].get('seam') != 'out' or sg[-1].get('seam') != 'in' or any(s.get('seam') for s in sg[1:-1]):
+        errors.append('Demo: Naht nur am Anfang (out) und am Ende (in)')
+    mid = sg[1:-1]
+    if mid and (mid[0]['p'][0] != 0 or mid[-1]['p'][1] != 1):
+        errors.append('Demo: Fahrt muss bei p 0 beginnen und bei p 1 enden (Anschluss an die Naht)')
+    for a, b in zip(mid, mid[1:]):
+        if abs(a['p'][1] - b['p'][0]) > 1e-9:
+            errors.append('Demo: Fortschritt springt bei %s s' % a['t'][1])
+    zst = {z['st'] for z in zones}
+    for k, w in (dm.get('clean') or {}).items():
+        if k not in zst:
+            errors.append('Demo: Reinigung für %s ohne Zone' % k)
+        if not sg[0]['t'][1] <= w[0] < w[1] <= sg[-1]['t'][0]:
+            errors.append('Demo: Reinigungsfenster %s muss zwischen den Nahtabschnitten liegen (Rücksprung nur verdeckt)' % k)
     return errors
 
 
@@ -331,6 +379,8 @@ def tour_config(d):
         'doors': {x['id']: dict({'open': x['open'], 'close': x['close']}, **({'angle': x['angleRad']} if 'angleRad' in x else {'slide': x['slideM']})) for x in t['doors']},
         'highlights': {x['id']: {'in': x['in'], 'out': x['out']} for x in t['highlights']},
         'smoothing': t['smoothing'],
+        'light': t.get('light', 'tag'),
+        'demo': t.get('demo'),
         'cleaning': {'zones': [{k: z[k] for k in ('id', 'st', 'type', 'label', 'box', 'dir', 'edge', 'mat', 'strength', 'seed', 'p')} for z in t.get('cleaning', {}).get('zones', [])]},
         'routeClearance': t['routeClearance'],
         'wind': {'idleMs': t['wind']['idleMs'], 'maxFps': t['wind']['maxFps']},
@@ -480,10 +530,10 @@ def tour_markup(d, still_src, inline_arrow=False, page=True, vorher_src=None):
     out.append('<nav class="jr-nav" aria-label="Stationen des Rundgangs"><ol>%s</ol><div class="jr-bar" aria-hidden="true"><i></i></div></nav>' % nav)
     if page:
         out.append('<p class="jr-3d-note" role="status" hidden></p>')
-        out.append('<div class="jr-skip"><button type="button" class="jr-3d-btn" data-3d hidden aria-pressed="false"><span>3D-Ansicht starten</span></button><a href="#ablauf" class="jr-skip-a">Tour überspringen %s</a><a href="#offerte" class="jr-skip-o">Offerte anfragen</a></div>' % a)
+        out.append('<div class="jr-skip"><div class="jr-demo" role="group" aria-label="Demo-Rundlauf"><button type="button" class="jr-db" data-demo="toggle" aria-pressed="false"><span>Demo-Rundlauf starten</span></button><button type="button" class="jr-db" data-demo="stop" hidden>Beenden</button></div><div class="jr-light" role="group" aria-label="Licht der Visualisierung"><button type="button" class="jr-lb" data-light="tag" aria-pressed="true">Tageslicht</button><button type="button" class="jr-lb" data-light="nacht" aria-pressed="false">Dämmerung</button></div><button type="button" class="jr-3d-btn" data-3d hidden aria-pressed="false"><span>3D-Ansicht starten</span></button><a href="#ablauf" class="jr-skip-a">Tour überspringen %s</a><a href="#offerte" class="jr-skip-o">Offerte anfragen</a></div>' % a)
     else:
         out.append('<p class="jr-3d-note" role="status" hidden></p>')
-        out.append('<div class="jr-skip"><button type="button" class="jr-3d-btn" data-3d hidden aria-pressed="false"><span>3D-Ansicht starten</span></button><button type="button" class="jr-skip-a" data-skip>Tour überspringen %s</button><a href="#offerte" class="jr-skip-o">Offerte anfragen</a></div>' % a)
+        out.append('<div class="jr-skip"><div class="jr-demo" role="group" aria-label="Demo-Rundlauf"><button type="button" class="jr-db" data-demo="toggle" aria-pressed="false"><span>Demo-Rundlauf starten</span></button><button type="button" class="jr-db" data-demo="stop" hidden>Beenden</button></div><div class="jr-light" role="group" aria-label="Licht der Visualisierung"><button type="button" class="jr-lb" data-light="tag" aria-pressed="true">Tageslicht</button><button type="button" class="jr-lb" data-light="nacht" aria-pressed="false">Dämmerung</button></div><button type="button" class="jr-3d-btn" data-3d hidden aria-pressed="false"><span>3D-Ansicht starten</span></button><button type="button" class="jr-skip-a" data-skip>Tour überspringen %s</button><a href="#offerte" class="jr-skip-o">Offerte anfragen</a></div>' % a)
     out.append('<div class="jr-steps" role="group" aria-label="Rundgang steuern"><button type="button" class="jr-stepb" data-step="-1" aria-label="Vorherige Station">← Zurück</button><button type="button" class="jr-stepb" data-step="1" aria-label="Nächste Station">Weiter →</button></div>')
     out.append('</div></div></section>')
     if page:

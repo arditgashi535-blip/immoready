@@ -280,6 +280,27 @@
         "stillAlt": "Wohnblock in der Gesamtansicht am Abend"
       }
     ],
+    "light": "tag",
+    "_light": "Lichtfassung beim Start: tag (weiches, neutrales Tageslicht für Materialvergleich und Vorher/Nachher) oder nacht (Dämmerung). Umschaltbar im Rundgang.",
+    "demo": {
+      "_note": "Ausdrücklich gestarteter Demo-Rundlauf (≈ 48 s, Gestaltungsdauer, kein Messwert). Abschnitte: Zeit [s] → Fortschritt p (eingeschwungen) bzw. Naht an der strassenseitigen Hecke. clean: Station → Zeitfenster der sichtbaren Reinigung. Vor dem Fenster schmutzig, danach sauber; der Rücksprung auf schmutzig geschieht nur hinter der Hecke (Bild vollständig verdeckt).",
+      "duration": 48,
+      "seam": {"e": [10.8, 0.92, 19.72], "t": [10.8, 0.86, 18.6], "f": 0.9, "via": [[10.8, 1.8, 24.0], [24.0, 10.0, 40.0]]},
+      "segments": [
+        {"t": [0, 6], "seam": "out"},
+        {"t": [6, 10], "p": [0.0, 0.235]},
+        {"t": [10, 14], "p": [0.235, 0.235]},
+        {"t": [14, 19], "p": [0.235, 0.405]},
+        {"t": [19, 22], "p": [0.405, 0.44]},
+        {"t": [22, 25], "p": [0.44, 0.59]},
+        {"t": [25, 30], "p": [0.59, 0.59]},
+        {"t": [30, 33], "p": [0.59, 0.752]},
+        {"t": [33, 38.5], "p": [0.752, 0.752]},
+        {"t": [38.5, 45], "p": [0.752, 1.0]},
+        {"t": [45, 48], "seam": "in"}
+      ],
+      "clean": {"garten": [10.4, 13.6], "eingang": [18.6, 21.8], "wohnung": [25.4, 29.2], "bad": [33.4, 37.8]}
+    },
     "cleaning": {
       "_note": "Schmutz → sauber (Realismus-Auftrag). Je Zone: Box in Weltkoordinaten (m), Art kalk|wasser|staub|laub, Wischrichtung, Kantenbreite (Anteil), Materialnummern (−1 = keine), Stärke, fester Startwert, Fortschrittsbereich p, in dem die Reinigung geschieht (davor schmutzig, danach sauber). Grundsatz: jeder Stationshalt zeigt den Zustand «Nachher», «Vorher» ist über den Vergleich erreichbar. Illustration eines komprimierten Arbeitsablaufs, keine echte Bearbeitungsdauer und kein Kundenergebnis.",
       "zones": [
