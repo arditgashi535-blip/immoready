@@ -64,7 +64,10 @@ const PORTRAIT = {
         await p.screenshot({ path: pngV, clip: bb, timeout: 300000 });
         execFileSync('python3', ['-c', `from PIL import Image;im=Image.open(${JSON.stringify(pngV)}).convert('RGB');im=im.resize((${fmt.w},${fmt.h}),Image.LANCZOS) if im.size!=(${fmt.w},${fmt.h}) else im;im.save(${JSON.stringify(outV)},'WEBP',quality=82,method=6)`]);
         await p.evaluate(st => window.__JR.setClean(st, null), s.st);
-        console.log(outV.replace(ROOT + '/', ''), fs.statSync(outV).size, 'Bytes');
+        /* kein sichtbarer Unterschied (z. B. WC: keine Zone im Bild) → kein «Vorher»-Bild, der Vergleich wird dort ausgeblendet */
+        const share = +execFileSync('python3', ['-c', `from PIL import Image;import numpy as n;a=n.asarray(Image.open(${JSON.stringify(png)}).convert('RGB'),dtype=float);b=n.asarray(Image.open(${JSON.stringify(pngV)}).convert('RGB'),dtype=float);print((abs(a-b).sum(2)>30).mean())`]).toString();
+        if (share < 0.001) { fs.unlinkSync(outV); console.log(outV.replace(ROOT + '/', ''), 'verworfen: kein sichtbarer Unterschied (' + (share * 100).toFixed(3) + ' % der Bildpunkte)'); }
+        else console.log(outV.replace(ROOT + '/', ''), fs.statSync(outV).size, 'Bytes,', (share * 100).toFixed(2), '% der Bildpunkte verändert');
       }
     }
     await p.evaluate(() => window.__JR.setCamera(null));

@@ -1940,12 +1940,14 @@ var MARKUP="<section class=\"jr\" id=\"reise\" aria-labelledby=\"h-hero\" data-s
     }
 
     /* ---------- Modi: Standbilder, Stationen, Scroll ---------- */
-    function showStill(i) { cur = i; ui(ST[i].hold); root.querySelectorAll('.jr-still').forEach(function (im, j) { im.classList.toggle('on', j === i); }); root.querySelectorAll('.jr-det [data-det]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.detI === '-1')); }); }
+    function showStill(i) { cur = i; ui(ST[i].hold); root.querySelectorAll('.jr-still').forEach(function (im, j) { im.classList.toggle('on', j === i); }); root.querySelectorAll('.jr-det [data-det]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.detI === '-1')); }); if (mode === 'static') cmpAvail(); }
     function setStatic() { mode = 'static'; root.classList.add('jr-static'); root.classList.remove('jr-live', 'jr-button'); showStill(cur); cmpAvail(); }
     /* Bildmodus: Vergleich nur anbieten, wenn ein «Vorher»-Bild derselben Kamera vorliegt (Komponente ohne Vorher-Bilder: ausgeblendet) */
+    /* je gezeigtem Bild (Station oder Nahansicht): ohne sichtbaren Unterschied gibt es kein «Vorher»-Bild und keinen Vergleich */
     function cmpAvail() {
-      var base = root.querySelectorAll('.jr-still:not(.jr-still-det):not(.jr-still-v)');
-      root.querySelectorAll('.jr-st').forEach(function (el, i) { var g = el.querySelector('.jr-cmp'); if (!g) return; var n = base[i] && base[i].dataset.n; g.classList.toggle('jr-cmp-nov', !(n && root.querySelector('.jr-still-v[data-v="' + n + '"]'))); });
+      var on = root.querySelector('.jr-still.on:not(.jr-still-v)'), n = on && on.dataset.n, g = root.querySelectorAll('.jr-st')[cur];
+      root.querySelectorAll('.jr-cmp').forEach(function (x) { x.classList.remove('jr-cmp-nov'); });
+      g = g && g.querySelector('.jr-cmp'); if (g) g.classList.toggle('jr-cmp-nov', !(n && root.querySelector('.jr-still-v[data-v="' + n + '"]')));
     }
     /* Handy und niedrige Bildschirme: Bildmodus zuerst; «3D-Ansicht starten» startet dieselbe Szene im Stationsmodus
        (gleicher Fortschritt, gleiche Schleife, kein Festhalten beim Scrollen) innerhalb des Bildrahmens. Läuft sie auf dem
@@ -2003,7 +2005,7 @@ var MARKUP="<section class=\"jr\" id=\"reise\" aria-labelledby=\"h-hero\" data-s
       if (grp) grp.querySelectorAll('[data-det]').forEach(function (b) { b.setAttribute('aria-pressed', String(b === btn)); });
       if (mode === 'live') { var top = root.getBoundingClientRect().top + win.scrollY, span = root.offsetHeight - win.innerHeight; glide(q, C.smoothing.jumpTauMs); win.scrollTo({ top: Math.round(top + q * span), behavior: 'instant' }); }
       else if (mode === 'button') glide(q, RMQ.matches ? 1 : C.smoothing.stepsTauMs);
-      else root.querySelectorAll('.jr-still').forEach(function (im, j) { im.classList.toggle('on', k < 0 ? j === cur : im.dataset.detStill === String(k)); });
+      else { root.querySelectorAll('.jr-still-v').forEach(function (x) { x.classList.remove('on'); }); root.querySelectorAll('.jr-still').forEach(function (im, j) { im.classList.toggle('on', k < 0 ? j === cur : im.dataset.detStill === String(k)); }); cmpUi(null); cmpAvail(); }
     }
     function syncDet(q) {
       var best = null, bd = 0.012; root.querySelectorAll('.jr-st.on [data-det]').forEach(function (b) { var d = Math.abs(+b.dataset.det - q); if (d < bd) { bd = d; best = b; } });

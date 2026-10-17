@@ -63,6 +63,15 @@ gebacken, alle Stationsbilder neu). Handy/niedrige Bildschirme: Bilder zuerst, �
 Klasse `jr-3d`, Stationsmodus im Bildrahmen); Rückfall bei Bildzeit-Median > 60 ms (`TOO_SLOW`; Tests: `IR_PERF_MS`, `IR_NO_PERF_FALLBACK`).
 Letzte Station: «Tour erneut starten» (`goTo: 0`), keine automatische Wiederholung. Bericht `docs/reise/BERICHT-REISE.md`, Prüfung t27.
 
+**Realismus-Auftrag (17.10.2026):** Schmutz → sauber im Material-Shader (`DIRTF`/`DIRTM`, bis 6 Zonen aus `rise.json → tour.cleaning`:
+Box in Weltkoordinaten, Art kalk|wasser|staub|laub, Wischrichtung, fester Startwert, Fortschrittsbereich; Zustand nur aus `ps`, vorwärts =
+rückwärts; Rauschen aus kachelbarer Textur `mkNoise()`, Einheit 6; Schleife ohne `continue` wegen ANGLE/SwiftShader). Vergleich an der
+Station «Vorher · Nachher · Reinigungsfortschritt» mit Hinweis «kein Kundenergebnis» (`_cmp` in `tools/rise.py`, `compare()`), Bildmodus
+mit `<still>-vorher(-hoch).webp` (`render-stills.js`). Licht: Tageslicht Standard, Dämmerung umschaltbar (`tour.light`, `setDaylight`,
+`[data-light]`; t16 prüft die Dämmerung, t28 das Tageslicht). Demo-Rundlauf ≈ 48 s nur auf Knopfdruck (`tour.demo`, `demoAt/demoSeek`,
+`[data-demo]`, Naht vor der Hecke, Zeit nach Weg und Drehung, nicht bei «Bewegung reduzieren»). Aufnahme `npm run aufnahme:demo`,
+Belege `docs/realismus/` (STATUS.md, Collagen `python3 tools/realismus-collage.py`, Bilder `node tools/realismus-bilder.js`), Prüfung t28.
+
 **Einzige Quelle für Fakten und Tour: `rise.json`** (geprüft gegen `rise.schema.json` und die Regeln in
 `tools/rise.py`). Firmen-/Kontaktdaten, Leistungsschlüssel, Stationen und Texte, Kameraroute, Türen,
 Hervorhebung, Ereignisse und Wix-Regeln werden **nur dort** geändert, nie direkt im erzeugten Code.
@@ -307,7 +316,7 @@ Ausgaben in `dist/`:
 python3 tools/rise.py             # rise.json prüfen
 python3 build.py                  # baut dist/ (prüft rise.json zuerst)
 npm install && npx playwright install chromium
-npm test                          # Build, RISE, Velo (t15), t7 Seite, t9 Interaktionen, t11 Rundgang, t14 V13/V14, t16 V14, t17 V15, t18 V16, t19 V17, t20 V17.1, t21 Fertigstellung, t22 Handy, t23 GmbH/Startsperre, t24 Inhalte, t25 Premium, t26 Videos, t27 Reise
+npm test                          # Build, RISE, Velo (t15), t7 Seite, t9 Interaktionen, t11 Rundgang, t14 V13/V14, t16 V14, t17 V15, t18 V16, t19 V17, t20 V17.1, t21 Fertigstellung, t22 Handy, t23 GmbH/Startsperre, t24 Inhalte, t25 Premium, t26 Videos, t27 Reise, t28 Realismus
 npm run abnahme                   # 32 Abnahmebilder + Übersicht/Vergleich → docs/v171/
 npm run bake                      # Build → Licht vorab rechnen → Build (nach Geometrieänderungen Pflicht)
 npm run perf                      # Ladeleistung gedrosselt (Server: python3 -m http.server 8702)

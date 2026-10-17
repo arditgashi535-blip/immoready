@@ -3,7 +3,8 @@
 //    zwei Bilder bei gleicher Kamera identisch (kein Flimmern), Vorher/halb/Nachher sichtbar verschieden
 //  · Vergleich an der Station: «Vorher», «Nachher», Regler «Reinigungsfortschritt» (Maus und Tastatur), Hinweis «kein Kundenergebnis»,
 //    Stationswechsel stellt den Fortschrittszustand her; Bildmodus: «Vorher»-Bild derselben Kamera
-//  · Licht: Tageslicht beim Start, Dämmerung umschaltbar
+//  · Licht: Tageslicht beim Start, Dämmerung umschaltbar; im Tageslicht keine ausgebrannten Flächen, brauchbare Belichtung,
+//    weiche Anpassung beim Eintreten (Gegenstück zu den Dämmerungsprüfungen in t16)
 //  · Demo-Rundlauf: nur auf Knopfdruck, Start/Pause/Fortsetzen/Beenden, Naht hinter der Hecke ohne sichtbaren Sprung,
 //    Rücksprung «schmutzig» nur verdeckt, eigenes Scrollen oder Stationswahl beenden die Demo, eine Schleife, unsichtbar = Stillstand,
 //    nicht bei «Bewegung reduzieren», nach destroy() keine Bilder mehr
@@ -138,6 +139,24 @@ const nextFrame = async (p, f0) => p.waitForFunction(f => window.__JR.state().fr
     const de = await p.evaluate(async () => { window.__JR.destroy(); const f = window.__JR.state().frames; await new Promise(r => setTimeout(r, 1200)); const s = window.__JR.state(); return { f, f2: s.frames, run: s.running, d: s.destroyed, demo: window.__JR.demoState().on }; });
     ok(de.d && !de.run && !de.demo && de.f === de.f2, 'destroy() während der Demo: keine Schleife, keine Bilder mehr');
     await p.close();
+    /* 4b Tageslicht: keine ausgebrannten Flächen, brauchbare Belichtung, weiche Anpassung beim Eintreten (Gegenstück zu t16,
+       dort für die Dämmerung; im Tageslicht ist aussen heller als innen, die Belichtung steigt deshalb beim Eintreten) */
+    p = await b.newPage({ viewport: { width: 1440, height: 900 } });
+    await p.goto(url);
+    await p.evaluate(() => document.getElementById('reise').scrollIntoView({ block: 'start', behavior: 'instant' }));
+    await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 180000 });
+    const fsd = [];
+    for (const s of RT.stations) { await p.evaluate(q => window.__JR.jump(q), s.hold); await p.waitForTimeout(300); fsd.push([s.key, await p.evaluate(() => window.__JR.frameStats())]); }
+    ok(await p.evaluate(() => window.__JR.lightMode().light) === 'tag', 'Tageslicht aktiv');
+    ok(fsd.every(x => x[1].clipped < 0.01), 'Tageslicht: keine ausgebrannten Flächen (weisse Pixel je Station ' + fsd.map(x => x[0] + ' ' + (x[1].clipped * 100).toFixed(2) + ' %').join(', ') + ')');
+    ok(fsd.every(x => x[1].mean > 0.08 && x[1].mean < 0.75), 'Tageslicht: Belichtung je Station im brauchbaren Bereich (' + fsd.map(x => x[1].mean).join(', ') + ')');
+    const HH = await p.evaluate(() => { const r = document.getElementById('reise'); return [r.getBoundingClientRect().top + scrollY, r.offsetHeight - innerHeight]; });
+    await p.evaluate(q => window.__JR.jump(q), 0.3); await p.waitForTimeout(800);
+    const ed0 = await p.evaluate(() => window.__JR.state().expo);
+    await p.evaluate(y => scrollTo({ top: y, behavior: 'instant' }), Math.round(HH[0] + 0.44 * HH[1]));
+    const exd = []; for (let k = 0; k < 20; k++) { await p.waitForTimeout(200); exd.push(+(await p.evaluate(() => window.__JR.state().expo)).toFixed(3)); }
+    ok(new Set(exd).size >= 3 && exd[exd.length - 1] > ed0, 'Tageslicht: weiche Belichtungsanpassung beim Eintreten (' + ed0.toFixed(3) + ' → ' + exd.slice(0, 8).join(' → ') + ' …)');
+    await p.close();
     /* 5 Handy: Bildmodus mit «Vorher»-Bild, Demo im Handy-3D, unsichtbar = Stillstand */
     p = await b.newPage(mob); await p.addInitScript(() => { window.IR_NO_PERF_FALLBACK = true; }); await p.goto(url); await p.waitForTimeout(800);
     await p.evaluate(() => document.getElementById('reise').scrollIntoView({ block: 'start', behavior: 'instant' })); await p.waitForTimeout(400);
@@ -151,6 +170,13 @@ const nextFrame = async (p, f0) => p.waitForFunction(f => window.__JR.state().fr
     ok(await p.evaluate(n => !document.querySelector('#reise .jr-still-v.on') && document.querySelector('#reise .jr-still.on').dataset.n === n, RT.stations[1].still), '«Nachher» zeigt wieder das Stationsbild');
     await p.click('#reise .jr-st.on [data-cmp="0"]'); await p.evaluate(() => document.querySelectorAll('#reise .jr-nav button')[2].click()); await p.waitForTimeout(200);
     ok(await p.evaluate(() => !document.querySelector('#reise .jr-still-v.on')), 'Stationswechsel blendet das «Vorher»-Bild aus');
+    /* Bad: in der Übersicht und am WC ohne sichtbaren Unterschied → kein Vergleich; an der Nahansicht Waschtisch mit Vergleich */
+    await p.evaluate(() => document.querySelectorAll('#reise .jr-nav button')[4].click()); await p.waitForTimeout(200);
+    const vis = () => p.evaluate(() => { const g = document.querySelector('#reise .jr-st.on .jr-cmp'); return !!g && getComputedStyle(g).display !== 'none'; });
+    const bv0 = await vis();
+    await p.click('#reise .jr-st.on [data-det-i="0"]'); await p.waitForTimeout(200); const bv1 = await vis();
+    await p.click('#reise .jr-st.on [data-det-i="1"]'); await p.waitForTimeout(200); const bv2 = await vis();
+    ok(!bv0 && bv1 && !bv2, 'Bildmodus Bad: Vergleich nur, wo ein Unterschied sichtbar ist (Übersicht ' + bv0 + ', Waschtisch ' + bv1 + ', WC ' + bv2 + ')');
     await p.click('#reise [data-3d]');
     await p.waitForFunction(() => window.__JR.state().inline3d && window.__JR.state().ready, null, { timeout: 150000 }).catch(() => {});
     await p.waitForTimeout(500);

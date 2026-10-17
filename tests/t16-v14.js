@@ -41,6 +41,10 @@ const log = []; const ok = (c, m) => log.push((c ? 'PASS ' : 'FAIL ') + m);
     const dx = Math.max(Math.abs(pr[0][0] - pr[1][0]), Math.abs(pr[2][0] - pr[3][0]));
     ok(dx < 0.15, `Senkrechte Kanten bleiben senkrecht bei p=${q} (Abweichung ${dx.toFixed(3)} % der Bildbreite über 11 m Höhe)`);
   }
+  // Die folgenden Belichtungsprüfungen gelten der Dämmerungsfassung (V14: innen heller als aussen, Belichtung sinkt beim
+  // Eintreten). Seit dem Realismus-Auftrag startet der Rundgang im Tageslicht; dort kehrt sich das physikalisch um. Deshalb hier
+  // ausdrücklich «Dämmerung» (Grenzwerte unverändert); die Tageslicht-Gegenstücke prüft t28.
+  await p.evaluate(() => window.__JR.setDaylight(false));
   // keine ausgebrannten Flächen: Anteil voll gesättigter Pixel je Station
   const fs2 = [];
   for (const s of RISE.tour.stations) { await p.evaluate(q => window.__JR.jump(q), s.hold); await p.waitForTimeout(300); fs2.push([s.key, await p.evaluate(() => window.__JR.frameStats())]); }
