@@ -2,6 +2,7 @@
 //   Querformat 1440×900  → assets/tour/station-0N-<key>.webp      (Desktop-Fallback, Komponente)
 //   Hochformat  960×864 (10:9, V17; vorher 960×1080) → assets/tour/station-0N-<key>-hoch.webp (Smartphone ≤700 px)
 // Aufruf: python3 build.py && node tools/render-stills.js && python3 build.py
+// Realismus-Auftrag: Tageslicht (rise.json → tour.light) und je Station mit Reinigungszone ein «Vorher»-Bild <still>-vorher(-hoch).webp.
 // V14: alle zwölf Bilder stammen aus demselben Gebäudemodell und derselben Route wie der Rundgang (gleiches Licht, gleiche Texturen).
 // Hochformat: gleiche Kamerapositionen wie im Rundgang, Blickziel auf das Motiv zentriert
 // (im Querformat steht das Motiv rechts, links liegt der Text; im Hochformat steht der Text unter dem Bild).
@@ -34,7 +35,9 @@ const PORTRAIT = {
     await p.evaluate(() => { window.__JR.setScale(1, true); });
     /* Stationen und ihre Nahansichten (rise.json → details): gleiche Szene, gleiches Licht */
     const JOBS = [];
-    ST.forEach(s => { JOBS.push({ key: s.key, hold: s.hold, still: s.still }); (s.details || []).forEach(d => JOBS.push({ key: s.key + '-' + d.key, hold: d.q, still: d.still })); });
+    ST.forEach(s => { JOBS.push({ key: s.key, st: s.key, hold: s.hold, still: s.still }); (s.details || []).forEach(d => JOBS.push({ key: s.key + '-' + d.key, st: s.key, hold: d.q, still: d.still })); });
+    /* Realismus-Auftrag: für Stationen mit Reinigungszonen zusätzlich «Vorher» aus derselben Kamera (Zonen der Station schmutzig) */
+    const DIRTY = new Set(((cfg.tour.cleaning || {}).zones || []).map(z => z.st));
     for (let i = 0; i < JOBS.length; i++) {
       const s = JOBS[i];
       await p.evaluate(([q, cam]) => {
@@ -49,10 +52,20 @@ const PORTRAIT = {
       const png = path.join(TMP, `${s.still}${fmt.suffix}.png`);
       /* V17.1: Ausschnitt der Bühne statt Element-Screenshot (kein Warten auf «stabil» bei langsamer Software-Grafik) */
       const bb = await p.evaluate(() => { const r = document.querySelector('#reise .jr-stage').getBoundingClientRect(); return { x: r.left, y: r.top, width: r.width, height: r.height }; });
-      await p.screenshot({ path: png, clip: bb, timeout: 120000 });
+      await p.screenshot({ path: png, clip: bb, timeout: 300000 });
       const out = path.join(ROOT, 'assets/tour', `${s.still}${fmt.suffix}.webp`);
       execFileSync('python3', ['-c', `from PIL import Image;im=Image.open(${JSON.stringify(png)}).convert('RGB');im=im.resize((${fmt.w},${fmt.h}),Image.LANCZOS) if im.size!=(${fmt.w},${fmt.h}) else im;im.save(${JSON.stringify(out)},'WEBP',quality=82,method=6)`]);
       console.log(out.replace(ROOT + '/', ''), fs.statSync(out).size, 'Bytes');
+      if (DIRTY.has(s.st)) {
+        const f0 = await p.evaluate(st => { const n = window.__JR.state().frames; window.__JR.setClean(st, 0); return n; }, s.st);
+        await p.waitForFunction(n => window.__JR.state().frames > n, f0, { timeout: 120000 });
+        await p.waitForTimeout(1500);
+        const pngV = path.join(TMP, `${s.still}-vorher${fmt.suffix}.png`), outV = path.join(ROOT, 'assets/tour', `${s.still}-vorher${fmt.suffix}.webp`);
+        await p.screenshot({ path: pngV, clip: bb, timeout: 300000 });
+        execFileSync('python3', ['-c', `from PIL import Image;im=Image.open(${JSON.stringify(pngV)}).convert('RGB');im=im.resize((${fmt.w},${fmt.h}),Image.LANCZOS) if im.size!=(${fmt.w},${fmt.h}) else im;im.save(${JSON.stringify(outV)},'WEBP',quality=82,method=6)`]);
+        await p.evaluate(st => window.__JR.setClean(st, null), s.st);
+        console.log(outV.replace(ROOT + '/', ''), fs.statSync(outV).size, 'Bytes');
+      }
     }
     await p.evaluate(() => window.__JR.setCamera(null));
     await p.close();

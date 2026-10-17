@@ -137,8 +137,8 @@ def _demo_rules(t):
     if sg[0].get('seam') != 'out' or sg[-1].get('seam') != 'in' or any(s.get('seam') for s in sg[1:-1]):
         errors.append('Demo: Naht nur am Anfang (out) und am Ende (in)')
     mid = sg[1:-1]
-    if mid and (mid[0]['p'][0] != 0 or mid[-1]['p'][1] != 1):
-        errors.append('Demo: Fahrt muss bei p 0 beginnen und bei p 1 enden (Anschluss an die Naht)')
+    if mid and (mid[0]['p'][0] != 0 or not 0.85 <= mid[-1]['p'][1] <= 1):
+        errors.append('Demo: Fahrt muss bei p 0 beginnen (Anschluss an die Naht «out») und nach der Terrasse enden (p 0,85–1, Anschluss «in»)')
     for a, b in zip(mid, mid[1:]):
         if abs(a['p'][1] - b['p'][0]) > 1e-9:
             errors.append('Demo: Fortschritt springt bei %s s' % a['t'][1])

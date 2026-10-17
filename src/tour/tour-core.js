@@ -496,29 +496,41 @@
       'float d=0.0;vec3 kc=vec3(0.0);float kr=0.0,km=0.0;' +
       /* 1 Kalk: matter, grauweisser Belag, am Fuss und am Auslauf dichter */
       'if(A.w<1.5){float ft=exp(-q.y/0.018)+exp(-pow((q.x-ext.x)/0.025,2.0))*0.8;' +
-      'd=clamp(smoothstep(0.55,0.8,n2.g)*0.14+ft*smoothstep(0.3,0.62,n2.b),0.0,1.0);kc=vec3(0.80,0.79,0.75);kr=0.65;km=1.0;}' +
+      'd=clamp(smoothstep(0.62,0.88,n2.b)*0.22+ft*smoothstep(0.3,0.62,n2.b),0.0,1.0);kc=vec3(0.80,0.79,0.75);kr=0.65;km=1.0;}' +
       /* 2 Wasserränder und Spritzflecken auf Keramik */
       /* eingetrocknete Tropfenränder (1–2 cm) als einzelne Kreise in 4-cm-Zellen, gegen den Ablauf dichter, dazu ein matter Film */
       'else if(A.w<2.5){vec2 cg=wu*25.0+Dd.w;vec2 ci=floor(cg),cf=fract(cg);vec2 cc=vec2(dh3(vec3(ci,5.0)),dh3(vec3(ci,6.0)))*0.5+0.25;float cr=0.18+0.16*dh3(vec3(ci,7.0));' +
-      'vec2 dv=cf-cc;float dc=length(dv)*(1.0+(n2.r-0.5)*0.55)+(n2.b-0.5)*0.05;float rp=dh3(vec3(ci,8.0));' +
-      'float ring=step(0.58,rp)*(smoothstep(cr-0.06,cr-0.012,dc)-smoothstep(cr,cr+0.03,dc))*(0.25+0.75*smoothstep(0.3,0.75,n1.g))*(0.45+0.55*rp)' +
-      '+smoothstep(0.74,0.84,n2.g)*smoothstep(0.4,0.7,n1.b)*0.4;' +
-      'float dr=length((q.xz-ext.xz*0.5)/max(ext.xz*0.5,vec2(0.01)));float flm=(1.0-smoothstep(0.15,0.75,dr))*smoothstep(0.35,0.7,n1.r)*0.55;' +
-      'd=clamp(max(ring*0.85,flm),0.0,1.0);kc=vec3(0.70,0.69,0.65);kr=0.45;}' +
+      'vec2 dv=cf-cc;float dc=length(dv)*(1.0+(n2.r-0.5)*0.75)+(n2.b-0.5)*0.06;float rp=dh3(vec3(ci,8.0));' +
+      /* Runde 4: im Tageslicht auf weisser Keramik sichtbar, aber nicht grafisch – unterbrochene, verzogene Ränder, kleine runde
+         Tropfenpunkte, beides zum Ablauf hin dichter; matter Film beige-grau */
+      'float dr=length((q.xz-ext.xz*0.5)/max(ext.xz*0.5,vec2(0.01)));float nr=0.45+0.55*(1.0-smoothstep(0.1,0.95,dr));' +
+      'float ang=atan(dv.y,dv.x);float arc=smoothstep(0.25,0.7,0.5+0.5*sin(ang*2.0+rp*19.0)+(n1.g-0.5)*0.8);' +
+      'float ring=step(0.55,rp)*(smoothstep(cr-0.05,cr-0.014,dc)-smoothstep(cr,cr+0.022,dc))*arc*(0.45+0.55*rp)*nr;' +
+      'float dt=step(0.28,rp)*step(rp,0.55)*(1.0-smoothstep(cr*0.22,cr*0.42,dc))*0.6*nr;' +
+      'float flm=(1.0-smoothstep(0.15,0.8,dr))*smoothstep(0.3,0.7,n1.r)*0.45;' +
+      'd=clamp(max(max(ring,dt)*0.9,flm),0.0,1.0);kc=max(ring,dt)*0.9>flm?vec3(0.47,0.45,0.41):vec3(0.58,0.56,0.51);kr=0.45;}' +
       /* 3 Staub und Schuhspuren auf Böden */
       /* Staub sammelt sich an den Wandkanten, leichter Film in der Fläche; Schuhspuren als Gehspur (links/rechts im Schritt 34 cm)
          entlang der Wischrichtung, mit Sohlenprofil, zwei Spuren je Zone */
-      'else if(A.w<3.5){float wk=1.0-smoothstep(0.02,0.4,min(o.x,o.z));float du=(wk*0.75+0.22)*smoothstep(0.3,0.8,n1.r);' +
+      /* Runde 4: auch auf waagrechten Möbelflächen in der Zone (Tisch, Sitzflächen), Schuhspuren und Wandkanten nur am Boden */
+      'else if(A.w<3.5){float fl0=1.0-smoothstep(0.03,0.08,q.y);float wk=(1.0-smoothstep(0.02,0.4,min(o.x,o.z)))*fl0;float du=((wk*0.75+0.2+0.2*(1.0-fl0))*(0.62+0.38*n1.g)+smoothstep(0.55,0.95,n2.b)*0.18)*smoothstep(0.55,0.9,N.y);' +
       'vec2 ax=abs(Cw.x)>0.5?vec2(q.z-ext.z*0.5,q.x):vec2(q.x-ext.x*0.5,q.z);float pr=0.0;' +
       'for(int tk=0;tk<2;tk++){float off=tk==0?-0.35:0.5;float kz=floor(ax.y/0.34+float(tk)*0.5);float sd=mod(kz,2.0)<0.5?-1.0:1.0;' +
       'vec2 lc=vec2(ax.x-off-sd*0.11-(dh3(vec3(kz,float(tk),9.0))-0.5)*0.05,fract(ax.y/0.34+float(tk)*0.5)*0.34-0.17);' +
-      'float sole=smoothstep(1.0,0.82,length(lc*vec2(1.0/0.052,1.0/0.13)))*(0.55+0.45*step(0.5,fract(lc.y*55.0)));pr=max(pr,sole*step(0.25,dh3(vec3(kz,float(tk),11.0))));}' +
-      'd=clamp(max(du*0.6,pr*(0.5+0.5*n2.g)*0.85),0.0,1.0);kc=pr>du?vec3(0.13,0.12,0.11):vec3(0.24,0.22,0.2);kr=0.3;}' +
+      'float sole=smoothstep(1.0,0.82,length(lc*vec2(1.0/0.052,1.0/0.13)))*(0.55+0.45*step(0.5,fract(lc.y*55.0)));pr=max(pr,sole*step(0.25,dh3(vec3(kz,float(tk),11.0))));}pr*=fl0;' +
+      /* Runde 4: Staub wirkt auf dunklem Parkett hell und grau, auf hellen Platten dunkler (Farbe aus der Grundhelligkeit vd.rgb) */
+      'float al=smoothstep(0.12,0.42,dot(vd.rgb,vec3(0.3,0.59,0.11)));' +
+      'd=clamp(max(du*mix(0.85,0.6,al),pr*(0.5+0.5*n2.g)*0.85),0.0,1.0);kc=pr>du?mix(vec3(0.34,0.32,0.29),vec3(0.13,0.12,0.11),al):mix(vec3(0.46,0.44,0.41),vec3(0.24,0.22,0.2),al);kr=0.3;}' +
       /* 4 Laub, Moos an den Rändern und in Fugen */
-      'else{vec2 lg=P.xz*3.6+Dd.w;vec2 li=floor(lg),lf=fract(lg)-0.5;float lh=dh3(vec3(li,2.0));float lr=dh3(vec3(li,3.0))*6.283;vec2 lr2=vec2(cos(lr)*lf.x-sin(lr)*lf.y,sin(lr)*lf.x+cos(lr)*lf.y);' +
-      'float lf2=step(0.5,lh)*smoothstep(0.3,0.16,length(lr2*vec2(1.0,2.0)));float ed=smoothstep(0.5,0.8,abs(q.x-ext.x*0.5)/(ext.x*0.5));' +
-      'float ms=max(ed,gr*4.0)*smoothstep(0.42,0.7,n2.g);d=clamp(max(lf2,ms*0.85),0.0,1.0);' +
-      'kc=lf2>ms?mix(vec3(0.36,0.16,0.04),vec3(0.62,0.38,0.08),dh3(vec3(li,4.0))):vec3(0.12,0.2,0.05);kr=0.25;}' +
+      /* Runde 4: zwei Blattgrössen (≈ 6 und 3 cm), gehäuft in Wolken und zu den Rändern hin, gedämpfte Brauntöne (trocken bis nass),
+         spitz zulaufende Blattform; dazu ein grünlich-grauer Schmutzfilm in Wolken und Moos an den Rändern und in den Fugen */
+      'else{float ed=smoothstep(0.5,0.85,abs(q.x-ext.x*0.5)/(ext.x*0.5));float cw=smoothstep(0.3,0.78,n1.r)*0.7+ed*0.45;float lf2=0.0;vec3 lcol=vec3(0.0);' +
+      'for(int ly=0;ly<2;ly++){float sc=ly==0?3.2:6.5;vec2 lg=P.xz*sc+Dd.w+float(ly)*7.1;vec2 li=floor(lg),lf=fract(lg)-0.5;float lh=dh3(vec3(li,2.0+float(ly)));float lr=dh3(vec3(li,3.0+float(ly)))*6.283;' +
+      'lf+=(vec2(dh3(vec3(li,12.0)),dh3(vec3(li,13.0)))-0.5)*0.36;vec2 lr2=vec2(cos(lr)*lf.x-sin(lr)*lf.y,sin(lr)*lf.x+cos(lr)*lf.y);' +
+      'float sh=length(lr2*vec2(1.0,2.1))+abs(lr2.x)*0.35;float on=step(1.0-cw*0.75,lh)*smoothstep(0.31,0.2,sh);' +
+      'if(on>lf2){lf2=on;float tn=dh3(vec3(li,4.0+float(ly)));lcol=tn<0.45?mix(vec3(0.13,0.065,0.025),vec3(0.24,0.12,0.04),tn/0.45):mix(vec3(0.3,0.16,0.05),vec3(0.46,0.3,0.08),(tn-0.45)/0.55);}}' +
+      'float fl=smoothstep(0.42,0.8,dzn(su*0.35).r)*0.36;float ms=max(ed,gr*4.0)*smoothstep(0.42,0.7,n2.g);d=clamp(max(max(lf2,ms*0.85),fl),0.0,1.0);' +
+      'kc=lf2>max(ms,fl)?lcol:ms>fl?vec3(0.1,0.17,0.045):vec3(0.11,0.115,0.08);kr=0.25;}' +
       'd*=Dd.z*inb*(1.0-cl);dCol+=kc*d;dAmt+=d;dR+=kr*d;dMt+=km*d;dWet=max(dWet,wt*inb);}}' +
       'if(dAmt>0.0001){vec3 Lr=vd.rgb/max(va,vec3(0.03));base=mix(base,(dCol/dAmt)*Lr*fac,clamp(dAmt,0.0,0.92));}base*=1.0-0.22*dWet;';
     /* kachelbare Rauschtextur 128² für die Schmutzschicht (eigene Erzeugung, fester Startwert): Wertrauschen mit 8/16/32 Zellen
@@ -568,7 +580,7 @@
         'vec3 H=normalize(Ld+V);float nh=max(dot(Nb,H),0.0),nv=max(dot(Nb,V),0.001);float sp=2.0/max(a2*a2,0.0004)-2.0;float D=min((sp+8.0)*0.0398*pow(nh,sp),40.0);' +
         /* Metall: F0 = Grundfarbe (unbeleuchtet, linear) – Chrom neutral, Aluminium matter, keine Lichtfarbe im Reflex */
         'vec3 Fs=F0+(1.0-F0)*pow(1.0-max(dot(H,V),0.0),5.0);vec3 tint=vec3(1.0);' +
-        'vec3 spec=Lc*D*Fs*ndl*tint;vec3 R=reflect(-V,Nb);vec3 env;' +
+        'vec3 spec=Lc*D*Fs*ndl*tint*(1.0-clamp(dAmt,0.0,1.0)*0.8);vec3 R=reflect(-V,Nb);vec3 env;' +
         (lite ? '' : 'if(hasPr>0.5&&vp.w<0.5){vec3 f1=(prB-P)/R,f2=(prA-P)/R,ff=max(f1,f2);float t=min(min(ff.x,ff.y),ff.z);vec3 e=textureCube(pr,P+R*t-prC,r*7.0).rgb;env=e*e*1.25;}else ') +
         'if(vp.w<0.5)env=vec3(0.18,0.15,0.12);else env=sky(R)*(0.55+0.45*smoothstep(-0.25,0.05,R.y));' +
         'vec3 Fe=F0+(1.0-F0)*pow(1.0-nv,5.0)*(1.0-r)*(1.0-r);' +
@@ -966,25 +978,40 @@
        Die Zeit läuft nur, solange Bilder entstehen: ausserhalb des Sichtbereichs und im verdeckten Tab steht sie still. */
     var DM = C.demo || null, demo = null, demoCam = null, dzDemo = null, SEAM = null;
     function sm(u) { u = Math.max(0, Math.min(1, u)); return u * u * (3 - 2 * u); }
-    function seamCam(u) {
-      if (!SEAM) {
-        var o = camAt(0), sd = sub(DM.seam.t, DM.seam.e), od = sub(o.t, o.e), y0 = Math.atan2(sd[0], sd[2]), y1 = Math.atan2(od[0], od[2]);
+    /* Fahrprofil: 30 % anfahren, gleichmässig, 30 % abbremsen (Spitze 1,43 × Mittel statt 1,5 × bei smoothstep) */
+    function trap(u) { u = Math.max(0, Math.min(1, u)); var a = 0.3, v = 1 / (1 - a); return u < a ? 0.5 * v * u * u / a : u > 1 - a ? 1 - 0.5 * v * (1 - u) * (1 - u) / a : v * (u - a / 2); }
+    /* Fahrabschnitt nach Weg und Drehung gleichmässig: Tabelle Fortschritt → Anteil (1 rad Drehung zählt wie 4 m Weg),
+       sonst liefe die Kamera in langen Stützpunktabständen sehr schnell und drehte an Türen ruckartig */
+    var SEGT = {};
+    function segQ(a, b, u) {
+      var key = a + ':' + b, T = SEGT[key], n = 160;
+      if (!T) { T = [0]; var pc = camAt(a); for (var i = 1; i <= n; i++) { var c = camAt(a + (b - a) * i / n), dy = c.yaw - pc.yaw, dp = c.pitch - pc.pitch; T.push(T[i - 1] + Math.hypot(c.e[0] - pc.e[0], c.e[1] - pc.e[1], c.e[2] - pc.e[2]) + 4.0 * Math.hypot(dy * Math.cos(c.pitch), dp)); pc = c; } SEGT[key] = T; }
+      var L = T[n] * u, lo = 0, hi = n; if (!(T[n] > 0)) return a + (b - a) * u;
+      while (hi - lo > 1) { var m = (lo + hi) >> 1; if (T[m] < L) lo = m; else hi = m; }
+      var f = (L - T[lo]) / Math.max(1e-9, T[hi] - T[lo]); return a + (b - a) * (lo + f) / n;
+    }
+    /* Nahtweg: u = 0 an der Hecke, u = 1 am Anschluss an die Fahrt («out»: Anfang p 0 über via, «in»: Ende der Fahrt über viaIn) */
+    function seamCam(u, dir) {
+      if (!SEAM) SEAM = {};
+      if (!SEAM[dir]) {
+        var sg = DM.segments, pe = dir === 'in' ? sg[sg.length - 2].p[1] : sg[1].p[0];
+        var o = camAt(pe), sd = sub(DM.seam.t, DM.seam.e), od = sub(o.t, o.e), y0 = Math.atan2(sd[0], sd[2]), y1 = Math.atan2(od[0], od[2]);
         while (y1 - y0 > Math.PI) y1 -= 2 * Math.PI; while (y1 - y0 < -Math.PI) y1 += 2 * Math.PI;
-        SEAM = { P: [DM.seam.e].concat(DM.seam.via || [], [o.e]), y: [y0, y1], pt: [Math.atan2(sd[1], Math.hypot(sd[0], sd[2])), Math.atan2(od[1], Math.hypot(od[0], od[2]))], d: [Math.hypot(sd[0], sd[1], sd[2]), Math.hypot(od[0], od[1], od[2])], f: [DM.seam.f, o.f] };
+        SEAM[dir] = { pe: pe, P: [DM.seam.e].concat((dir === 'in' ? DM.seam.viaIn : DM.seam.via) || [], [o.e]), y: [y0, y1], pt: [Math.atan2(sd[1], Math.hypot(sd[0], sd[2])), Math.atan2(od[1], Math.hypot(od[0], od[2]))], d: [Math.hypot(sd[0], sd[1], sd[2]), Math.hypot(od[0], od[1], od[2])], f: [DM.seam.f, o.f] };
       }
-      if (u >= 1) return camAt(0);
-      var P = SEAM.P, n = P.length - 1, x = u * n, i = Math.min(n - 1, Math.floor(x)), v = x - i, a = P[Math.max(0, i - 1)], b = P[i], c = P[i + 1], d = P[Math.min(n, i + 2)];
+      var SE = SEAM[dir]; if (u >= 1) return camAt(SE.pe);
+      var P = SE.P, n = P.length - 1, x = u * n, i = Math.min(n - 1, Math.floor(x)), v = x - i, a = P[Math.max(0, i - 1)], b = P[i], c = P[i + 1], d = P[Math.min(n, i + 2)];
       var e = [0, 1, 2].map(function (j) { return cat(a[j], b[j], c[j], d[j], v); }), k = sm(u);
-      var yaw = SEAM.y[0] + (SEAM.y[1] - SEAM.y[0]) * k, pit = SEAM.pt[0] + (SEAM.pt[1] - SEAM.pt[0]) * k, ds = SEAM.d[0] + (SEAM.d[1] - SEAM.d[0]) * k;
-      var dir = [Math.sin(yaw) * Math.cos(pit), Math.sin(pit), Math.cos(yaw) * Math.cos(pit)];
-      return { e: e, t: [e[0] + dir[0] * ds, e[1] + dir[1] * ds, e[2] + dir[2] * ds], f: SEAM.f[0] + (SEAM.f[1] - SEAM.f[0]) * k, yaw: yaw, pitch: pit };
+      var yaw = SE.y[0] + (SE.y[1] - SE.y[0]) * k, pit = SE.pt[0] + (SE.pt[1] - SE.pt[0]) * k, ds = SE.d[0] + (SE.d[1] - SE.d[0]) * k;
+      var dv = [Math.sin(yaw) * Math.cos(pit), Math.sin(pit), Math.cos(yaw) * Math.cos(pit)];
+      return { e: e, t: [e[0] + dv[0] * ds, e[1] + dv[1] * ds, e[2] + dv[2] * ds], f: SE.f[0] + (SE.f[1] - SE.f[0]) * k, yaw: yaw, pitch: pit };
     }
     /* Zustand zur Demo-Zeit t (Sekunden, deterministisch): Fortschritt, Kamera an der Naht, Reinigungsstand je Station */
     function demoAt(t) {
       var T = DM.duration; t = ((t % T) + T) % T; var sg = DM.segments, s = sg[sg.length - 1];
       for (var i = 0; i < sg.length; i++) if (t < sg[i].t[1]) { s = sg[i]; break; }
-      var u = sm((t - s.t[0]) / (s.t[1] - s.t[0])), q, cam = null, cl = {};
-      if (s.seam) { q = s.seam === 'out' ? 0 : 1; cam = seamCam(s.seam === 'out' ? u : 1 - u); } else q = s.p[0] + (s.p[1] - s.p[0]) * u;
+      var r = (t - s.t[0]) / (s.t[1] - s.t[0]), u = sm(r), q, cam = null, cl = {};
+      if (s.seam) { cam = seamCam(s.seam === 'out' ? u : 1 - u, s.seam); q = SEAM[s.seam].pe; } else q = s.p[0] === s.p[1] ? s.p[0] : segQ(s.p[0], s.p[1], trap(r));
       Object.keys(DM.clean || {}).forEach(function (k) { var c = DM.clean[k]; cl[k] = sm((t - c[0]) / (c[1] - c[0])); });
       return { t: t, q: q, cam: cam, clean: cl };
     }
@@ -1154,7 +1181,12 @@
 
     /* ---------- Modi: Standbilder, Stationen, Scroll ---------- */
     function showStill(i) { cur = i; ui(ST[i].hold); root.querySelectorAll('.jr-still').forEach(function (im, j) { im.classList.toggle('on', j === i); }); root.querySelectorAll('.jr-det [data-det]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.detI === '-1')); }); }
-    function setStatic() { mode = 'static'; root.classList.add('jr-static'); root.classList.remove('jr-live', 'jr-button'); showStill(cur); }
+    function setStatic() { mode = 'static'; root.classList.add('jr-static'); root.classList.remove('jr-live', 'jr-button'); showStill(cur); cmpAvail(); }
+    /* Bildmodus: Vergleich nur anbieten, wenn ein «Vorher»-Bild derselben Kamera vorliegt (Komponente ohne Vorher-Bilder: ausgeblendet) */
+    function cmpAvail() {
+      var base = root.querySelectorAll('.jr-still:not(.jr-still-det):not(.jr-still-v)');
+      root.querySelectorAll('.jr-st').forEach(function (el, i) { var g = el.querySelector('.jr-cmp'); if (!g) return; var n = base[i] && base[i].dataset.n; g.classList.toggle('jr-cmp-nov', !(n && root.querySelector('.jr-still-v[data-v="' + n + '"]'))); });
+    }
     /* Handy und niedrige Bildschirme: Bildmodus zuerst; «3D-Ansicht starten» startet dieselbe Szene im Stationsmodus
        (gleicher Fortschritt, gleiche Schleife, kein Festhalten beim Scrollen) innerhalb des Bildrahmens. Läuft sie auf dem
        Gerät nicht flüssig (gemessene Bildzeiten), kehrt sie mit Hinweis zu den Bildern derselben Szene zurück. */
@@ -1270,7 +1302,7 @@
     });
     /* Eingaben halten den Wind kurz am Leben (danach steht die Szene still) */
     ['pointermove', 'pointerdown', 'wheel', 'keydown', 'touchstart'].forEach(function (ev) { on(root, ev, function () { if (running && win.performance.now() - lastInput > 250) poke(); }, { passive: true }); });
-    if (reqMode === 'scroll') on(win, 'scroll', function () { /* Demo: eigenes Scrollen beendet sie, danach folgt die Kamera wieder der Seite */ if (demo) { if (Math.abs(win.scrollY - demo.sy) < 6) return; demoStop(true); } /* V17.1: ausserhalb des Sichtbereichs ohne Bildanforderung (Fortschritt bleibt am Rand) */ if (!show()) { if (mode === 'live' && !scrollTick) setProgress(scrollProg()); return; } if (!scrollTick) { scrollTick = true; win.requestAnimationFrame(function () { scrollTick = false; if (mode === 'live') setProgress(scrollProg()); }); } }, { passive: true });
+    if (reqMode === 'scroll') on(win, 'scroll', function () { /* Demo im Scrollmodus: eigenes Scrollen beendet sie, danach folgt die Kamera wieder der Seite (Stationsmodus: ausserhalb des Bildes steht sie still) */ if (demo && mode === 'live') { if (Math.abs(win.scrollY - demo.sy) < 6) return; demoStop(true); } /* V17.1: ausserhalb des Sichtbereichs ohne Bildanforderung (Fortschritt bleibt am Rand) */ if (!show()) { if (mode === 'live' && !scrollTick) setProgress(scrollProg()); return; } if (!scrollTick) { scrollTick = true; win.requestAnimationFrame(function () { scrollTick = false; if (mode === 'live') setProgress(scrollProg()); }); } }, { passive: true });
     function prefChange() { if (demo && RMQ.matches) demoStop(false); if (mode !== 'static' && !inline3d && (SMALL.matches || (RMQ.matches && reqMode === 'scroll'))) { stopGL(); setStatic(); } }
     onMQ(RMQ, prefChange); onMQ(SMALL, prefChange);
 
@@ -1400,6 +1432,16 @@
         if (!gl) return null; draw(); var W2 = canvas.width, H2 = canvas.height, px = new Uint8Array(W2 * H2 * 4); gl.readPixels(0, 0, W2, H2, gl.RGBA, gl.UNSIGNED_BYTE, px);
         var n = W2 * H2, sum = 0, clip = 0; for (var i = 0; i < n; i++) { var r = px[i * 4], g = px[i * 4 + 1], b = px[i * 4 + 2]; sum += 0.2126 * r + 0.7152 * g + 0.0722 * b; if (r >= 253 && g >= 253 && b >= 253) clip++; }
         return { mean: +(sum / n / 255).toFixed(3), clipped: +(clip / n).toFixed(5), w: W2, h: H2 };
+      },
+      /* Prüfhilfe Realismus: Bild als gw×gh-Raster mittlerer RGB-Werte (0…255), Windzeit fest (wt) – Vergleich Vorher/Nachher, Naht */
+      frameGrid: function (gw, gh, wt) {
+        if (!gl) return null; var t0 = windT; if (wt !== undefined) windT = wt; draw(); windT = t0; var W2 = canvas.width, H2 = canvas.height, px = new Uint8Array(W2 * H2 * 4); gl.readPixels(0, 0, W2, H2, gl.RGBA, gl.UNSIGNED_BYTE, px);
+        var out = []; for (var gy = 0; gy < gh; gy++) for (var gx = 0; gx < gw; gx++) {
+          var x0 = Math.floor(gx * W2 / gw), x1 = Math.floor((gx + 1) * W2 / gw), y0 = Math.floor((gh - 1 - gy) * H2 / gh), y1 = Math.floor((gh - gy) * H2 / gh), r = 0, g = 0, b = 0, n = 0;
+          for (var y = y0; y < y1; y += 2) for (var x = x0; x < x1; x += 2) { var i = (y * W2 + x) * 4; r += px[i]; g += px[i + 1]; b += px[i + 2]; n++; }
+          out.push([r / n, g / n, b / n]);
+        }
+        return out;
       },
       /* Prüfhilfen V15: Mischwert des Türlichts (0 = zu gebacken, 1 = offen gebacken) · Bildstabilität (zwei Bilder bei
          gleicher Kamera und gleicher Windzeit, mittlere absolute Differenz 0…1) · Leuchtenanteil eines Wandpunkts */

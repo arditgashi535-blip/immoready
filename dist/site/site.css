@@ -2005,6 +2005,7 @@ body.hdr-compact .hdr{background:var(--ivory)}
 .jr-cmpr input{flex:1 1 auto;min-width:0;min-height:44px;accent-color:var(--lime)}
 .jr-cmpn{flex:1 1 100%;margin:0;font-size:.75rem;color:rgba(252,248,245,.62)}
 .jr-static .jr-cmpr{display:none}
+.jr-static:not(.jr-3d) .jr-cmp-nov{display:none}
 .jr-static.jr-3d .jr-cmpr{display:flex}
 .jr-still-v{opacity:0}
 .jr-still-v.on{opacity:1}
