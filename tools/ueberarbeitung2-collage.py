@@ -88,14 +88,32 @@ grid([[(os.path.join(BZ, 'bad-%d-kunde.png' % v), '%d %% gereinigt' % v) for v i
      'Bad · Waschtisch in fünf Reinigungszuständen (Regler «Reinigungsfortschritt» in der Website)',
      'Gleiche Kamera, gleiches Licht, gleicher Startwert. Kalk am Armaturenfuss und Strahlregler, Seifenfilm am Ablauf; gewischt vom Rand zum Ablauf. Synthetischer Arbeitsablauf – kein Kundenergebnis.',
      'bad-zustaende.jpg')
-# 5 Vorher | Nachher im 3D
+# 5 Vorher | Nachher im 3D: Ausschnitt 1:1 dort, wo sich die reine Szene zwischen 0 und 100 % am stärksten ändert
+def strongest(a, b, w, h):
+    d = (np.abs(np.asarray(a, dtype=float) - np.asarray(b, dtype=float)).sum(2) > 18).astype(np.int64)
+    H, W = d.shape
+    w, h = min(w, W), min(h, H)
+    I = np.pad(d.cumsum(0).cumsum(1), ((1, 0), (1, 0)))
+    S = I[h:, w:] - I[:H - h + 1, w:] - I[h:, :W - w + 1] + I[:H - h + 1, :W - w + 1]
+    y, x = np.unravel_index(int(np.argmax(S)), S.shape)
+    return (int(x), int(y), int(x) + w, int(y) + h), int(S[y, x]) / float(w * h)
+
+
 V3 = os.path.join(ROOT, 'shots/vergleich-3d')
 rows = []
 for k, n in (('garten', 'Garten'), ('eingang', 'Eingang/Treppenhaus'), ('wohnung', 'Wohnung'), ('bad', 'Bad · Waschtisch')):
-    rows.append([(os.path.join(V3, '%s-0-ausschnitt.png' % k), 'Vorher (0 %%) · %s · Ausschnitt' % n), (os.path.join(V3, '%s-100-ausschnitt.png' % k), 'Nachher (100 %)'),
+    f0, f1 = os.path.join(V3, '%s-0-szene.png' % k), os.path.join(V3, '%s-100-szene.png' % k)
+    a = b = None
+    if os.path.exists(f0) and os.path.exists(f1):
+        a, b = Image.open(f0).convert('RGB'), Image.open(f1).convert('RGB')
+        bx, share = strongest(a, b, 560, 330)
+        a, b = a.crop(bx), b.crop(bx)
+        print('  Ausschnitt %s: %s, Anteil geänderter Bildpunkte %.1f %%' % (k, bx, share * 100))
+    rows.append([(a, 'Vorher (0 %%) · %s · Szene 1:1' % n), (b, 'Nachher (100 %)'),
                  (os.path.join(V3, '%s-0-kunde.png' % k), 'Vorher · Kundenansicht'), (os.path.join(V3, '%s-100-kunde.png' % k), 'Nachher · Kundenansicht')])
 grid(rows, 560, 330, 'Vorher und Nachher im 3D (1280×720, Regler in der Website)',
-     'Gleiche Kamera und gleiches Licht je Station. Synthetischer Arbeitsablauf – kein Kundenergebnis. ' + NOTE, 'vergleich-3d.jpg')
+     'Links reine Szene 1:1 im Bereich der grössten Änderung, rechts die Kundenansicht. Gleiche Kamera und gleiches Licht je Station. Synthetischer Arbeitsablauf – kein Kundenergebnis. '
+     + NOTE, 'vergleich-3d.jpg')
 # 6 Stationsbilder Vorher | Nachher (Bildmodus)
 T = os.path.join(ROOT, 'assets/tour')
 st = [('station-02-garten', 'Garten'), ('station-03-eingang', 'Eingang'), ('station-04-wohnung', 'Wohnung'), ('station-05-bad-waschtisch', 'Bad · Waschtisch')]

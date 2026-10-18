@@ -1,6 +1,7 @@
 // Vorher/Nachher im 3D aus der echten Website (Überarbeitung 2): Garten, Eingang, Wohnung und Bad (Nahansicht Waschtisch).
 // Je Station wird der Regler «Reinigungsfortschritt» wie ein Besucher auf 0 und 100 % gestellt (gleiche Kamera, gleiches Licht).
-// Ausgabe: <ordner>/<station>-<0|100>-kunde.png (Fenster) und -ausschnitt.png (Bereich der Reinigungszonen der Station, 1:1).
+// Ausgabe: <ordner>/<station>-<0|100>-kunde.png (Fenster), -szene.png (nur die Bühne, Bedienung ausgeblendet; daraus wählt
+// tools/ueberarbeitung2-collage.py den Ausschnitt 1:1 mit der grössten Änderung) und -ausschnitt.png (Boxen der Reinigungszonen).
 // Aufruf: node tools/vergleich-3d.js [html] [ordner] [breite] [höhe]
 const { chromium } = require('playwright');
 const path = require('path'), fs = require('fs');
@@ -9,6 +10,7 @@ const out = path.resolve(process.argv[3] || 'shots/vergleich-3d'); fs.mkdirSync(
 const W = +(process.argv[4] || 1280), H = +(process.argv[5] || 720);
 const T = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../rise.json'), 'utf8')).tour;
 const ST = [['garten', null], ['eingang', null], ['wohnung', null], ['bad', 0]];
+const HIDE = '#reise .jr-ui,#reise .jr-st,#reise .jr-skip,#reise .jr-hot,#reise .jr-tech,#reise .jr-tag,#reise .jr-nav,#reise .jr-cmpo,.hdr,.demo,.mbar{visibility:hidden!important}';
 (async () => {
   const b = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
   const p = await b.newPage({ viewport: { width: W, height: H } });
@@ -36,6 +38,11 @@ const ST = [['garten', null], ['eingang', null], ['wohnung', null], ['bad', 0]];
       await p.waitForTimeout(400);
       await p.screenshot({ path: path.join(out, `${key}-${v}-kunde.png`), timeout: 180000 });
       await p.screenshot({ path: path.join(out, `${key}-${v}-ausschnitt.png`), clip, timeout: 180000 });
+      const hs = await p.addStyleTag({ content: HIDE });
+      await p.waitForTimeout(100);
+      const bb = await p.evaluate(() => { const r = document.querySelector('#reise .jr-stage').getBoundingClientRect(); return { x: Math.max(0, r.left), y: Math.max(0, r.top), width: Math.min(innerWidth, r.width), height: Math.min(innerHeight, r.bottom) - Math.max(0, r.top) }; });
+      await p.screenshot({ path: path.join(out, `${key}-${v}-szene.png`), clip: bb, timeout: 180000 });
+      await hs.evaluate(n => n.remove());
     }
     console.log(key, 'q', q, 'Ausschnitt', clip.width + '×' + clip.height);
   }
