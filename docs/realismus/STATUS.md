@@ -7,7 +7,11 @@ Auftrag: `IMMOREADY-CLAUDE-CODE-MASTERPROMPT.md` (Upload vom 17.10.2026). Dieser
 - **Vollständiges Quellprojekt:** dieses Repository (`arditgashi535-blip/immoready`, Branch `v17.1-release-candidate`). Die angehängte Vorschau-HTML wird daraus gebaut (`python3 build.py` → `dist/immoready-vorschau.html`). Es musste nichts aus der HTML rekonstruiert werden.
 - **Das im Auftrag genannte Repository `infoimmoready-commits/immoready`** (Wix-Gerüst) ist in dieser Sitzung nicht freigegeben. Es wurde weder gelesen noch verändert; daraus wird nichts abgeleitet.
 - **Canva «ImmoReady photo board»** (`DAHXQAIJpu4`): am 17.10.2026 über den Canva-Connector **nur gelesen** (keine Änderung). 8 Seiten: leere Titelseite, Fassade mit Loggien, Treppenhaus (Terrazzo, Flachstahlgeländer), Einhebelarmatur, Garten mit Hecke, leere Wohnung mit Parkett, Eingang mit Vordach, Luftbild. Es sind Einzelbilder **verschiedener Gebäude**; Herkunft und Lizenz sind im Board nicht angegeben (das Vorhandensein im Board ist kein Lizenznachweis). Sie dienten nur als Sichtreferenz für Materialien und Stimmung. In den Rundgang und die Seite wurde nichts davon übernommen.
-- **Sites:** In dieser Sitzung nicht verwendet. Die private Vorschau ist das Claude-Artefakt (privat).
+- **Sites:** In dieser Sitzung nicht verwendet.
+- **Private Vorschau:** das bestehende Claude-Artefakt https://claude.ai/artifact/3dNzp9yHwHBA5XhEwpwe1w, am 18.10.2026 auf Version 26 aktualisiert.
+  - Laut Werkzeugergebnis ist es privat: Öffnen können nur der Eigentümer und Personen, denen der Eigentümer Zugriff gegeben hat.
+  - Ob bereits Zugriff erteilt wurde, ist für Claude nicht einsehbar; die Freigabe kann Claude nicht ändern.
+  - Keine Domain, keine Wix-Seite und keine öffentliche Website wurden verändert.
 - Keine `AGENTS.md`; massgebend sind `CLAUDE.md` und die Regeln in `tools/rise.py`.
 
 ## Markenfarben (bestätigte Fassung)
@@ -130,3 +134,83 @@ Am Eingang bleiben +21 %: dort ist der Wohnungsstaub tatsächlich in Sichtweite.
   - Versuch 1: gleichmässige helle Schrägstreifen über die ganze Tür – zu grafisch, verworfen.
   - Versuch 2: Schlieren nur stellenweise und vor allem in Griffhöhe, Abdrücke kleiner und seltener – übernommen.
 - **Stationsbilder:** Eingang und Bad neu gerendert. «Vorher» ohne sichtbaren Unterschied wird verworfen (Bad-Übersicht 0,025 %, WC 0 % der Bildpunkte); dort blendet der Bildmodus den Vergleich aus.
+
+## Ergebnis (Endstand)
+
+### Sichtbar umgesetzt
+
+- **Schmutz → sauber an fünf Stellen**, jeweils in Weltkoordinaten mit festem Startwert, Wischkante mit kurzer Nässe, vorwärts und rückwärts gleich:
+  - Gartenweg: Laub, Moos an den Rändern, Schmutzfilm;
+  - Eingang: Gehspuren mit eingetragenem Schmutz, Fingerabdrücke und Schlieren an der Lifttür;
+  - Wohnung: Staubfilm auf Parkett, Tisch und Sitzflächen;
+  - Bad: Kalk an Armatur und Strahlregler, Wasserränder und Tropfen im Waschtisch.
+- **Vergleich an den Stationen:** «Vorher», «Nachher», Regler «Reinigungsfortschritt» (Maus, Touch, Tastatur), Hinweis «Illustration eines Arbeitsablaufs, kein Kundenergebnis.». Im Bildmodus (Handy, ohne WebGL) Bilder derselben Kamera.
+- **Licht:** weiches Tageslicht als Standard, «Dämmerung» umschaltbar.
+- **Demo-Rundlauf ≈ 48 s** auf Knopfdruck, nahtlos hinter der Hecke, Start/Pause/Fortsetzen/Beenden.
+
+### Wo starten
+
+- **Vergleich:** in der Reise (Startseite → «Gebäude entdecken» → Abschnitt Rundgang) an den Stationen Garten, Eingang, Wohnung und Bad: Knöpfe «Vorher» / «Nachher» und der Regler unter dem Stationstext.
+- **Demo:** in der Leiste unten in der Bühne: «Demo-Rundlauf starten». Auf dem Handy zuerst «3D-Ansicht starten». Bei «Bewegung reduzieren» wird die Demo nicht angeboten.
+
+### Belege in diesem Ordner
+
+| Datei | Inhalt |
+|---|---|
+| `vergleich-desktop.jpg`, `vergleich-handy.jpg` | Ausgangsstand und Endstand: Startseite und sechs Stationen (Desktop 1440×900 3D, Handy 390×844 Bildmodus), beschriftet |
+| `bad-zustaende.jpg` | Waschtisch vorher · halb gereinigt · nachher, gleiche Kamera |
+| `stationen-vorher-nachher.jpg`, `details-1zu1.jpg` | Stationsbilder «Vorher»/«Nachher» und Ausschnitte in Originalgrösse |
+| `demo-rundlauf.mp4` | ganze Demo, 48 s, 1280×720, 24 Bilder/s. Bild für Bild aus der Software-Grafik in voller Qualität gesetzt (`demoSeek`), keine Echtzeitaufnahme. Weil die Aufnahme die Demo dafür anhält, zeigt der Knopf «Fortsetzen» statt «Pause» |
+| `demo-rundlauf-naht.mp4` | Naht, 12 s: 46 → 48 = 0 → 2 s in Echtzeit, danach 47 → 1 s in vierfacher Zeitlupe |
+| `demo-rundlauf-naht.jpg` | letztes Bild (47,958 s) und erstes Bild (0 s) mit Differenz. Bildfläche ohne Stationstext: mittlere Abweichung 0,46 % (Rest: aktive Station in der Leiste); reine Zeichenfläche laut t28: 0,006 % |
+| `demo-dreimal.txt` | Demo dreimal in Echtzeit abgespielt: Nähte, Zeitsprünge, Kamerasprünge, Bildwechsel |
+| `testlauf.log` | vollständige Ausgabe des Gesamtlaufs |
+
+Die Rohbilder (PNG) liegen in `shots/realismus/` (nicht im Repository): `baseline-*`, `final-*`, `bad-*`, Konsolenprotokolle `*-konsole.txt`.
+
+### Assets
+
+- **Keine externen Dateien neu eingebunden.**
+  - Rauschtextur der Schmutzschicht: im Code erzeugt (`mkNoise`, fester Startwert).
+  - Stationsbilder und «Vorher»-Bilder: aus der eigenen Szene gerendert (`tools/render-stills.js`).
+  - Materialtexturen: unverändert prozedural (`tools/make-textures.py`).
+- **Canva-Board:** nur gelesen, nichts übernommen (siehe oben).
+- **Fotos der Seite:** unverändert. Herkunft und Kennzeichnung wie bisher in `rise.json → assets.photos`.
+
+### Prüfungen (Endstand, 18.10.2026)
+
+- **Gesamtlauf** `sh tests/alle.sh`, zusammenhängend, ohne Wiederholung: **612 bestanden, 0 fehlgeschlagen** (`npm test` mit Build, RISE, t15, t7, t9, t11, t14, t16–t28; dazu t12 und t13 mit lokalen Servern). Ausgabe: `testlauf.log`.
+- **Davor zwei nicht bestandene Gesamtläufe:**
+  - 364/2: t16 Alternativtext, t18 WC-Fahrt; danach brach die Kette ab.
+  - 403/6: t9 Logo, t20 Knopfhöhe.
+  Ursachen und Korrekturen stehen unter Runde 5.
+- **t28 Realismus (50 Prüfungen):**
+  - Zonen und Determinismus, vorwärts = rückwärts;
+  - Vorher/halb/Nachher mit gleicher Kamera, kein Flimmern;
+  - Vergleichsknöpfe, Regler per Tastatur, Stationswechsel;
+  - Tageslicht/Dämmerung, Tageslicht-Belichtung;
+  - Demo-Zeitplan ohne Sprung, Naht gleich und verdeckt, Pause, Beenden;
+  - Abbruch durch Scrollen und Stationswahl, keine zweite Schleife, `destroy()`;
+  - Handy-Bildmodus mit «Vorher»-Bild, Vergleich nur mit sichtbarem Unterschied;
+  - Handy-3D-Demo, Stillstand ausserhalb des Bildes;
+  - «Bewegung reduzieren».
+- **Demo dreimal in Echtzeit:** `demo-dreimal.txt`.
+- **Konsole:** Desktop und Handy ohne Fehler, Warnungen oder fehlgeschlagene Anfragen (`shots/realismus/final-konsole.txt`).
+
+## Offene Punkte und bekannte Grenzen
+
+1. **Nicht fotorealistisch.**
+   - Die Verschmutzung ist prozedural und bleibt erkennbar synthetisch, besonders die Wasserränder im Becken (3 Versuche, Grenze erreicht).
+   - Der Schmutzfilm auf dem Gartenweg wirkt eher körnig (terrazzoartig) als wie ein Belag.
+   - Fotografische, lizenzierte Materialscans würden das verbessern (Lizenz und Kosten vorher klären).
+2. **«Nachher» altert nicht zusätzlich:** Der saubere Zustand ist das bestehende Material (Putzstruktur, Fugen, Plattentöne) ohne eigene Patina.
+3. **Nicht umgesetzt:**
+   - Räumungsgegenstände in der Wohnung;
+   - Glasschlieren an der Haustür (das Türglas wird vereinfacht ohne Materialschicht gezeichnet).
+   Am Eingang zeigen stattdessen Lifttür und Boden den Unterschied.
+4. **Bad-Übersicht und WC:** In diesen Ansichten liegt keine Zone im Bild, deshalb gibt es dort kein «Vorher»-Bild, und der Bildmodus blendet den Vergleich aus. Im 3D wirkt der Vergleich in der Übersicht nur schwach (Waschtisch klein im Bild).
+5. **Demo-Naht:** Das Bild ist nahtlos (Hecke formatfüllend). Der Stationstext wechselt an der Naht sichtbar von «Station 6» zu «Station 1» – gewollt, weil er die Orientierung gibt. Drehungen bis ≈ 86°/s in den kurzen Innenabschnitten (Gestaltungsdauer 48 s).
+6. **Software-Grafik:** Die Demo-Zeit läuft je Bild höchstens 0,25 s. Auf langsamen Rechnern läuft sie deshalb langsamer statt ruckartig.
+7. **Leistung auf echter Hardware nicht gemessen:** Alle Messungen stammen aus Headless-Chromium mit SwiftShader. Echte GPUs (Mac/Windows), echtes iPhone und Android, Safari und der Wix-Live-Test stehen aus. Browseremulation ersetzt keinen echten Gerätetest.
+8. **Tageslicht:** Die Putzstruktur der Fassade wirkt im Tageslicht fleckiger als in der Dämmerung (nicht geändert).
+9. **Nicht veröffentlicht:** keine Domain, keine Wix-Seite verändert. Das im Auftrag genannte Repository `infoimmoready-commits/immoready` wurde nicht berührt.

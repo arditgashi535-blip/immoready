@@ -37,20 +37,27 @@ const enc = (dir, o) => execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-fr
     enc(dir, out); fs.rmSync(dir, { recursive: true, force: true });
     console.log('Video:', path.relative(process.cwd(), out), (fs.statSync(out).size / 1e6).toFixed(1), 'MB,', (n / FPS).toFixed(1), 's');
   }
-  /* Naht: Echtzeit, dann Zeitlupe */
+  /* Naht: Echtzeit, dann Zeitlupe (NUR_BILD=1: nur das Vergleichsbild letztes/erstes Bild) */
   const rt = [...Array(4 * FPS).keys()].map(i => (D - 2 + i / FPS) % D), sl = [...Array(8 * FPS).keys()].map(i => (D - 1 + i / (4 * FPS)) % D);
-  const dirN = base + '-naht.frames'; await run(rt.concat(sl), dirN);
-  enc(dirN, base + '-naht.mp4');
-  /* letztes Bild (D − 1/FPS) und erstes Bild (0) */
+  const dirN = base + '-naht.frames';
+  if (!process.env.NUR_BILD) { await run(rt.concat(sl), dirN); enc(dirN, base + '-naht.mp4'); } else fs.mkdirSync(dirN, { recursive: true });
+  /* letztes Bild (D − 1/FPS) und erstes Bild (0): erst nach der Überblendung der Stationstexte (sonst halb alter, halb neuer Text) */
   const last = path.join(dirN, 'last.png'), first = path.join(dirN, 'first.png');
-  await shot(D - 1 / FPS, last); await shot(0, first);
+  await shot(D - 1 / FPS - 0.2, last); await p.waitForTimeout(100); await shot(D - 1 / FPS, last); await p.waitForTimeout(1200); await p.screenshot({ path: last });
+  await shot(0, first); await p.waitForTimeout(1200); await p.screenshot({ path: first });
+  const box = await p.evaluate(() => { const r = document.querySelector('#reise .jr-stage').getBoundingClientRect(), u = document.querySelector('#reise .jr-st.on'), q = u ? u.getBoundingClientRect() : { right: 0 }; return [Math.round(Math.max(q.right + 8, r.left)), Math.round(r.top), Math.round(r.right), Math.round(r.bottom)]; });
   execFileSync('python3', ['-c', `
-from PIL import Image, ImageChops, ImageDraw
+from PIL import Image, ImageChops, ImageDraw, ImageFont
+import os
+F=[f for f in ('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf','/usr/share/fonts/dejavu/DejaVuSans.ttf') if os.path.exists(f)]
+ft=ImageFont.truetype(F[0],15) if F else None
 a=Image.open(${JSON.stringify(last)}).convert('RGB'); c=Image.open(${JSON.stringify(first)}).convert('RGB')
 d=ImageChops.difference(a,c); s=sum(sum(px) for px in d.resize((160,90)).getdata())/(160*90*3*255)
+bx=${JSON.stringify(box)}; dc=ImageChops.difference(a.crop(bx),c.crop(bx)); w3,h3=dc.size; s3=sum(sum(px) for px in dc.resize((max(1,w3//8),max(1,h3//8))).getdata())/(max(1,w3//8)*max(1,h3//8)*3*255)
+print('Naht-Differenz 3D-Fläche ohne Stationstext:',round(s3,5))
 w,h=a.size; k=0.5; a2=a.resize((int(w*k),int(h*k))); c2=c.resize((int(w*k),int(h*k))); d2=d.point(lambda v:min(255,v*8)).resize((int(w*k),int(h*k)))
 o=Image.new('RGB',(a2.width*3+40,a2.height+56),(252,248,245)); dr=ImageDraw.Draw(o)
-for i,(im,t) in enumerate([(a2,'letztes Bild (%.3f s)'%(${D}-1/${FPS})),(c2,'erstes Bild (0 s)'),(d2,'Differenz ×8 (mittel %.4f)'%s)]): o.paste(im,(10+i*(a2.width+10),46)); dr.text((10+i*(a2.width+10),16),t,fill=(59,58,57))
+for i,(im,t) in enumerate([(a2,'letztes Bild (%.3f s)'%(${D}-1/${FPS})),(c2,'erstes Bild (0 s)'),(d2,'Differenz ×8: ganzes Bild %.4f, 3D-Fläche ohne Text %.5f'%(s,s3))]): o.paste(im,(10+i*(a2.width+10),46)); dr.text((10+i*(a2.width+10),16),t,fill=(59,58,57),font=ft)
 o.save(${JSON.stringify(base + '-naht.jpg')},quality=86); print('Naht-Differenz (ganzes Bild, inkl. Stationstext):',round(s,5))
 `], { stdio: 'inherit' });
   fs.rmSync(dirN, { recursive: true, force: true });

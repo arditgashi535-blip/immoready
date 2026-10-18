@@ -6,9 +6,9 @@
 > build
 > python3 build.py
 
-Seite: 4364066 Zeichen
-Komponente: 431508 Bytes (inline: 2281979 )
-Produktionsform dist/site/: index.html 64244 Bytes, site.css 152124, site.js 388336, gesamt 3561791 Bytes
+Seite: 4368473 Zeichen
+Komponente: 434068 Bytes (inline: 2284539 )
+Produktionsform dist/site/: index.html 64393 Bytes, site.css 152124, site.js 390747, gesamt 3565745 Bytes
 PASS rise.json ist gültig
 PASS Lücke zwischen Stationen wird erkannt
 PASS hold ausserhalb des Bereichs wird erkannt
@@ -115,10 +115,10 @@ PASS 390 FAQ unterbrechbar (schnell zu/auf)
 PASS Einstieg: Kontaktaktionen ab Start sichtbar
 PASS Einstieg nach ~1.1 s abgeschlossen
 PASS Layoutverschiebung beim Laden < 0.05 (CLS 0.001)
-PASS Bewegung reduzieren während der Nutzung: Inhalte sofort sichtbar (nach 45 ms, nächstes Bild in SwiftShader)
+PASS Bewegung reduzieren während der Nutzung: Inhalte sofort sichtbar (nach 38 ms, nächstes Bild in SwiftShader)
 PASS Reduzierte Bewegung: alles sofort sichtbar
 PASS Kopfzeile kompakt ohne Layoutsprung (12544/12544)
-PASS Logo im kompakten Kopf vollständig sichtbar, Proportion 1.318 {"hb":97,"lt":2.1295127868652344,"lb":89.51618576049805,"lw":115.19485473632812,"lh":87.38667297363281}
+PASS Logo im kompakten Kopf vollständig sichtbar, Proportion 1.318 {"hb":97,"lt":2.1320114135742188,"lb":89.5165023803711,"lw":115.19197082519531,"lh":87.38449096679688}
 PASS Bildkarte neigt sich max. 3° (rx 2.4, ry 2.7)
 PASS Bildkarte kehrt in Ausgangslage zurück
 PASS Kein Magnet-Effekt: Schaltfläche und Beschriftung bleiben unter dem Zeiger stehen
@@ -157,7 +157,7 @@ PASS Terrassentür: gleitet vor der Durchfahrt 1,0 m auf, schliesst danach [0,1,
 PASS Bad: technisches Overlay sichtbar
 PASS Overlay ausserhalb des Bads aus
 PASS Ruhezustand innen ohne Dauerschleife (0 Frames)
-PASS Wind aussen aktiv, gedrosselt (5 Aufrufe in 2 s, Grenze 30 Bilder/s)
+PASS Wind aussen aktiv, gedrosselt (4 Aufrufe in 2 s, Grenze 30 Bilder/s)
 PASS Ruhezustand: 15 s nach der letzten Eingabe steht auch der Wind still (0 Frames)
 PASS Stationsnavigation (Maus): Sprung zum Bad
 PASS Stationsnavigation (Tastatur): Sprung zum Garten
@@ -174,7 +174,7 @@ PASS Smartphone: kurze Stationswechsel per Berührung
 PASS Pfeiltasten wechseln Stationen
 PASS Smartphone: kein seitliches Scrollen
 PASS Scan-Kante: geplante Dauer 1200 ms (Vorgabe 900–1400 ms)
-PASS Scan-Kante startet erst nach dem ersten fertigen Bild und endet nach 1237 ms (gemessen in SwiftShader, Bildtakt ≈ 0,3–0,5 s)
+PASS Scan-Kante startet erst nach dem ersten fertigen Bild und endet nach 1342 ms (gemessen in SwiftShader, Bildtakt ≈ 0,3–0,5 s)
 PASS Kameraroute (4000 interpolierte Punkte) ohne Kontakt zu Wänden und Möbeln (Abstand ≥ 0.12 Szeneneinheiten)
 PASS Keine abrupten Blickwechsel: max. 30.4° je 1 % Fortschritt (bei p=0.423; V12: 459°)
 PASS Kein extremer Weitwinkel: max. vertikaler Bildwinkel 53.9°
@@ -213,16 +213,16 @@ PASS Innenwände mit lichter Raumhöhe 2,60 m (10 Wandkörper, Boden 0,50 → De
 PASS Senkrechte Kanten bleiben senkrecht bei p=0.03 (Abweichung 0.000 % der Bildbreite über 11 m Höhe)
 PASS Senkrechte Kanten bleiben senkrecht bei p=0.235 (Abweichung 0.000 % der Bildbreite über 11 m Höhe)
 PASS Keine ausgebrannten Fenster/Leuchten: Anteil weisser Pixel je Station aussen 0.00 %, garten 0.00 %, eingang 0.00 %, wohnung 0.00 %, bad 0.00 %, zurueck 0.00 %
-PASS Belichtung je Station im brauchbaren Bereich (mittlere Helligkeit 0.338, 0.26, 0.568, 0.471, 0.546, 0.337)
+PASS Belichtung je Station im brauchbaren Bereich (mittlere Helligkeit 0.338, 0.26, 0.568, 0.471, 0.547, 0.337)
 PASS Innenräume ausreichend hell (min. 0.471) gegenüber der Dämmerung aussen (max. 0.338)
-PASS Weiche Belichtungsanpassung beim Eintreten: 5 Zwischenwerte (1 → 0.867 → 0.867 → 0.859 → 0.859 → 0.859 → 0.856 → 0.856 …)
+PASS Weiche Belichtungsanpassung beim Eintreten: 5 Zwischenwerte (1 → 0.877 → 0.858 → 0.858 → 0.856 → 0.856 → 0.854 → 0.854 …)
 PASS keine JS-Fehler 
 PASS Bewegung reduzieren: keine Pflanzenbewegung
 PASS Ersatzweg ohne vorab gerechnetes Licht: Szene läuft (Licht zur Laufzeit, Texturen ready)
 PASS Ersatzweg ohne Materialtexturen: Szene läuft (Licht vorab, Texturen off)
 PASS Smartphone: Stationsbilder, Texturen und Lichtdaten werden nicht geladen/entpackt
 PASS Nahebene schneidet keine Wand und keinen Türflügel (3001 Punkte, kleinster Abstand 0.241 m bei p=0.5197, Körper 168)
-PASS Reflexionsaufnahme (Würfeltextur) des Bads aufgenommen, sobald es sichtbar ist: bad (2 ms)
+PASS Reflexionsaufnahme (Würfeltextur) des Bads aufgenommen, sobald es sichtbar ist: bad (1 ms)
 PASS Badspiegel: echte planare Spiegelung gerendert (2 Spiegelbilder bisher)
 PASS Spiegel wird ausserhalb des Bads nicht gerechnet (Garten: 2 → 2)
 PASS Haustür: Licht zu/offen überblendet (Mischwert 0.00 → 1.00 → 0.00)
@@ -398,8 +398,8 @@ PASS Kein schwarzblaues Band am Horizont (dunkle Pixel im oberen Bilddrittel: Da
 PASS Szene: keine JS-Fehler 
 PASS Alle 16 Stationsbilder aus der finalen Szene neu gerendert (gegenüber v17-ausgang verglichen: 16)
 offerte speichern Error: x
-    at insert (file:///tmp/velo-GvtHMD/http-functions.mjs:3:54)
-    at Module.post_offerte (file:///tmp/velo-GvtHMD/http-functions.mjs:74:53)
+    at insert (file:///tmp/velo-i39Qf3/http-functions.mjs:3:54)
+    at Module.post_offerte (file:///tmp/velo-i39Qf3/http-functions.mjs:74:53)
     at async /home/user/immoready/tests/t21-fertigstellung.js:100:33
 PASS Mit Endpunkt: kein Demo-Hinweis «Formular nicht verbunden»
 PASS Ladezustand während der Übermittlung sichtbar («Anfrage wird übermittelt …»), noch keine Erfolgsmeldung
@@ -417,7 +417,7 @@ PASS Backend: serverseitige Prüfung lehnt ungültige Angaben mit Feldmeldungen 
 PASS Backend: fremder Ursprung 403, kaputtes JSON 400, Speicherfehler 500 ohne Erfolg
 PASS Backend: Upload-Adresse nur für Bilder ≤ 10 MB
 PASS Backend: CORS nur für www.immoready.ch / immoready.ch
-PASS Renderloop: ausserhalb des Sichtbereichs 0 Bilder trotz Scroll/Resize, im Bild wieder gezeichnet (3 Durchgänge: 0/14, 0/16, 0/16)
+PASS Renderloop: ausserhalb des Sichtbereichs 0 Bilder trotz Scroll/Resize, im Bild wieder gezeichnet (3 Durchgänge: 0/13, 0/16, 0/14)
 PASS Direktaufruf und Neuladen von 10 Unterseiten zeigen die richtige Seite
 PASS Browser-Zurück/Vorwärts: kontakt → leistungen → kontakt
 PASS Produktionsform über HTTP 1440 px: alle Anfragen erfolgreich, keine Konsolenfehler
@@ -555,7 +555,7 @@ PASS «Tour erneut starten» führt zur Gesamtansicht am Anfang
 PASS Handy: Bildmodus mit «3D-Ansicht starten» (≥ 48 px) {"st":true,"btn":true,"h":49.1875,"label":"3D-Ansicht starten"}
 PASS Handy: 3D läuft im Bildrahmen (Stationsmodus)
 PASS Handy-3D ohne Scrollfalle: Abschnitt 1031 px hoch (Bildschirm 844 px), Seite scrollt normal
-PASS Handy-3D: Zeichenfläche passend zum Bildrahmen (318×286)
+PASS Handy-3D: Zeichenfläche passend zum Bildrahmen (270×243)
 PASS Handy-3D: Station «Sanitär» per Knopf
 PASS Handy-3D: Mausrad über der Szene scrollt die Seite weiter (kein Festhalten)
 PASS Umschalter heisst im 3D «Bilder statt 3D»
@@ -566,16 +566,16 @@ PASS Bewegung reduzieren: Bilder derselben Szene, 6 Stationen, Anfrageaktionen, 
 PASS ohne WebGL (Desktop): Bilder derselben Szene, 6 Stationen, Anfrageaktionen, Station «Bad» per Knopf
 
 t27: 23/23 bestanden
-PASS Reinigungszonen aus rise.json: garten-weg, eingang-boden, wohnung-boden, bad-armatur, bad-auslauf, bad-waschtisch
+PASS Reinigungszonen aus rise.json: garten-weg, eingang-boden, eingang-lift, wohnung-boden, bad-armatur, bad-waschtisch
 PASS Reinigungszustand nur aus dem Fortschritt: vorwärts = rückwärts (p 0,216: 0.5/0/0/0/0/0)
 PASS am Anfang alles «Vorher», am Ende alles «Nachher»
-PASS Bad: Vorher und Nachher sichtbar verschieden (grösste Änderung je Rasterfeld 8.9 %)
-PASS Bad: halber Zustand ist weder «Vorher» noch «Nachher» (Wischkante: 6.5 % / 8.5 %)
+PASS Bad: Vorher und Nachher sichtbar verschieden (grösste Änderung je Rasterfeld 8.6 %)
+PASS Bad: halber Zustand ist weder «Vorher» noch «Nachher» (Wischkante: 4.3 % / 8.4 %)
 PASS Bad: zwei Bilder bei gleicher Kamera und gleichem Zustand identisch – kein Flimmern (0.00000)
 PASS Wischkante (halb gereinigt): frameDiff 0.00000
 PASS Station garten: Vorher/Nachher sichtbar verschieden (0.0048)
-PASS Station eingang: Vorher/Nachher sichtbar verschieden (0.0027)
-PASS Station wohnung: Vorher/Nachher sichtbar verschieden (0.0070)
+PASS Station eingang: Vorher/Nachher sichtbar verschieden (0.0030)
+PASS Station wohnung: Vorher/Nachher sichtbar verschieden (0.0069)
 PASS Station Bad: «Vorher», «Nachher» und Regler «Reinigungsfortschritt»
 PASS Hinweis «Illustration eines Arbeitsablaufs, kein Kundenergebnis.», Knöpfe ≥ 44 px
 PASS «Vorher»: Zonen der Station schmutzig, Knopf gedrückt, Regler 0
@@ -591,21 +591,21 @@ PASS Demo-Dauer 48 s, Zeitplan deterministisch
 PASS Kamera ohne Sprung (grösster Schritt je 0,05 s: 1.14 m bei 7.4 s; Naht 47,95 → 0 s: 0.002 m)
 PASS Drehung höchstens 90°/s (grösste 86°/s bei 41 s)
 PASS Reinigung ohne Sprung innerhalb des Rundlaufs
-PASS Demo läuft (Quelle «demo», t 0.517 s), Knopf «Pause», «Beenden» sichtbar
-PASS Pause hält die Demo an (t bleibt 1.017 s), Knopf «Fortsetzen»
+PASS Demo läuft (Quelle «demo», t 0.533 s), Knopf «Pause», «Beenden» sichtbar
+PASS Pause hält die Demo an (t bleibt 1.033 s), Knopf «Fortsetzen»
 PASS Naht: Bild bei 47,99 s und 0 s gleich (Differenz 0.00006)
 PASS Naht 47,5 – 0,5 s: Hecke füllt das Bild (Grünanteil 1.00 / 1.00 / 1.00 / 1.00)
 PASS Rücksprung auf «Vorher» nur hinter der Hecke (47,99 s sauber, 0 s schmutzig)
 PASS eigenes Scrollen beendet die Demo (Quelle wieder «scroll»)
 PASS Stationsknopf beendet die Demo und springt zur Station
 PASS «Beenden»: Bild bleibt (p 0.752), Seite steht an derselben Stelle (0.752)
-PASS nach dem Beenden im Bad keine weiteren Bilder (keine zweite Schleife; 130 → 130)
+PASS nach dem Beenden im Bad keine weiteren Bilder (keine zweite Schleife; 133 → 133)
 PASS keine Konsolenfehler
 PASS destroy() während der Demo: keine Schleife, keine Bilder mehr
 PASS Tageslicht aktiv
 PASS Tageslicht: keine ausgebrannten Flächen (weisse Pixel je Station aussen 0.00 %, garten 0.00 %, eingang 0.00 %, wohnung 0.00 %, bad 0.00 %, zurueck 0.00 %)
-PASS Tageslicht: Belichtung je Station im brauchbaren Bereich (0.456, 0.422, 0.662, 0.557, 0.677, 0.448)
-PASS Tageslicht: weiche Belichtungsanpassung beim Eintreten (0.920 → 0.92 → 0.92 → 0.92 → 1.062 → 1.103 → 1.103 → 1.12 → 1.12 …)
+PASS Tageslicht: Belichtung je Station im brauchbaren Bereich (0.456, 0.422, 0.662, 0.557, 0.676, 0.448)
+PASS Tageslicht: weiche Belichtungsanpassung beim Eintreten (0.920 → 0.92 → 0.92 → 0.92 → 0.92 → 1.081 → 1.081 → 1.114 → 1.114 …)
 PASS Handy-Bildmodus: Vorher/Nachher an der Station, ohne Regler und ohne Demo
 PASS «Vorher» zeigt das Bild derselben Kamera im Ausgangszustand (station-02-garten)
 PASS «Nachher» zeigt wieder das Stationsbild

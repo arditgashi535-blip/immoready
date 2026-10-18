@@ -64,8 +64,10 @@ Klasse `jr-3d`, Stationsmodus im Bildrahmen); Rückfall bei Bildzeit-Median > 60
 Letzte Station: «Tour erneut starten» (`goTo: 0`), keine automatische Wiederholung. Bericht `docs/reise/BERICHT-REISE.md`, Prüfung t27.
 
 **Realismus-Auftrag (17.10.2026):** Schmutz → sauber im Material-Shader (`DIRTF`/`DIRTM`, bis 6 Zonen aus `rise.json → tour.cleaning`:
-Box in Weltkoordinaten, Art kalk|wasser|staub|laub, Wischrichtung, fester Startwert, Fortschrittsbereich; Zustand nur aus `ps`, vorwärts =
-rückwärts; Rauschen aus kachelbarer Textur `mkNoise()`, Einheit 6; Schleife ohne `continue` wegen ANGLE/SwiftShader). Vergleich an der
+Box in Weltkoordinaten, Art kalk|wasser|staub|laub|schlieren, Wischrichtung, fester Startwert, Fortschrittsbereich, optional `walk`
+(Laufwege), `entry`, `range`; Zustand nur aus `ps`, vorwärts = rückwärts; Rauschen aus kachelbarer Textur `mkNoise()`, Einheit 6). **Leistung:**
+Der Shader wird aus den Zonen erzeugt (`dirtSrc`, je Zone nur ihre Art), Variante je naher, nicht sauberer Zonen (`dzProg`, Sichtweite `dzR`
+mit weicher Ausblendung), sonst Programm ohne Schmutzschicht – eine allgemeine Schleife kostete in SwiftShader das 4–5-Fache je Bild. Vergleich an der
 Station «Vorher · Nachher · Reinigungsfortschritt» mit Hinweis «kein Kundenergebnis» (`_cmp` in `tools/rise.py`, `compare()`), Bildmodus
 mit `<still>-vorher(-hoch).webp` (`render-stills.js`). Licht: Tageslicht Standard, Dämmerung umschaltbar (`tour.light`, `setDaylight`,
 `[data-light]`; t16 prüft die Dämmerung, t28 das Tageslicht). Demo-Rundlauf ≈ 48 s nur auf Knopfdruck (`tour.demo`, `demoAt/demoSeek`,
@@ -333,7 +335,7 @@ node tests/bench-frames.js <html> …  # Bildzeiten (Testumgebung)
 
 - Tests mit WebGL starten Chromium mit SwiftShader (Software-GPU, V15 ≈0,5–1,8 s je Bild); zeitkritische Prüfungen
   warten deshalb auf Bedingungen bzw. auf gezeichnete Bilder (`state().frames`) statt auf feste Zeiten.
-- Stand Korrektur 3D-Reise (16.10.2026): Gesamtlauf 562/0 ohne Wiederholung (inkl. t27). Stand Premium-Durchgang: 539/0 ohne Wiederholung (inkl. t25/t26), Bericht `docs/premium/BERICHT-PREMIUM.md`. Stand Fertigstellung (15.10.2026): 495/0. Früher V17.1: 356 bestehende Prüfungen + t20 43/43 = 399 (Details und ehrliche
+- Stand Realismus-Auftrag (18.10.2026): Gesamtlauf 612/0 ohne Wiederholung (inkl. t28 50/50), Belege `docs/realismus/`. Stand Korrektur 3D-Reise (16.10.2026): Gesamtlauf 562/0 ohne Wiederholung (inkl. t27). Stand Premium-Durchgang: 539/0 ohne Wiederholung (inkl. t25/t26), Bericht `docs/premium/BERICHT-PREMIUM.md`. Stand Fertigstellung (15.10.2026): 495/0. Früher V17.1: 356 bestehende Prüfungen + t20 43/43 = 399 (Details und ehrliche
   Einordnung eines einmaligen Zeitausreissers in t11: `docs/TESTBERICHT-V17.1.md`, Leistung: `docs/PERFORMANCE-V17.1.md`).
 - Stand V17 (Branch `v17-final-realism`, Tag `v17-stand`; Sicherung des V16-Stands: Tag `v16-stand`):
   RISE 21/21, t15 10/10, t7 68/68, t9 18/18, t11 37/37, t12 14/14, t13 24/24, t14 28/28, t16 19/19, t17 18/18,
