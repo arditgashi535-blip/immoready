@@ -17,8 +17,9 @@ const PORTRAIT = {
   eingang: { e: [-0.35, 2.1, 4.75], t: [1.75, 1.55, 1.75], f: 0.92 },
   wohnung: { e: [5.85, 2.0, 3.6], t: [7.4, 1.5, 1.0], f: 0.95 },
   bad: { e: [5.0, 1.62, 2.05], t: [3.3, 1.0, 0.35], f: 0.95 },
-  'bad-waschtisch': { e: [3.98, 1.66, 1.3], t: [3.24, 1.15, 0.8], f: 0.78 },
-  'bad-wc': { e: [4.05, 1.36, 0.62], t: [3.36, 0.78, -0.38], f: 0.84 },
+  /* Überarbeitung 2: Waschtisch weiter zurück (Armatur mit Luft nach oben, Platz für den Vergleich am Bild), WC mit Betätigungsplatte */
+  'bad-waschtisch': { e: [4.3, 1.92, 1.42], t: [3.3, 1.2, 0.84], f: 0.8 },
+  'bad-wc': { e: [4.4, 1.52, 0.8], t: [3.33, 0.98, -0.34], f: 0.86 },
   zurueck: { e: [37, 17.5, 47], t: [0.2, 4.7, 1.5], f: 0.56 }
 };
 (async () => {

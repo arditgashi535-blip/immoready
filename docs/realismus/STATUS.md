@@ -155,6 +155,8 @@ Am Eingang bleiben +21 %: dort ist der Wohnungsstaub tatsächlich in Sichtweite.
 
 ### Belege in diesem Ordner
 
+> Hinweis: Diese Liste beschreibt den Stand vor Überarbeitung 2. Die Dateien wurden mit dem Endstand der Überarbeitung 2 neu erzeugt (gleiche oder neue Namen); massgeblich ist die Liste unter «Ergebnis Überarbeitung 2».
+
 | Datei | Inhalt |
 |---|---|
 | `vergleich-desktop.jpg`, `vergleich-handy.jpg` | Ausgangsstand und Endstand: Startseite und sechs Stationen (Desktop 1440×900 3D, Handy 390×844 Bildmodus), beschriftet |
@@ -316,3 +318,57 @@ Anlass: Im ruhigeren Ausschnitt (Waschtisch ≈ 480 px breit, rund 1 Bildpunkt j
 - Heckenkarten bewegen sich im Wind kaum noch (geschnittene Hecke). Stämme und Äste waren schon unbewegt.
 - Rasen mit dezenten Mähstreifen (0,6 m, ±6 %).
 - **Pflanzenassets geprüft:** Im Projekt liegen keine lizenzierten Pflanzenmodelle oder -texturen. Vorhanden ist nur der eigene, prozedural erzeugte Laubatlas `assets/tex/laub.webp` (`tools/make-textures.py`, `assets/tex/LIZENZ.txt`: eigenes Werk). Es wurde nichts heruntergeladen.
+
+## Runde 11 – Handy, Funde aus dem Prüflauf, Leistung
+
+- **Handy (Befund 8):** Vergleich direkt am Bild (`.jr-cmpo`, oben rechts im Bildrahmen) mit dem Hinweis «Illustration · kein Kundenergebnis». Im Bildmodus ersetzt er die Knöpfe im Stationstext (nicht doppelt), im Handy-3D bleibt dort der Regler «Reinigungsfortschritt». Wer «Vorher» antippt, sieht die Wirkung, ohne zurückzuscrollen. Geprüft per Antippen und Tastatur (t29, t28). Ladehinweis «3D wird geladen …» und der Rückfall «3D läuft auf diesem Gerät nicht flüssig. Sie sehen Bilder derselben Szene.» waren schon vorhanden und sind unverändert.
+- **Fund 768 px (t14):** Die neue Polsterung der Bühne galt für alle Breiten und hob auf Tablets (Hochformat) den Platz für die Stationsleiste auf – Anfrageknöpfe lagen darunter. Jetzt nur auf dem Desktop; ≤ 980 px steht der Text wie vor der Kopfregel.
+- **Fund Leistungspunkt Bad (t17):** In der neuen Bad-Übersicht ragte die 190 px breite Beschriftung 7 px in die Stationsleiste und wurde deshalb ausgeblendet. Ist die bevorzugte Seite belegt, steht die Beschriftung jetzt auf der anderen Seite; ausgeblendet wird nur, wenn beide Seiten belegt sind.
+- **Fund Vergleich in der Bad-Übersicht (t28):** Folge der Regel «Vergleich nur, wo er etwas zeigt»; die Prüfung bedient den Vergleich jetzt an der Nahansicht Waschtisch und prüft, dass die Übersicht keinen zeigt.
+- **Leistung** (nur Software-Grafik SwiftShader dieser Umgebung, 1440×900, ohne `IR_FORCE_HQ`; Ausgangsstand = Build von `ade7f1a`): {{BENCH}}
+- **Vertex-Attribute** unverändert 8 (`p`, `n`, `c`, `em`, `lt`, `lt2`, `sl`, `sc`); die Sonnensichtbarkeit steckt aussen in der Glanzfarbe `sc`. Keine neue Shader-Variante und keine neue Schleife: die Wasserränder sind eine Lage statt zwei, der Wischweg ohne `atan`. Die übrigen Neuerungen sind Rechnung ohne Verzweigung (Mähstreifen, Parkettfugen) oder liegen im vorab gerechneten Licht.
+
+## Ergebnis Überarbeitung 2 (Endstand)
+
+Sichtbar umgesetzt, Reihenfolge nach Wirkung:
+1. Die Szene liegt vollständig unter dem Kopf. Text, Beschriftungen und Leistungspunkte überdecken weder Motiv noch Bedienung. Die Bad-Nahansichten zeigen Armatur, Becken und Reinigungsflächen bei 1280×720, 1440×900 und 1920×1080 gleich gross und frei.
+2. Tageslicht mit Richtung: Schlagschatten von Baum, Balkonen und Vordach, Fensterlicht mit Abfall in den Raum, Sonnenflecken innen; Dämmerung unverändert umschaltbar.
+3. Gartenweg, Veloplatz und Terrasse aus einzelnen, leicht verschiedenen Platten; Parkett mit Dielenfugen; Fassade ohne Interpolationsfahnen.
+4. Beete in Pflanzgruppen mit drei Grassorten, Stauden und Sträuchern, Bodenkontakt; Rasen mit Mähstreifen; Hecken ruhig.
+5. Schmutz am Waschtisch nach seiner Entstehung, Reinigung vom Rand zum Ablauf mit materialgerechter Nasskante; Vergleich nur, wo er etwas zeigt.
+6. «Details ansehen», neutraler Text an der Demo-Naht, Vergleich am Bild auf dem Handy.
+
+**Kein Fotorealismus:** Die Bilder bleiben sichtbar stilisiert: prozedurale Texturen, Laubkarten, Licht je Eckpunkt. Die Szene ist durchgehend als «Illustrative Visualisierung · kein Referenzobjekt» gekennzeichnet, der Vergleich als «Illustration eines Arbeitsablaufs, kein Kundenergebnis».
+
+### Belege in diesem Ordner (alle aus dem Endstand)
+
+| Datei | Inhalt |
+|---|---|
+| `vergleich-desktop.jpg` | Ausgangsstand (`ade7f1a`) und Endstand, 1280×720, Kundenansicht, alle Stationen und Nahansichten |
+| `vergleich-handy.jpg` | dasselbe auf dem Handy 390×844, Bildmodus und Handy-3D |
+| `uebersicht-desktop.jpg` | Endstand 1440×900 mit Bedienung und als reine Szene |
+| `bad-zustaende.jpg` | Waschtisch bei 0 / 25 / 50 / 75 / 100 % (Regler in der Website), Kundenansicht und Ausschnitt 1:1 |
+| `vergleich-3d.jpg` | Vorher/Nachher im 3D: Garten, Eingang, Wohnung, Bad |
+| `stationen-vorher-nachher.jpg` | Stationsbilder (Bildmodus) Vorher/Nachher, quer und hoch |
+| `details-1zu1.jpg` | Ausschnitte 1:1 aus den Stationsbildern |
+| `demo-rundlauf.mp4`, `demo-rundlauf-naht.mp4`, `demo-rundlauf-naht.jpg` | Demo-Rundlauf 48 s (Bild für Bild aus der Seite), Naht in Echtzeit und Zeitlupe, letztes/erstes Bild mit Differenz |
+| `demo-dreimal.txt` | Echtzeit-Wiedergabe im Browser, drei Durchläufe: Sprünge, Naht, Text an der Naht, Bildabstände |
+| `testlauf.log` | tatsächliches Protokoll des Gesamtlaufs |
+
+### Grenzen (Ursache → nächster Schritt)
+
+1. **Schatten nur so fein wie das Eckpunktraster** (Fassaden 17 cm, Boden aussen 50 cm, Böden innen 25 cm). Kleine Schatten fehlen, etwa von Pollern und Stuhlbeinen. → Sonnenschatten je Bildpunkt über eine einmal gerechnete Schattentextur. Erst prüfen: Texturbudget unter WebGL 1 (Einheit 7 ist die letzte freie) und Kosten in der Software-Grafik.
+2. **Pflanzen aus vier eigenen Laubkarten.** Aus der Nähe bleiben Silhouetten kartenhaft. Lizenzierte Pflanzenmodelle gibt es im Projekt nicht. → Lizenzierte Assets nur nach Ihrer Freigabe, Kosten und Lizenz vorher klären.
+3. **Prozedurale Texturen** ohne fotografische Mikrostruktur. → Lizenzierte Materialscans nach Freigabe.
+4. **Nicht bearbeitet:** Nachbarhäuser als einfache Baukörper und das Sofa aus wenigen Quadern (Befund 10).
+5. **Handy-3D lädt keine Texturen und Lichtdaten**, dort also ohne Schatten (bewusst, Ladezeit).
+6. **Messungen nur in der Software-Grafik dieser Umgebung.** Keine Bildraten auf echter Hardware gemessen. Safari, iPhone und Android sind nicht geprüft.
+7. **Eine Tageszeit:** Sonne fest, etwa 58° hoch. Der Himmel bleibt dunstig hell.
+
+### Freigabe der Vorschau
+
+Der Artefakt-Dienst meldet für die Vorschau «shared with anyone with the link». Wer den Link hat, kann sie öffnen; privat ist sie nicht. Ändern lässt sich das nur im Teilen-Menü der Vorschau; Claude kann die Freigabe nicht ändern. Wix-Seite, Domain, Firmenangaben und öffentliche Sichtbarkeit sind unverändert.
+
+### Prüfungen (Endstand)
+
+{{TESTS}}

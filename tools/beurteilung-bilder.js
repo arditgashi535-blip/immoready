@@ -52,6 +52,9 @@ const HIDE = '#reise .jr-ui,#reise .jr-st,#reise .jr-skip,#reise .jr-hot,#reise 
         if (pt.det) { const bt = [...r.querySelectorAll('.jr-st.on [data-det]')].find(x => x.textContent.trim().toLowerCase() === pt.det.toLowerCase()); if (bt) bt.setAttribute('aria-pressed', 'true'); }
       }, pt);
       await p.waitForFunction(f => window.__JR.state().frames > f, f0, { timeout: 120000 }).catch(() => {});
+      /* ein weiteres Bild: Ansichtswahl, Vergleich und Beschriftungen folgen dem Fortschritt erst im nächsten Bild */
+      const f1 = await p.evaluate(() => { const t = window.__JR; t.jump(t.state().p); return t.state().frames; });
+      await p.waitForFunction(f => window.__JR.state().frames > f, f1, { timeout: 120000 }).catch(() => {});
       /* Textüberblendung abwarten (in der Software-Grafik laufen CSS-Übergänge verzögert) */
       await p.waitForFunction(() => [...document.querySelectorAll('#reise .jr-st')].every(e => +getComputedStyle(e).opacity === (e.classList.contains('on') ? 1 : 0)), null, { timeout: 15000 }).catch(() => {});
       await p.waitForTimeout(300);
