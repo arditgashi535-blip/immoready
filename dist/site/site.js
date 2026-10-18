@@ -881,7 +881,7 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
     var buildMs = 0, bakeMs = 0;
     /* Aufbau in Etappen (Geometrieteile, dann Licht je Satz) – beim Start auf Leerlauf-Phasen verteilt.
        Vorab gerechnetes Licht (opts.bake) wird parallel entpackt; die Licht-Etappen warten darauf höchstens 2,5 s. */
-    var baked = false, partsDone = 0, bakeQ = null, PB = null, pbState = 'none', pbT0 = 0, pbRaw = null, pbHash = '', pbUsed = false;
+    var baked = false, partsDone = 0, bakeQ = null, PB = null, pbState = 'none', pbT0 = 0, pbRaw = null, pbHash = '', pbUsed = false, pbK = 0;
     function buildGeo() { var t0 = Date.now(); T = G; SUB = 0; SUBMODE = 'all'; MAT = 0; BUILD_PARTS[partsDone++](); T = G; buildMs += Date.now() - t0; if (partsDone === BUILD_PARTS.length) built = true; }
     /* eine Etappe ausführen; true = alles fertig. noWait: nicht auf das vorab gerechnete Licht warten */
     function buildStep(noWait) {
@@ -896,7 +896,7 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
         var t0 = Date.now(), j = bakeQ.shift(), pb = PB && PB[j[0].name];
         /* bewegte Türen: Licht für geschlossen und offen, der Shader mischt nach Öffnungsgrad (keine falschen Schatten) */
         if (j[2]) { bakeSet(j[0], j[2]); var L2 = j[0].L; bakeSet(j[0], j[1]); j[0].L2 = L2; }
-        else bakeSet(j[0], j[1], pb && pb.ao, pb && pb.lv);
+        else bakeSet(j[0], j[1], pb && pb.ao, pb && pb.lv, pb && pb.sv, pb && pb.ws);
         bakeMs += Date.now() - t0; if (!bakeQ.length) baked = true; return baked;
       }
       return true;
@@ -922,9 +922,12 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
     function applyBake() {
       PB = null; pbUsed = false; if (pbState !== 'ready' || !pbRaw) return;
       var nG = G.P.length / 3, nI = INT.P.length / 3, nE = ENV.P.length / 3;
-      if (pbRaw.length !== 2 * (nG + nI + nE) || pbHash !== geoHash()) { if (win.console) win.console.info('ImmoReady-Rundgang: vorab gerechnetes Licht passt nicht zur Geometrie – Licht wird zur Laufzeit gerechnet.'); return; }
-      var o = 0; PB = {};
-      [[G, nG], [INT, nI], [ENV, nE]].forEach(function (x) { PB[x[0].name] = { ao: pbRaw.subarray(o, o + x[1]), lv: pbRaw.subarray(o + x[1], o + 2 * x[1]) }; o += 2 * x[1]; });
+      /* Überarbeitung 2: je Eckpunkt vier Bytes – Umgebungsverdeckung, Leuchten, Sonne (Tageslicht), Himmel durch Öffnungen (innen);
+         Daten mit zwei Bytes (vor Überarbeitung 2) bleiben lesbar, dann ohne Sonnenschatten */
+      var nT = nG + nI + nE, K = pbRaw.length === 4 * nT ? 4 : pbRaw.length === 2 * nT ? 2 : 0;
+      if (!K || pbHash !== geoHash()) { if (win.console) win.console.info('ImmoReady-Rundgang: vorab gerechnetes Licht passt nicht zur Geometrie – Licht wird zur Laufzeit gerechnet.'); return; }
+      var o = 0; PB = {}; pbK = K;
+      [[G, nG], [INT, nI], [ENV, nE]].forEach(function (x) { var n = x[1]; PB[x[0].name] = { ao: pbRaw.subarray(o, o + n), lv: pbRaw.subarray(o + n, o + 2 * n), sv: K > 2 ? pbRaw.subarray(o + 2 * n, o + 3 * n) : null, ws: K > 2 ? pbRaw.subarray(o + 3 * n, o + 4 * n) : null }; o += K * n; });
       pbUsed = true;
     }
     /* ---------- Materialtexturen: 8 Graustufenbilder → 2 RGBA-Texturen (je 4 Kanäle), dazu der Laubatlas ---------- */
@@ -1154,18 +1157,27 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
        Bodenverschattung unter Körpern (OCC). */
     /* Realismus-Auftrag: zweite Lichtfassung «Tageslicht» (weich, bedeckt, neutral) – gleiche Umgebungsverdeckung und Schatten
        aus licht.json, Aussenleuchten aus, Innenleuchten gedämpft, Tageslicht durch die Fenster. BDAY schaltet die Rechnung um. */
+    /* WSREF: Anteil der Himmelsstrahlen durch Öffnungen, ab dem ein Innenpunkt als «am Fenster» gilt. Gemessen im Lichtwerkzeug
+       (WS_STATS=1): Wohnraum Boden Median 0,8 %, 90 % bei 1,9 %; Wände 0,3 % / 3,8 % – realistische Tageslichtquotienten. Der Anteil
+       wird über die Wurzel abgebildet (wahrnehmungsgerechter Abfall vom Fenster in den Raum). */
+    var WSREF = 0.02;
     var BDAY = (C.light || 'tag') === 'tag' ? 1 : 0, SUND = (function () { var v = [0.35, 0.85, 0.4], l = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]); return [v[0] / l, v[1] / l, v[2] / l]; })();
-    function bakeOne(q, n, m, spec, ao, lv) {
+    function bakeOne(q, n, m, spec, ao, lv, sv, ws) {
       var pre = ao !== undefined; if (!pre) { ao = 1; lv = 1; }
       var rm = roomOf(q), t = n[1] * 0.5 + 0.5, k, o0, o1, o2, i, l;
+      /* Überarbeitung 2 – Tageslicht mit Richtung: Sonne (SUND) mit vorab gerechneter Sichtbarkeit sv (Schlagschatten, Sonnenflecken
+         durch die Fenster) und Himmelslicht; innen nimmt das Himmelslicht mit dem Abstand zur Öffnung ab (ws = Anteil der Strahlen, die
+         den Raum durch eine Öffnung verlassen). Ohne Vorabdaten: aussen besonnt ohne Schatten, innen ohne Sonnenflecken. */
+      if (sv === undefined) sv = rm ? 0 : 1;
+      if (ws === undefined) ws = WSREF * 0.5;
+      var ks = Math.max(n[0] * SUND[0] + n[1] * SUND[1] + n[2] * SUND[2], 0);
       if (BDAY && rm) {
         k = (0.8 + 0.2 * sstep(0.5, 1.2, q[1]));
-        var wfd = Math.max(n[0] * WINF[0] + n[1] * WINF[1] + n[2] * WINF[2], 0);
-        o0 = ((0.27 + 0.1 * t) * k + 0.2 * wfd) * ao; o1 = ((0.275 + 0.1 * t) * k + 0.21 * wfd) * ao; o2 = ((0.28 + 0.105 * t) * k + 0.225 * wfd) * ao;
+        var wfd = Math.max(n[0] * WINF[0] + n[1] * WINF[1] + n[2] * WINF[2], 0), wl = Math.min(1.25, Math.sqrt(ws / WSREF)), bb = (0.1 + 0.04 * t) * k, wn = (0.28 + 0.1 * t + 0.2 * wfd) * wl, sn = 0.9 * ks * sv;
+        o0 = (bb * 0.98 + wn * 0.96) * ao + sn * 1.04; o1 = (bb + wn * 0.985) * ao + sn * 0.99; o2 = (bb * 1.02 + wn * 1.04) * ao + sn * 0.92;
       } else if (BDAY) {
-        var ks = Math.max(n[0] * SUND[0] + n[1] * SUND[1] + n[2] * SUND[2], 0);
-        var kd = (pre ? ao * (0.9 + 0.1 * sstep(0, 1.2, q[1])) : (0.62 + 0.38 * sstep(0, 1.7, q[1])));
-        o0 = (0.3 + 0.42 * t + 0.16 * ks) * 0.96 * kd; o1 = (0.3 + 0.42 * t + 0.16 * ks) * 0.985 * kd; o2 = (0.3 + 0.42 * t + 0.16 * ks) * 1.03 * kd;
+        var kd = (pre ? ao * (0.9 + 0.1 * sstep(0, 1.2, q[1])) : (0.62 + 0.38 * sstep(0, 1.7, q[1]))), sky = (0.2 + 0.3 * t) * kd, sn2 = 0.62 * ks * sv;
+        o0 = sky * 0.94 + sn2 * 1.04; o1 = sky * 0.975 + sn2 * 0.99; o2 = sky * 1.05 + sn2 * 0.92;
       } else if (rm) {
         k = (0.74 + 0.26 * sstep(0.5, 1.2, q[1])) * (0.86 + 0.14 * sstep(CEIL, CEIL - 0.6, q[1]));
         /* linear: schwache, neutrale Grundaufhellung; die Leuchten (direkt + indirekt) prägen den Raum */
@@ -1191,7 +1203,8 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
       }
       var dk = rm ? 1.5 : 1.6;
       o0 += (a0 * lv * dk + ib0 * 0.32 * ao) * ldk; o1 += (a1 * lv * dk + ib1 * 0.32 * ao) * ldk; o2 += (a2 * lv * dk + ib2 * 0.32 * ao) * ldk;
-      if (spec) { if (best >= 0) { l = LIT[best]; var sk = 0.35 + 0.65 * lv; spec[0] = l[0]; spec[1] = l[1]; spec[2] = l[2]; spec[3] = l[3]; spec[4] = l[4] * sk; spec[5] = l[5] * sk; spec[6] = l[6] * sk; } else { spec[0] = spec[1] = spec[2] = 0; spec[3] = 1; spec[4] = spec[5] = spec[6] = 0; } }
+      /* aussen ohne Leuchte: Glanzfarbe trägt die Sonnensichtbarkeit (Shader: kein Sonnenglanz im Schatten) */
+      if (spec) { if (best >= 0) { l = LIT[best]; var sk = 0.35 + 0.65 * lv; spec[0] = l[0]; spec[1] = l[1]; spec[2] = l[2]; spec[3] = l[3]; spec[4] = l[4] * sk; spec[5] = l[5] * sk; spec[6] = l[6] * sk; } else { spec[0] = spec[1] = spec[2] = 0; spec[3] = 1; spec[4] = spec[5] = spec[6] = rm ? 0 : sv; } }
       return [o0, o1, o2];
     }
     /* Gewichte der Leuchten für einen Eckpunkt (für das Vorabrechnen der weichen Schatten): [[Index, Beitrag], …] */
@@ -1205,14 +1218,14 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
       }
       return out;
     }
-    function bakeSet(Sx, Mx, AOa, LVa) {
-      if (AOa !== undefined || !('_ao' in Sx)) { Sx._ao = AOa; Sx._lv = LVa; }
+    function bakeSet(Sx, Mx, AOa, LVa, SVa, WSa) {
+      if (AOa !== undefined || !('_ao' in Sx)) { Sx._ao = AOa; Sx._lv = LVa; Sx._sv = SVa; Sx._ws = WSa; }
       var nv = Sx.P.length / 3, L = new Float32Array(nv * 3), SL = new Float32Array(nv * 4), SC = new Float32Array(nv * 3), sp = [0, 0, 0, 1, 0, 0, 0], q = [0, 0, 0], n = [0, 0, 0];
       Mx = Mx || null;
       for (var v = 0, i = 0; v < nv; v++, i += 3) {
         q[0] = Sx.P[i]; q[1] = Sx.P[i + 1]; q[2] = Sx.P[i + 2]; n[0] = Sx.N[i]; n[1] = Sx.N[i + 1]; n[2] = Sx.N[i + 2];
         if (Mx) { var x = q[0], y = q[1], z = q[2], a = n[0], b = n[1], c = n[2]; q[0] = Mx[0] * x + Mx[4] * y + Mx[8] * z + Mx[12]; q[1] = Mx[1] * x + Mx[5] * y + Mx[9] * z + Mx[13]; q[2] = Mx[2] * x + Mx[6] * y + Mx[10] * z + Mx[14]; n[0] = Mx[0] * a + Mx[4] * b + Mx[8] * c; n[1] = Mx[1] * a + Mx[5] * b + Mx[9] * c; n[2] = Mx[2] * a + Mx[6] * b + Mx[10] * c; }
-        var o = AOa ? bakeOne(q, n, Sx.M[v], sp, AOa[v] / 255, LVa[v] / 255) : bakeOne(q, n, Sx.M[v], sp);
+        var o = AOa ? bakeOne(q, n, Sx.M[v], sp, AOa[v] / 255, LVa[v] / 255, SVa ? SVa[v] / 255 : undefined, WSa ? WSa[v] / 255 : undefined) : bakeOne(q, n, Sx.M[v], sp);
         if (Sx.AO) { o[0] *= Sx.AO[v]; o[1] *= Sx.AO[v]; o[2] *= Sx.AO[v]; }
         L[i] = o[0]; L[i + 1] = o[1]; L[i + 2] = o[2];
         SL[v * 4] = sp[0]; SL[v * 4 + 1] = sp[1]; SL[v * 4 + 2] = sp[2]; SL[v * 4 + 3] = sp[3]; SC[i] = sp[4]; SC[i + 1] = sp[5]; SC[i + 2] = sp[6];
@@ -1470,8 +1483,15 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
     MAT=ERD;withSub(0.5,function(){box(-5.19,-0.05,ZF+0.225,7.62,0.08,0.45,'#9b968d',0,0);box(3.69,-0.05,ZF+0.225,4.12,0.08,0.45,'#9b968d',0,0);box(XS+0.225,-0.05,0.225,0.45,0.08,DEP+0.45,'#9b968d',0,0);
       box(0,-0.05,-ZF-0.225,W+0.9,0.08,0.45,'#9b968d',0,0);box(-XS-0.225,-0.05,0.0,0.45,0.08,DEP,'#9b968d',0,0);},'up');
     MAT=MET;box(-5.19,-0.05,ZF+0.453,7.62,0.1,0.006,'#4b4845',0,0);box(3.69,-0.05,ZF+0.453,4.12,0.1,0.006,'#4b4845',0,0);box(XS+0.453,-0.05,0.0,0.006,0.1,DEP,'#4b4845',0,0);MAT=PUTZ;
-    /* Gehweg: Betonplatten 50 cm, Granit-Randsteine in 1-m-Stücken */
-    MAT=PLA;withSub(0.5,function(){box(0,-0.05,13.45,1.6,0.1,11.6,'#a8a39b',0,0);},'up');
+    /* Überarbeitung 2: Plattenbeläge aus einzelnen Platten statt einer durchgehenden Fläche (seit V17 enthält die Plattentextur keine
+       eingebrannten Fugen mehr – innen zeichnet der Shader die Fugen). Fugen 8 mm über einem dunklen Sandbett, Fase 4 mm, Ton je
+       Platte ±5 %, Höhe je Platte ±1 mm, einzelne Platten verwittert dunkler. Masse illustrativ (Annahme, keine Normangabe). */
+    function slabs(x0,x1,z0,z1,ytop,nx,lz,col,th){var J=0.008,w=(x1-x0-(nx+1)*J)/nx,c=hex(col);th=th||0.04;
+      MAT=ERD;withSub(0.5,function(){box((x0+x1)/2,ytop-th-0.01,(z0+z1)/2,x1-x0,th+0.004,z1-z0,'#5d584f',0,0);},'up');
+      MAT=PLA;BEV=0.004;for(var zz=z0+J;zz<z1-0.05;zz+=lz+J){var l=Math.min(lz,z1-J-zz);for(var i=0;i<nx;i++){var k=0.95+0.1*rnd(),u=rnd()*2-1;if(rnd()<0.12)k*=0.9;
+        var cc=[c[0]*k*(1+0.02*u),c[1]*k,c[2]*k*(1-0.02*u)];withSub(0.5,function(){box(x0+J+w/2+i*(w+J),ytop-th+(rnd()-0.5)*0.002,zz+l/2,w,th,l,cc,0,0);},'up');}}BEV=0;}
+    /* Gehweg: Betonplatten ≈ 52 × 50 cm, Granit-Randsteine in 1-m-Stücken */
+    slabs(-0.8,0.8,7.65,19.25,0.05,3,0.5,'#a8a39b');
     MAT=STE;BEV=0.01;for(var z=7.65;z<19.25;z+=1.0){var l=Math.min(0.994,19.25-z);box(-0.84,-0.1,z+l/2,0.08,0.18,l,'#a29d95',0,0);box(0.84,-0.1,z+l/2,0.08,0.18,l,'#a29d95',0,0);}BEV=0;
     MAT=PUTZ;
     /* Beete: Erde mit Stahlkante, Pflanzen sitzen in der Erde */
@@ -1481,25 +1501,40 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
     var Y=0.045;
     /* linkes Beet: Felsenbirne (mehrstämmig), Sträucher, Gräser, Stauden in Gruppen */
     treeC(-3.9,10.1,1.15,'#8a9a72',[[-0.12,0],[0.1,0.08],[0.02,-0.12]]);
-    shrubC(-5.4,Y,9.0,0.42,0.75,LEAF[1]);shrubC(-5.6,Y,11.1,0.36,0.62,LEAF[3]);shrubC(-2.0,Y,11.2,0.34,0.55,LEAF[0]);shrubC(-1.85,Y,8.9,0.3,0.5,LEAF[4]);
-    [[-4.7,8.75],[-4.4,9.05],[-2.9,8.7],[-2.6,11.4],[-3.1,11.55],[-5.0,11.45],[-1.75,10.1]].forEach(function(g,i){grassC(g[0],Y,g[1],0.55+rnd()*0.3,['#c9bf8a','#b8b480','#cfc394'][i%3]);});
-    [[-4.9,10.2],[-4.6,10.6],[-2.4,9.6],[-2.2,10.4],[-3.4,9.2],[-5.3,10.0],[-2.9,10.95]].forEach(function(g){perC(g[0],Y,g[1],0.42+rnd()*0.2,['#b5c19c','#c2c6a2','#adbb94'][(rnd()*3)|0]);});
+    /* Überarbeitung 2: Bodenkontakt – dunklere, feuchtere Erde direkt unter jeder Pflanze (weicher Verlauf zum Beet hin; das
+       vorab gerechnete Licht verschattet zusätzlich durch das Laub) */
+    var SOIL=C3('#6b5947');
+    function foot(x,z,r){r*=1.3;var cd=[SOIL[0]*0.48,SOIL[1]*0.46,SOIL[2]*0.44],up=[0,1,0],c=[x,Y+0.0015,z],N=10,a0=rnd()*6.283;MAT=ERD;
+      for(var i=0;i<N;i++){var a=a0+i/N*6.283,b=a0+(i+1)/N*6.283,ra=r*(0.85+0.3*h2(i,x)),rb=r*(0.85+0.3*h2((i+1)%N,x));vert(c,up,cd,0);vert([x+Math.cos(b)*rb,Y+0.0015,z+Math.sin(b)*rb],up,SOIL,0);vert([x+Math.cos(a)*ra,Y+0.0015,z+Math.sin(a)*ra],up,SOIL,0);}MAT=PUTZ;}
+    /* Pflanzen in Gruppen («Drifts») wie bei einer Beetpflanzung: je Gruppe eine Sorte, Abstand je Pflanze, Grösse gestreut */
+    function drift(cx,cz,rx,rz,n,fn){var pts=[],tries=0;while(pts.length<n&&tries<80){tries++;var a=rnd()*6.283,d=Math.sqrt(rnd()),x=cx+Math.cos(a)*rx*d,z=cz+Math.sin(a)*rz*d;
+      if(pts.some(function(q){return Math.hypot(q[0]-x,q[1]-z)<0.26;}))continue;pts.push([x,z]);fn(x,z,pts.length-1);}}
+    /* Sorten (Tönung der Laubkarten, Höhe in m): Lampenputzergras ocker, Blauschwingel blaugrau und niedrig, Segge grün, Stauden */
+    function gOcker(x,z){var h=0.55+rnd()*0.3;foot(x,z,0.17+h*0.12);grassC(x,Y,z,h,['#c9bf8a','#bfb582','#cfc394'][(rnd()*3)|0],5+((rnd()*3)|0));}
+    function gBlau(x,z){var h=0.24+rnd()*0.1;foot(x,z,0.13);grassC(x,Y,z,h,['#a3b2a4','#9eae9f'][(rnd()*2)|0],8);}
+    function gSegge(x,z){var h=0.36+rnd()*0.14;foot(x,z,0.15);grassC(x,Y,z,h,['#9bad76','#a4b47f'][(rnd()*2)|0],6+((rnd()*2)|0));}
+    function pStaude(x,z){var h=0.34+rnd()*0.22;foot(x,z,0.18);perC(x,Y,z,h,['#9cb07f','#a8b98c','#8ea374'][(rnd()*3)|0]);}
+    function sh(x,z,r,hg,c){foot(x,z,r*1.15);shrubC(x,Y,z,r,hg,c);}
+    sh(-5.4,9.0,0.42,0.75,LEAF[1]);sh(-5.6,11.1,0.36,0.62,LEAF[3]);sh(-2.0,11.2,0.34,0.55,LEAF[0]);sh(-1.85,8.9,0.3,0.5,LEAF[4]);
+    foot(-3.9,10.1,0.45);
+    drift(-4.55,8.9,0.5,0.28,4,gOcker);drift(-2.9,11.45,0.55,0.2,5,gBlau);drift(-5.05,10.35,0.32,0.45,3,gSegge);
+    drift(-2.45,9.95,0.4,0.42,4,pStaude);drift(-3.15,9.0,0.3,0.25,2,pStaude);drift(-1.7,10.15,0.15,0.3,2,gOcker);
     /* rechtes Beet */
-    shrubC(4.3,Y,10.9,0.4,0.7,LEAF[2]);shrubC(4.35,Y,13.0,0.36,0.6,LEAF[0]);shrubC(1.9,Y,13.15,0.3,0.48,LEAF[3]);
-    [[1.8,10.8],[2.2,11.2],[3.1,10.7],[3.5,12.6],[2.6,13.3],[1.75,12.1]].forEach(function(g,i){grassC(g[0],Y,g[1],0.5+rnd()*0.3,['#c9bf8a','#bdb784'][i%2]);});
-    [[2.6,11.8],[3.2,11.6],[2.1,12.6],[3.9,12.0],[3.0,12.7]].forEach(function(g){perC(g[0],Y,g[1],0.4+rnd()*0.2,['#b5c19c','#c2c6a2'][(rnd()*2)|0]);});
+    sh(4.3,10.9,0.4,0.7,LEAF[2]);sh(4.35,13.0,0.36,0.6,LEAF[0]);sh(1.9,13.15,0.3,0.48,LEAF[3]);
+    drift(2.0,11.0,0.35,0.35,3,gOcker);drift(3.35,12.55,0.4,0.3,3,gSegge);drift(2.6,13.3,0.45,0.18,4,gBlau);
+    drift(2.95,11.8,0.55,0.45,5,pStaude);drift(1.75,12.15,0.15,0.3,2,gOcker);
     /* Pflanzstreifen vor den Fenstern: niedrige, geschnittene Sträucher */
     /* Pflanzstreifen vor den Fenstern: lockere Gruppen aus Kugelsträuchern, Stauden und Gräsern – kein Raster */
     function strip(x0,x1){var px=x0;while(px<x1){var z=ZF+0.62+rnd()*0.38,r=rnd();
-      if(r<0.55){var rr=0.2+rnd()*0.12;shrubC(px,Y,z,rr,rr*1.5,LEAF[(rnd()*5)|0]);px+=rr*1.6+rnd()*0.35;}
-      else if(r<0.8){perC(px,Y,z,0.32+rnd()*0.2,['#b5c19c','#aebb92'][(rnd()*2)|0]);px+=0.35+rnd()*0.3;}
-      else{grassC(px,Y,z,0.4+rnd()*0.2,'#c2bb88');px+=0.3+rnd()*0.3;}}}
+      if(r<0.55){var rr=0.2+rnd()*0.12;foot(px,z,rr*1.1);shrubC(px,Y,z,rr,rr*1.5,LEAF[(rnd()*5)|0]);px+=rr*1.6+rnd()*0.35;}
+      else if(r<0.8){foot(px,z,0.16);perC(px,Y,z,0.32+rnd()*0.2,['#9cb07f','#a8b98c'][(rnd()*2)|0]);px+=0.35+rnd()*0.3;}
+      else{foot(px,z,0.14);grassC(px,Y,z,0.4+rnd()*0.2,['#c2bb88','#9bad76'][(rnd()*2)|0]);px+=0.3+rnd()*0.3;}}}
     strip(-8.35,-1.85);strip(1.9,4.9);
     /* Grasbüschel am Beetrand und im Rasen (lockert die Kanten auf) */
     for(var k=0;k<70;k++){var gx=-15+rnd()*30,gz=6.2+rnd()*12.8;if(Math.abs(gx)<1.3)continue;if(gx>-6.4&&gx<-1.05&&gz>8.1&&gz<12.1)continue;if(gx>1.05&&gx<5.1&&gz>10.1&&gz<13.9)continue;if(gx>5.6&&gx<9.2&&gz<8.9)continue;
       card(gx,0.0,gz,0.22,0.12,rnd()*3,1,'#9aa070',{ao:0.6,sw:0.4});}
     /* Veloabstellplatz neben dem Weg: Platten, drei Anlehnbügel (Chromstahl), zwei Velos */
-    MAT=PLA;withSub(0.5,function(){box(2.55,-0.05,7.75,2.3,0.1,1.5,'#a8a39b',0,0);},'up');
+    slabs(1.4,3.7,7.0,8.5,0.05,4,0.5,'#a8a39b');
     MAT=EDS;[1.9,2.6,3.3].forEach(function(bx){var pts=[];for(var i=0;i<=16;i++){var t=i/16,z,y;if(t<0.3){z=7.35;y=t/0.3*0.62;}else if(t>0.7){z=8.15;y=(1-t)/0.3*0.62;}else{var a=(t-0.3)/0.4*Math.PI;z=7.75-0.4*Math.cos(a);y=0.62+0.16*Math.sin(a);}pts.push([bx,y+0.05,z]);}
       bogen(pts,0.02,0.02,10,'#a7a8a6',0);WALLS.push([bx-0.05,bx+0.05,0,0.85,7.3,8.2]);});
     function velo(x,z0,col){var P=function(a,u){return [x,0.05+u,z0-a];};MAT=TEX;[[0,0.34],[1.06,0.34]].forEach(function(w){var ring=[],rim=[];for(var i=0;i<=36;i++){var t=i/36*Math.PI*2;ring.push(P(w[0]+0.34*Math.cos(t),w[1]+0.34*Math.sin(t)));rim.push(P(w[0]+0.3*Math.cos(t),w[1]+0.3*Math.sin(t)));}
@@ -1520,7 +1555,7 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
     function hedge(x0,x1,z0,z1,hgt){MAT=HEC;withSub(0.6,function(){box((x0+x1)/2,0,(z0+z1)/2,x1-x0,hgt,z1-z0,'#4e5f40',0,0);},'all');MAT=PUTZ;
       var lx=x1-x0,lz=z1-z0,along=lx>lz,L=Math.max(lx,lz),n=Math.round(L/0.45);
       for(var i=0;i<n;i++){var t=(i+0.5)/n,cx=along?x0+lx*t:(x0+x1)/2,cz=along?(z0+z1)/2:z0+lz*t,yaw=along?0:Math.PI/2,th=Math.min(lx,lz)/2;
-        [-1,1].forEach(function(sd){var ox=along?0:sd*th,oz=along?sd*th:0;card(cx+ox*0.96+(rnd()-0.5)*0.1,hgt-0.34+rnd()*0.12,cz+oz*0.96+(rnd()-0.5)*0.1,0.55+rnd()*0.25,0.5+rnd()*0.08,yaw+(rnd()-0.5)*0.4,0,'#a3b28c',{cx:(x0+x1)/2,cz:(z0+z1)/2,ao:0.7,sw:0.35,tilt:sd*(along?1:-1)*0.35});});
+        [-1,1].forEach(function(sd){var ox=along?0:sd*th,oz=along?sd*th:0;card(cx+ox*0.96+(rnd()-0.5)*0.1,hgt-0.34+rnd()*0.12,cz+oz*0.96+(rnd()-0.5)*0.1,0.55+rnd()*0.25,0.5+rnd()*0.08,yaw+(rnd()-0.5)*0.4,0,'#a3b28c',{cx:(x0+x1)/2,cz:(z0+z1)/2,ao:0.7,sw:0.12,tilt:sd*(along?1:-1)*0.35});});
         /* V17.1: Oberseite aus zwei kleineren, gegeneinander geneigten Karten statt einer flachen Platte (wirkt aus der Nähe gewölbt) */
         [-1,-0.5,0,0.5,1].forEach(function(sd){var ox=along?(rnd()-0.5)*0.3:sd*th*0.55,oz=along?sd*th*0.55:(rnd()-0.5)*0.3;card(cx+ox,hgt-0.12+rnd()*0.06,cz+oz,0.36+rnd()*0.16,0.32+rnd()*0.12,yaw+(rnd()-0.5)*1.2,0,['#a3b28c','#9aab84','#a8b690'][(rnd()*3)|0],{cx:(x0+x1)/2,cz:(z0+z1)/2,ao:0.88,sw:0.35,tilt:(sd||(rnd()<0.5?-1:1))*(along?-1:1)*(0.7+rnd()*0.35)});});
         /* V17: unregelmässige Oberkante – einzelne Triebe ragen 5–15 cm über den Schnitt */
@@ -1529,7 +1564,9 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
     hedge(-15.6,-1.62,18.55,19.25,1.3);hedge(1.62,15.6,18.55,19.25,1.3);hedge(-15.6,-14.9,6.0,18.55,1.3);hedge(14.9,15.6,6.0,18.55,1.3);
     /* Terrasse vor dem Wohnraum: grossformatige Platten, Stufe zum Rasen, Pflanzkübel, Wandleuchte */
     grp('Terrasse',G);
-    MAT=PLA;withSub(0.45,function(){box(7.37,-0.05,ZF+1.4,3.16,0.49,2.8,'#b3aea5',0,0);box(7.37,-0.05,ZF+2.97,3.16,0.27,0.34,'#aaa59c',0,0);},'up');
+    MAT=PLA;withSub(0.45,function(){box(7.37,-0.05,ZF+1.4,3.16,0.445,2.8,'#aaa59c',0,0);box(7.37,-0.05,ZF+2.97,3.16,0.27,0.34,'#aaa59c',0,0);},'up');
+    /* Terrasse: grossformatige Platten ≈ 79 × 60 cm auf dem Unterbau (Oberkante wie bisher 0,44 m) */
+    slabs(5.79,8.95,ZF,ZF+2.8,0.44,4,0.6,'#b3aea5',0.035);
     MAT=BET;withBev(0.015,function(){box(8.55,0.44,ZF+2.3,0.7,0.5,0.5,'#8e8a83',0,0.2);});MAT=ERD;box(8.55,0.94,ZF+2.3,0.62,0.01,0.42,'#3d3129',0,0);MAT=PUTZ;
     grassC(8.55,0.95,ZF+2.3,0.7,'#c4bc8a',4);WALLS.push([8.2,8.9,0.44,1.6,ZF+2.05,ZF+2.55]);
     MAT=MET;box(8.75,2.45,ZF+0.04,0.12,0.2,0.08,'#3a3a39',0,0);MAT=LEU;box(8.75,2.44,ZF+0.06,0.09,0.012,0.05,'#ffe2b6',1.2,0);MAT=PUTZ;light(8.7,2.3,ZF+0.35,4.2,'#ffc98c',0.8,0);halo(8.75,2.42,ZF+0.09,0.3,'#ffcf98',0.28);
@@ -1558,8 +1595,9 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
     WIN.forEach(function(o){var hh={u0:o.u-o.w/2,u1:o.u+o.w/2,y0:o.y,y1:o.y+o.h};(o.F===FRONT?HF:o.F===SIDE?HS:o.F===BACK?HB:HL).push(hh);});
     /* Fassadenflächen (WDVS, Abriebputz), fein gerastert für Licht und Umgebungsverdeckung */
     MAT=PUTZ;
-    /* V17.1: Vorder- und Seitenfassade (Hauptansichten) feiner gerastert – Balkonschatten ohne schräge Interpolationsfahnen */
-    withSub(0.34,function(){holed(FRONT,-XS,XS,FLOOR,PAR,0,HF,[0,0,1],FAC,true);holed(SIDE,-ZI,ZI,FLOOR,PAR,0,HS,[1,0,0],FAC,true);},'v');
+    /* V17.1: Vorder- und Seitenfassade (Hauptansichten) feiner gerastert – Balkonschatten ohne schräge Interpolationsfahnen.
+       Überarbeitung 2: 17 cm (Sonnenschatten von Balkonen, Vordach und Baum werden je Eckpunkt gebacken; bei 34 cm verschmierten sie) */
+    withSub(0.17,function(){holed(FRONT,-XS,XS,FLOOR,PAR,0,HF,[0,0,1],FAC,true);holed(SIDE,-ZI,ZI,FLOOR,PAR,0,HS,[1,0,0],FAC,true);},'v');
     withSub(0.55,function(){
       holed(BACK,-XS,XS,FLOOR,PAR,0,HB,[0,0,-1],FAC,true);holed(LEFT,-ZI,ZI,FLOOR,PAR,0,HL,[-1,0,0],FAC,true);
       /* Wandstirnen an den Ecken (gehören optisch zur Seitenfassade) */
@@ -1989,7 +2027,7 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
       var e = [0, 1, 2].map(function (j) { return cat(a[1][j], b[1][j], c[1][j], d[1][j], u); });
       var yaw = cat(KY[ia][0], KY[i][0], KY[i + 1][0], KY[id][0], u), pit = cat(KY[ia][1], KY[i][1], KY[i + 1][1], KY[id][1], u), ds = Math.max(0.5, cat(KY[ia][2], KY[i][2], KY[i + 1][2], KY[id][2], u));
       var dir = [Math.sin(yaw) * Math.cos(pit), Math.sin(pit), Math.cos(yaw) * Math.cos(pit)];
-      return { e: e, t: [e[0] + dir[0] * ds, e[1] + dir[1] * ds, e[2] + dir[2] * ds], f: b[3] + (c[3] - b[3]) * u, yaw: yaw, pitch: pit };
+      return { e: e, t: [e[0] + dir[0] * ds, e[1] + dir[1] * ds, e[2] + dir[2] * ds], f: b[3] + (c[3] - b[3]) * u, fit: (b[4] || 0) + ((c[4] || 0) - (b[4] || 0)) * u, yaw: yaw, pitch: pit };
     }
     function win2(d, q, k) { return k * sstep(d.open[0], d.open[1], q) * (1 - sstep(d.close[0], d.close[1], q)); }
     function doorAngle(q) { return win2(D_HT, q, D_HT.angle); }
@@ -2035,7 +2073,8 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
       'else if(M(20.0)){ch=1.0;s=2.3;k=0.8;}' +
       'else if(M(5.0)){ch=2.0;s=0.9;}' +
       'else if(M(19.0)){ch=3.0;s=0.8;}' +
-      'else if(M(7.0)){ch=4.0;s=1.52;}' +
+      /* Überarbeitung 2: Parkett – Längsfugen der Dielen (19 cm, wie in der Holztextur) je Pixel nachgezeichnet, nur am Boden */
+      'else if(M(7.0)){ch=4.0;s=1.52;if(n.y>0.5&&abs(p.y-0.5)<0.03)vq=vec4(2e4,p.x/0.19,0.3,0.0016/0.19);}' +
       /* V17 Platten: Fugen je Pixel in Metern, Raster ab der Raumecke (Bad: x 3,072 / z −0,928, Boden 0,5), Textur nur noch leicht */
       'else if(M(8.0)||M(9.0)){bool bd=p.x>2.9&&p.z<2.45;vec2 o=bd?vec2(3.072,-0.928):vec2(-3.0,1.5);bool wpl=M(8.0);ch=wpl?5.0:6.0;s=1.2;k=wpl?0.16:0.3;' +
       'vq=abs(n.y)>0.5?vec4(p.x-o.x,p.z-o.y,wpl?-0.26:-0.34,0.0028):vec4(abs(n.x)>0.5?p.z-o.y:p.x-o.x,p.y-0.5,-0.24,0.0022);}' +
@@ -2074,21 +2113,35 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
     /* Arten als GLSL-Bausteine: q (Punkt in der Box), ext (Boxmass), o (Abstand zu den Seiten), n1/n2 (Rauschen), su/wu (Flächenkoordinaten),
        sdw (Startwert), Cw (Wischrichtung, Kante) → d (Deckung), kc (Farbe, linear), kr (Rauheit), km (Metall weg) */
     var DZTYPE = {
-      /* Kalk: matter, grauweisser Belag, am Fuss und am Auslauf dichter */
-      kalk: 'float ft=exp(-q.y/0.018)+exp(-pow((q.x-ext.x)/0.025,2.0))*0.8;' +
-      'd=clamp(smoothstep(0.62,0.88,n2.b)*0.22+ft*smoothstep(0.3,0.62,n2.b),0.0,1.0);kc=vec3(0.80,0.79,0.75);kr=0.65;km=1.0;' +
-        '',
-      /* Wasserränder auf Keramik – Runde 4: im Tageslicht auf weisser Keramik sichtbar, aber nicht grafisch: unterbrochene, verzogene
-         Ränder (1–2 cm) in 4-cm-Zellen, kleine runde Tropfenpunkte, beides zum Ablauf hin dichter; matter Film beige-grau */
-      wasser: 'vec2 cg=wu*25.0+sdw;vec2 ci=floor(cg),cf=fract(cg);vec2 cc=vec2(dh3(vec3(ci,5.0)),dh3(vec3(ci,6.0)))*0.5+0.25;float cr=0.18+0.16*dh3(vec3(ci,7.0));' +
-      'vec2 dv=cf-cc;float dc=length(dv)*(1.0+(n2.r-0.5)*0.75)+(n2.b-0.5)*0.06;float rp=dh3(vec3(ci,8.0));' +
-      'float dr=length((q.xz-ext.xz*0.5)/max(ext.xz*0.5,vec2(0.01)));float nr=0.45+0.55*(1.0-smoothstep(0.1,0.95,dr));' +
-      'float ang=atan(dv.y,dv.x);float arc=smoothstep(0.25,0.7,0.5+0.5*sin(ang*2.0+rp*19.0)+(n1.g-0.5)*0.8);' +
-      'float ring=step(0.55,rp)*(smoothstep(cr-0.05,cr-0.014,dc)-smoothstep(cr,cr+0.022,dc))*arc*(0.45+0.55*rp)*nr;' +
-      'float dt=step(0.28,rp)*step(rp,0.55)*(1.0-smoothstep(cr*0.22,cr*0.42,dc))*0.6*nr;' +
-      'float flm=(1.0-smoothstep(0.15,0.8,dr))*smoothstep(0.3,0.7,n1.r)*0.45;' +
-      'd=clamp(max(max(ring,dt)*0.9,flm),0.0,1.0);kc=max(ring,dt)*0.9>flm?vec3(0.47,0.45,0.41):vec3(0.58,0.56,0.51);kr=0.45;' +
-        '',
+      /* Überarbeitung 2 – Schmutz aus seiner Entstehung (rise.json → focus: Entstehungsorte [x, y, z, Radius, Gewicht], der erste ist
+         der Hauptort). Grössen in Millimetern auf den Bildmassstab der Nahansicht abgestimmt (≈ 1 Bildpunkt je mm): feinere Spuren
+         würden flimmern oder als dunkle Punkte («Pfeffer») statt als Wasserflecken erscheinen.
+         Kalk: Kalkfuss über der Rosette (1–2 cm, ausgefranster Rand), Kruste am Strahlregler (Hauptort), wenige eingetrocknete Tropfen
+         am Körper – vorne (Spritzrichtung) häufiger; kein flächiges Fleckenmuster */
+      kalk: function (z) {
+        return dzFoci(z) + 'float bt=0.024+0.01*n2.g+0.005*(n1.b-0.5);float kb=(1.0-smoothstep(bt-0.004,bt,q.y))*(0.75+0.25*n2.r);float crs=smoothstep(0.3,0.6,fo+(n2.b-0.5)*0.5);' +
+          'vec2 kg=wu*125.0+sdw*2.3;vec2 ki=floor(kg),kf=fract(kg);float kp=dh3(vec3(ki,41.0));vec2 kcn=vec2(dh3(vec3(ki,42.0)),dh3(vec3(ki,43.0)))*0.4+0.3;float krr=0.16+0.14*dh3(vec3(ki,44.0));' +
+          'float kd=length(kf-kcn);float spot=step(1.0-(0.04+0.12*smoothstep(0.0,0.6,N.x)),kp)*(smoothstep(krr-0.1,krr-0.04,kd)*0.5+0.5)*(1.0-smoothstep(krr-0.02,krr+0.03,kd));' +
+          'd=clamp(max(max(kb,crs*0.95),spot*0.75),0.0,1.0);kc=vec3(0.80,0.79,0.75);kr=0.65;km=1.0;';
+      },
+      /* Wasser und Seife am Waschtisch: matter, beige-grauer Seifen- und Kalkfilm um den Ablauf (Hauptort) mit Schmutzring am Rand des
+         Ablaufdeckels; eingetrocknete Tropfenränder (Ø 6–12 mm, hellgrau, zu einer Seite offen) um Armaturenfuss und Seifenspender,
+         sonst vereinzelt; aussen an der Schürze wenige blasse Laufspuren mit Tropfen am Ende (Hände tropfen über die Vorderkante).
+         Die Beckenwände bleiben weitgehend frei – dort läuft Wasser ab, statt stehen zu bleiben */
+      wasser: function (z) {
+        var f0 = (z.focus && z.focus[0]) || [(z.box[0][0] + z.box[1][0]) / 2, z.box[0][1], (z.box[0][2] + z.box[1][2]) / 2, 0.1, 1];
+        return dzFoci(z) + 'float hz=smoothstep(0.35,0.8,abs(N.y)),dens=0.02+0.9*fo;vec3 h0=P-' + gv(f0.slice(0, 3)) + ';float rd=length(h0.xz),f00=exp(-dot(h0,h0)/' + gf(f0[3] * f0[3]) + ');' +
+          'float film=f00*smoothstep(0.28,0.66,n1.r*0.65+n1.b*0.35+f00*0.3)*0.85*hz;' +
+          'float grm=(1.0-smoothstep(0.0035,0.0065,abs(rd-0.0272)))*smoothstep(0.3,0.62,n2.g)*(1.0-smoothstep(0.01,0.02,abs(h0.y)));' +
+          'vec2 cg=wu*41.7+sdw;vec2 ci=floor(cg),cf=fract(cg);float rp=dh3(vec3(ci,8.0)),rq=dh3(vec3(ci,7.0));vec2 cc=vec2(dh3(vec3(ci,5.0)),dh3(vec3(ci,6.0)))*0.4+0.3;float cr=0.12+0.12*rq;' +
+          'vec2 dv=cf-cc;float dc=length(dv)*(1.0+(n2.r-0.5)*0.3);float ra=rp*37.0;float arc=smoothstep(-0.35,0.15,dot(dv,vec2(cos(ra),sin(ra)))/max(dc,0.001)+(n1.g-0.5)*0.6+rq*0.6);' +
+          'float ring=step(1.0-dens*0.75,rp)*((smoothstep(cr-0.09,cr-0.045,dc)-smoothstep(cr-0.01,cr+0.025,dc))*arc+(1.0-smoothstep(cr*0.4,cr-0.05,dc))*0.18);' +
+          'float apr=step(0.7,N.x)*step(' + gf(z.box[1][0] - 0.035) + ',P.x),ti=floor(P.z*45.0+sdw);float tx=fract(P.z*45.0+sdw)-0.5-(dh3(vec3(ti,32.0,2.0))-0.5)*0.4,tp=dh3(vec3(ti,31.0,1.0)),tl=0.025+0.05*dh3(vec3(ti,33.0,3.0));' +
+          'float yy=ext.y-q.y-0.006,ton=apr*step(1.0-(0.02+0.4*fo),tp),tw=0.07+0.05*clamp(yy/tl,0.0,1.0);' +
+          'float trl=ton*step(0.0,yy)*(1.0-smoothstep(tw*0.5,tw,abs(tx)))*(1.0-smoothstep(tl*0.85,tl,yy))*(0.65+0.35*n2.g);float blob=ton*(1.0-smoothstep(0.12,0.2,length(vec2(tx,(yy-tl*0.92)*45.0))));' +
+          'float rg2=ring*hz*0.8,tr2=max(trl,blob)*0.55;' +
+          'd=clamp(max(max(film,grm*0.85),max(rg2,tr2)),0.0,1.0);kc=grm*0.85>max(film,max(rg2,tr2))?vec3(0.32,0.29,0.25):film>max(rg2,tr2)?vec3(0.58,0.54,0.46):vec3(0.7,0.68,0.63);kr=0.45;';
+      },
       /* Staub und Schuhspuren: Staub an den Wandkanten und als Film, Gehspuren (Schritt 34 cm, Sohlenprofil) nur am Boden;
          Runde 4: auch auf waagrechten Möbelflächen, Farbe aus der Grundhelligkeit (auf dunklem Parkett hell und grau) */
       staub: function (z) {
@@ -2137,25 +2190,40 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
     /* Sichtweite je Zone: Feinheiten sind darüber hinaus nicht mehr erkennbar; der Shader blendet zwischen 75 % und 100 % weich aus,
        drawSet schaltet jenseits davon auf das Programm ohne Schmutzschicht (kein sichtbarer Wechsel) */
     function dzR(z) { return z.range || (z.type === 'laub' ? 30 : z.type === 'staub' ? 9 : z.type === 'schlieren' ? 6 : 4); }
+    /* Entstehungsorte einer Zone (rise.json → focus): fo = stärkster Einfluss 0…1; ohne Angabe gleichmässig mittel */
+    function dzFoci(z) {
+      if (!z.focus || !z.focus.length) return 'float fo=0.6;';
+      return 'float fo=0.0;' + z.focus.map(function (f) { var c = gv(f.slice(0, 3)); return '{vec3 fd=P-' + c + ';fo=max(fo,' + gf(f[4]) + '*exp(-dot(fd,fd)/' + gf(f[3] * f[3]) + '));}'; }).join('');
+    }
     function gf(v) { var t = (+v).toFixed(4); return t.indexOf('.') < 0 ? t + '.0' : t; }
     function gv(a) { return 'vec' + a.length + '(' + a.map(gf).join(',') + ')'; }
+    /* Wischweg: entlang der Wischrichtung (Front quer über die Zone) oder – mit wipeTo – vom Rand zu einem Ort hin (Becken: zum Ablauf),
+       mit leicht welliger Front wie beim Auswischen; der Zustand hängt weiter nur vom Fortschritt ab */
+    function dzSv(z) {
+      if (!z.wipeTo) return 'float sv=(dot(q,Cw.xyz)-mn)/max(rg,0.001)+(n1.g-0.5)*0.16;';
+      var R = 0; for (var c = 0; c < 8; c++) R = Math.max(R, Math.hypot(z.box[c & 1][0] - z.wipeTo[0], z.box[(c >> 1) & 1][1] - z.wipeTo[1], z.box[(c >> 2) & 1][2] - z.wipeTo[2]));
+      return 'vec3 wv=P-' + gv(z.wipeTo) + ';float sv=1.0-clamp(length(wv)/' + gf(R) + ',0.0,1.0)+(n1.g-0.5)*0.16+0.035*sin((wv.x*1.7+wv.z)*24.0+sdw);';
+    }
     function dirtSrc(zones, mask) {
-      var s = 'vec3 dCol=vec3(0.0);float dAmt=0.0,dR=0.0,dWet=0.0,dMt=0.0;vec2 wu=abs(N.y)>0.5?P.xz:(abs(N.x)>0.5?P.zy:P.xy);';
+      var s = 'vec3 dCol=vec3(0.0);float dAmt=0.0,dR=0.0,dWet=0.0,dMt=0.0,dWd=0.0;vec2 wu=abs(N.y)>0.5?P.xz:(abs(N.x)>0.5?P.zy:P.xy);';
       zones.forEach(function (z, i) {
         if (!(mask & (1 << i))) return;
+        /* Nasskante je Material: Böden (Staub, Laub) nach dem Wischen deutlich dunkler und breit nass, Keramik und Chrom vor allem
+           glänzender und nur leicht dunkler, der Film trocknet schmal hinter dem Tuch [Abdunklung, Breite hinter der Front] */
+        var wk = z.type === 'wasser' || z.type === 'kalk' ? [0.07, 0.06] : z.type === 'schlieren' ? [0.12, 0.08] : [0.22, 0.16];
         var mats = z.mat.filter(function (m) { return m >= 0; }).map(function (m) { return 'abs(vd.a-' + gf(m) + ')<0.5'; }).join('||') || 'true';
         var ext = [0, 1, 2].map(function (k) { return z.box[1][k] - z.box[0][k]; });
         s += '{float bw=dzv[' + i + '];vec3 q=P-' + gv(z.box[0]) + ',ext=' + gv(ext) + ',o=min(q,ext-q);float inb=smoothstep(-0.004,0.012,min(min(o.x,o.y),o.z))*(1.0-smoothstep(' + gf(dzR(z) * 0.75) + ',' + gf(dzR(z)) + ',dist));' +
           'if(bw<0.999&&inb>0.0&&(' + mats + ')){vec4 Cw=' + gv(z.dir.concat([z.edge])) + ';float sdw=' + gf(z.seed) + ';' +
           'float mn=min(0.0,Cw.x*ext.x)+min(0.0,Cw.y*ext.y)+min(0.0,Cw.z*ext.z),rg=abs(Cw.x*ext.x)+abs(Cw.y*ext.y)+abs(Cw.z*ext.z);' +
           'vec2 su=wu+sdw*0.37;vec4 n1=dzn(su*1.6),n2=dzn(su*7.0+0.31);' +
-          'float sv=(dot(q,Cw.xyz)-mn)/max(rg,0.001)+(n1.g-0.5)*0.16;' +
+          dzSv(z) +
           'float fr=bw*(1.0+2.0*Cw.w+0.18)-Cw.w-0.09;float cl=1.0-smoothstep(fr-Cw.w,fr,sv);' +
-          'float act=step(0.001,bw)*(1.0-smoothstep(0.9,1.0,bw));float wt=max(exp(-pow((sv-fr)/(Cw.w*1.3),2.0)),cl*exp(-max(fr-sv,0.0)/0.16)*0.65)*act;' +
+          'float act=step(0.001,bw)*(1.0-smoothstep(0.9,1.0,bw));float wt=max(exp(-pow((sv-fr)/(Cw.w*1.3),2.0)),cl*exp(-max(fr-sv,0.0)/' + gf(wk[1]) + ')*0.65)*act;' +
           'float d=0.0;vec3 kc=vec3(0.0);float kr=0.0,km=0.0;' + (typeof DZTYPE[z.type] === 'function' ? DZTYPE[z.type](z) : DZTYPE[z.type]) +
-          'd*=' + gf(z.strength) + '*inb*(1.0-cl);dCol+=kc*d;dAmt+=d;dR+=kr*d;dMt+=km*d;dWet=max(dWet,wt*inb);}}';
+          'd*=' + gf(z.strength) + '*inb*(1.0-cl);dCol+=kc*d;dAmt+=d;dR+=kr*d;dMt+=km*d;dWet=max(dWet,wt*inb);dWd=max(dWd,wt*inb*' + gf(wk[0]) + ');}}';
       });
-      return s + 'if(dAmt>0.0001){vec3 Lr=vd.rgb/max(va,vec3(0.03));base=mix(base,(dCol/dAmt)*Lr*fac,clamp(dAmt,0.0,0.92));}base*=1.0-0.22*dWet;';
+      return s + 'if(dAmt>0.0001){vec3 Lr=vd.rgb/max(va,vec3(0.03));base=mix(base,(dCol/dAmt)*Lr*fac,clamp(dAmt,0.0,0.92));}base*=1.0-dWd;';
     }
     /* kachelbare Rauschtextur 128² für die Schmutzschicht (eigene Erzeugung, fester Startwert): Wertrauschen mit 8/16/32 Zellen
        je Kachel in R/G/B, weisses Rauschen in A. Ohne Mipmaps (Zugriffe stehen in einer Schleife, keine Ableitungen nötig). */
@@ -2191,12 +2259,15 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
         (der ? 'float fj=max(fwidth(vq.x),fwidth(vq.y))+0.00001,aj=fj*0.75;' : 'float fj=0.0,aj=mix(0.004,0.0012,t2);') +
         'float gr=(1.0-smoothstep(vq.w*0.5-aj,vq.w*0.5+aj,dj))*abs(vq.z)' + (der ? '*mix(clamp(vq.w/(fj*1.5),0.0,1.0),mix(0.35,1.0,clamp(vq.w/(fj*1.5),0.0,1.0)),t2)' : '') + ';' +
         'vec2 ti=floor(tq);fac*=1.0+(fract((ti.x*0.618034+ti.y*0.414214)*7.31)-0.5)*0.03*t2;' +
+        /* Überarbeitung 2: Rasen mit dezenten Mähstreifen (Bahnen 0,6 m parallel zum Gartenweg, ±6 %) – gepflegter Rasen statt einheitlicher
+           Fläche; ab 25 m ausgeblendet (sonst schmaler als ein Bildpunkt: Moiré) */
+        'fac*=1.0+0.06*(1.0-step(0.5,abs(vu.z-2.0)))*(smoothstep(-0.25,0.25,sin(vp.x*5.236))*2.0-1.0)*step(0.5,vp.w)*(1.0-smoothstep(25.0,55.0,length(vp.xyz-eye)));' +
         'vec4 mp=texture2D(lut,vec2((vd.a+0.5)/32.0,0.5));' +
         'vec3 P=vp.xyz,V=normalize(eye-P),N=normalize(vn.xyz);if(dot(N,V)<0.0)N=-N;float dist=length(eye-P);' +
         (der ? 'float bh=((tv-0.5)*mp.a*0.004-gr*0.0012)*(1.0-smoothstep(2.5,8.0,dist));vec3 dpx=dFdx(P),dpy=dFdy(P);float hx=dFdx(bh),hy=dFdy(bh);vec3 r1=cross(dpy,N),r2=cross(N,dpx);float det=dot(dpx,r1);' +
           'vec3 Nb=abs(det)>1e-12?normalize(abs(det)*N-sign(det)*(hx*r1+hy*r2)):N;' : 'vec3 Nb=N;') +
         'vec3 Ld,Lc;float ar;if(vp.w<0.5){vec3 l=vl.xyz-P;float d=max(length(l),0.001);Ld=l/d;float q=clamp(1.0-d/max(vn.w,0.01),0.0,1.0);Lc=((P.x>3.0&&P.x<5.45&&P.z>-1.0&&P.z<2.4)?vec3(1.0,0.9,0.8):vec3(1.0,0.74,0.5))*vl.w*q*q;ar=0.05/(d+0.25);}' +
-        'else{Ld=normalize(mix(vec3(-0.857,0.302,0.423),vec3(0.35,0.85,0.4),day));Lc=mix(vec3(0.42,0.24,0.12),vec3(0.3,0.31,0.33),day);ar=mix(0.45,0.9,day);}' +
+        'else{Ld=normalize(mix(vec3(-0.857,0.302,0.423),vec3(0.35,0.85,0.4),day));Lc=mix(vec3(0.42,0.24,0.12),vec3(0.3,0.31,0.33)*clamp(vl.w,0.0,1.0),day);ar=mix(0.45,0.9,day);}' +
         'float ndl0=max(dot(N,Ld),0.0),ndl=max(dot(Nb,Ld),0.0);float bs=clamp((ndl+0.3)/(ndl0+0.3),0.75,1.25);' +
         'vec3 base=vd.rgb*fac*(1.0-gr)*bs;' + (dirt ? dirtSrc(DZ, dirt) : DIRT0) + 'vec3 col=base;' +
         /* sehr raue, nichtmetallische Flächen (Putz, Anstrich, Rasen, Textil: Rauheit > 0,76) haben keinen sichtbaren Glanz – Rechnung entfällt */
@@ -2334,8 +2405,15 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
     }
     /* Kamera wie in der Architekturfotografie: waagrecht gehalten, die Neigung wird als Objektivverschiebung
        umgesetzt – senkrechte Kanten bleiben senkrecht. Erst bei steilem Blick (> 17°) neigt sich die Kamera anteilig. */
+    /* Überarbeitung 2: Bildausschnitt in Bildpunkten (rise.json → keyframes[].fit, 0…1). Stationstext und Stationsleiste haben
+       feste Grössen in Bildpunkten; mit festem Bildwinkel würde ein Motiv auf hohen Bühnen (1440×900, 1920×1080) grösser als der
+       freie Bereich dazwischen. Auf Bühnen höher als FITPX (1280×720 unter dem Kopf) wird der Bildwinkel deshalb so geweitet, dass
+       das Motiv seine Grösse in Bildpunkten behält; niedrigere Bühnen und das Hochformat behalten den geplanten Bildwinkel.
+       Stationsbilder (render-stills, window.IR_NO_FIT): im Bildmodus steht der Text unter dem Bild – geplanter Bildwinkel ohne fit. */
+    var FITPX = 623;
     function matrix(q) {
       var cm = camNow(q), asp = w / h, f = cm.f * (asp < 1 ? 1.25 : 1);
+      if (cm.fit > 0 && asp >= 1.15 && h > FITPX && !win.IR_NO_FIT) f = 2 * Math.atan(Math.tan(f / 2) * (1 + cm.fit * (h / FITPX - 1)));
       var dc = Math.hypot(cm.e[0], cm.e[1] - 5, cm.e[2]), near = Math.max(0.05, Math.min(0.5, (dc - 14) * 0.025));
       var P = persp(f, asp, near, 1400), k = camOverride ? 0 : Math.max(0, Math.min(1, (1.15 - asp) / 0.45));
       if (k > 0) { var sh = pshift(q); P[8] = -(sh[0] || 0) * k; P[9] = -(sh[1] || 0) * k; }
@@ -2460,7 +2538,7 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
     /* Lichtfassungen: «tag» (Standard, weiches Tageslicht für den Materialvergleich) und «nacht» (Dämmerung als zweite Gestaltung).
        Der Aufbau rechnet die Startfassung; die andere entsteht einmalig beim ersten Umschalten und wird in die vorhandenen Puffer geladen. */
     var DAY = BDAY, LC = {}, lcMs = null;
-    function lightSetOf(Sx, Mx) { var L = Sx.L, SL = Sx.SL, SC = Sx.SC; bakeSet(Sx, Mx, Sx._ao, Sx._lv); var o = Sx.L; Sx.L = L; Sx.SL = SL; Sx.SC = SC; return o; }
+    function lightSetOf(Sx, Mx) { var L = Sx.L, SL = Sx.SL, SC = Sx.SC; bakeSet(Sx, Mx, Sx._ao, Sx._lv, Sx._sv, Sx._ws); var o = Sx.L; Sx.L = L; Sx.SL = SL; Sx.SC = SC; return o; }
     function lightsNow() { return { BLD: G.L, INT: INT.L, ENV: ENV.L, FOL: FOL.L, D: [D.L, D.L2], A: [A.L, A.L2], TT: [TT.L, TT.L2] }; }
     function lightsFor(day) {
       var t0 = win.performance.now(), keep = BDAY; BDAY = day;
@@ -2571,22 +2649,45 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
       if (scan.state === 'run' || hiNow > 0.001) { for (i = 0; i < ord.length; i++) drawLines(ord[i], Mx, mm.e, ms[i], hiNow); disableAttrs(); }
       if (labels.length && root.classList.contains('jr-hi')) {
         var lx0 = 100, lx1 = 0, ly0 = 100, ly1 = 0;
-        labels.forEach(function (l) { var p3 = project(Mx, l.w); l.el.style.setProperty('--x', p3[0].toFixed(2) + '%'); l.el.style.setProperty('--y', p3[1].toFixed(2) + '%'); l.el.classList.toggle('l', p3[0] > 62);
-          lx0 = Math.min(lx0, p3[0]); lx1 = Math.max(lx1, p3[0]); ly0 = Math.min(ly0, p3[1]); ly1 = Math.max(ly1, p3[1]); });
-        /* «Schematische Kennzeichnung» direkt unter (oder, wenn unten kein Platz, über) den Markierungen */
-        if (capEl) { var cyv = ly1 + 7 < 92 ? ly1 + 7 : Math.max(8, ly0 - 7); capEl.style.setProperty('--cx', Math.max(14, Math.min(86, (lx0 + lx1) / 2)).toFixed(2) + '%'); capEl.style.setProperty('--cy', cyv.toFixed(2) + '%'); }
+        labels.forEach(function (l) { var p3 = project(Mx, l.w); l.p3 = p3; l.el.style.setProperty('--x', p3[0].toFixed(2) + '%'); l.el.style.setProperty('--y', p3[1].toFixed(2) + '%'); l.el.classList.toggle('l', p3[0] > 62); l.el.classList.remove('off'); });
+        /* Überarbeitung 2: eine Beschriftung erscheint nur innerhalb der Bühne und ohne Überschneidung mit Stationstext,
+           Stationsleiste, Bedienleiste, Kennzeichnung oder einer anderen Beschriftung – sonst bleibt sie aus (die Information
+           steht im Text). Die «Schematische Kennzeichnung» folgt den sichtbaren Beschriftungen. */
+        var lsr = stage.getBoundingClientRect(), lbk = Array.prototype.map.call(root.querySelectorAll('.jr-st.on, .jr-nav, .jr-skip, .jr-steps, .jr-tag'), function (el) {
+          var r = el.getBoundingClientRect(), o = { left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width, height: r.height };
+          /* Stationstext als linke Spalte über der Bühne (Desktop): die ganze Spalte im abgedunkelten Verlauf bleibt frei – sonst stehen
+             Beschriftungen von Bauteilen am Bildrand (z. B. Armatur in der WC-Nahansicht) über oder unter dem Text */
+          if (el.classList.contains('jr-st') && r.top < lsr.bottom && r.bottom > lsr.top && r.right < lsr.left + lsr.width * 0.6) { o.top = lsr.top; o.bottom = lsr.bottom; }
+          return o; }).filter(function (r) { return r.width > 0 && r.height > 0; }), shown = [];
+        function hit(r, b, m) { return r.left < b.right + m && r.right > b.left - m && r.top < b.bottom + m && r.bottom > b.top - m; }
+        labels.forEach(function (l) {
+          var r = l.el.getBoundingClientRect(), ok = l.p3[2] > 0.2 && r.left > lsr.left + 8 && r.right < lsr.right - 8 && r.top > lsr.top + 8 && r.bottom < lsr.bottom - 8;
+          if (ok) lbk.concat(shown).forEach(function (b) { if (hit(r, b, 8)) ok = false; });
+          l.el.classList.toggle('off', !ok); if (ok) { shown.push(r); lx0 = Math.min(lx0, l.p3[0]); lx1 = Math.max(lx1, l.p3[0]); ly0 = Math.min(ly0, l.p3[1]); ly1 = Math.max(ly1, l.p3[1]); }
+        });
+        /* «Schematische Kennzeichnung» direkt unter (oder, wenn unten kein Platz, über) den sichtbaren Markierungen */
+        if (capEl) {
+          capEl.classList.remove('off');
+          if (!shown.length) capEl.classList.add('off');
+          else {
+            var cyv = ly1 + 7 < 86 ? ly1 + 7 : Math.max(6, ly0 - 7); capEl.style.setProperty('--cx', Math.max(14, Math.min(86, (lx0 + lx1) / 2)).toFixed(2) + '%'); capEl.style.setProperty('--cy', cyv.toFixed(2) + '%');
+            var cr = capEl.getBoundingClientRect(), cok = cr.top > lsr.top + 4 && cr.bottom < lsr.bottom - 4; lbk.concat(shown).forEach(function (b) { if (hit(cr, b, 4)) cok = false; }); capEl.classList.toggle('off', !cok);
+          }
+        }
       }
       /* Leistungspunkte: nie über Stationstext, Navigation oder Bedienknöpfen (sonst ausgeblendet; die CTA bleibt) */
       var blk = null, sr = null;
       hots.forEach(function (l) {
-        var p3 = project(Mx, l.w), vis = p3[2] > 0.2 && p3[0] > 2 && p3[0] < 96 && p3[1] > 6 && p3[1] < 94 && hotOn(l, q);
+        var p3 = project(Mx, l.w), vis = p3[2] > 0.2 && p3[0] > 2 && p3[0] < 96 && p3[1] > 6 && p3[1] < 94 && hotOn(l, q), side = p3[0] > 72;
         if (vis) {
           if (!blk) { sr = stage.getBoundingClientRect(); blk = Array.prototype.map.call(root.querySelectorAll('.jr-st.on, .jr-nav, .jr-skip, .jr-steps, .jr-tag'), function (el) { return el.getBoundingClientRect(); }).filter(function (r) { return r.width > 0 && r.height > 0; }); }
-          var px = sr.left + p3[0] / 100 * sr.width, py = sr.top + p3[1] / 100 * sr.height, lf = p3[0] > 72, x0 = lf ? px - 190 : px - 30, x1 = lf ? px + 30 : px + 190;
-          blk.forEach(function (r) { if (x1 > r.left && x0 < r.right && py + 30 > r.top && py - 30 < r.bottom) vis = false; });
+          var px = sr.left + p3[0] / 100 * sr.width, py = sr.top + p3[1] / 100 * sr.height;
+          var free = function (lf) { var x0 = lf ? px - 190 : px - 30, x1 = lf ? px + 30 : px + 190, ok = true; blk.forEach(function (r) { if (x1 > r.left && x0 < r.right && py + 30 > r.top && py - 30 < r.bottom) ok = false; }); return ok; };
+          /* Überarbeitung 2: ist die bevorzugte Seite belegt (z. B. Stationsleiste), steht die Beschriftung auf der anderen Seite */
+          if (!free(side)) { if (free(!side)) side = !side; else vis = false; }
         }
         /* rechts im Bild steht die Beschriftung links vom Punkt (bleibt im Bild) */
-        l.el.classList.toggle('l', p3[0] > 72);
+        l.el.classList.toggle('l', side);
         l.el.style.setProperty('--x', p3[0].toFixed(2) + '%'); l.el.style.setProperty('--y', p3[1].toFixed(2) + '%'); l.el.classList.toggle('on', vis);
       });
     }
@@ -2655,7 +2756,8 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
       Object.keys(DM.clean || {}).forEach(function (k) { var c = DM.clean[k]; cl[k] = sm((t - c[0]) / (c[1] - c[0])); });
       return { t: t, q: q, cam: cam, clean: cl };
     }
-    function demoApply(t) { var s = demoAt(t); p = ps = s.q; demoCam = s.cam; dzDemo = s.clean; ui(s.q); return s; }
+    /* Überarbeitung 2: an der Naht (Hecke verdeckt das Bild) blendet der Stationstext aus – der Wechsel 6 → 1 bleibt unsichtbar */
+    function demoApply(t) { var s = demoAt(t); p = ps = s.q; demoCam = s.cam; dzDemo = s.clean; root.classList.toggle('jr-seam', !!s.cam && (s.t > DM.duration - 1.1 || s.t < 0.9)); ui(s.q); return s; }
     function canDemo() { return !!(DM && running && gl && mode !== 'static' && !RMQ.matches); }
     function demoUi() {
       var g = root.querySelector('.jr-demo'); if (!g) return; g.hidden = !canDemo() && !demo;
@@ -2672,7 +2774,7 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
     /* Beenden: das Bild bleibt, wo die Demo stand; im Scrollmodus folgt die Seite dem Fortschritt (kein Sprung).
        Durch Scrollen beendet (byScroll): die Kamera gleitet zur Scrollposition. */
     function demoStop(byScroll) {
-      if (!demo) return; var t = demo.el; demo = null; dzDemo = null;
+      if (!demo) return; var t = demo.el; demo = null; dzDemo = null; root.classList.remove('jr-seam');
       if (demoCam) { demoCam = null; p = ps = demoAt(t).q; }
       if (mode === 'live' && !byScroll) { var top = root.getBoundingClientRect().top + win.scrollY, span = root.offsetHeight - win.innerHeight; win.scrollTo({ top: Math.round(top + p * span - (p >= 1 ? 2 : 0)), behavior: 'instant' }); }
       demoUi(); emit('demo-change', { state: 'stopped', t: +t.toFixed(2) }); ui(p); if (running) request();
@@ -2804,7 +2906,7 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
     }
     function stopGL() {
       running = false; if (raf) { win.cancelAnimationFrame(raf); raf = 0; } if (windTimer) { win.clearTimeout(windTimer); windTimer = 0; }
-      if (demo || demoCam) { demo = null; demoCam = null; dzDemo = null; } demoUi();
+      if (demo || demoCam) { demo = null; demoCam = null; dzDemo = null; } root.classList.remove('jr-seam'); demoUi();
       if (ro) { ro.disconnect(); ro = null; } if (io) { io.disconnect(); io = null; }
       if (gl) {
         try {
@@ -2828,6 +2930,14 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
       var on = root.querySelector('.jr-still.on:not(.jr-still-v)'), n = on && on.dataset.n, g = root.querySelectorAll('.jr-st')[cur];
       root.querySelectorAll('.jr-cmp').forEach(function (x) { x.classList.remove('jr-cmp-nov'); });
       g = g && g.querySelector('.jr-cmp'); if (g) g.classList.toggle('jr-cmp-nov', !(n && root.querySelector('.jr-still-v[data-v="' + n + '"]')));
+      cmpoSync();
+    }
+    /* Überarbeitung 2: Vergleich am Bild (Handy, Bildmodus, Handy-3D): gleiche Verfügbarkeit wie im Stationstext */
+    function cmpoSync() {
+      var o = root.querySelector('.jr-cmpo'); if (!o) return;
+      var i = currentIndex(), g = root.querySelectorAll('.jr-st')[i], k = ST[i] && ST[i].k; g = g && g.querySelector('.jr-cmp');
+      var ok = !!g && DZ.some(function (z) { return z.st === k; }) && (mode === 'static' || inline3d) && !g.classList.contains(inline3d ? 'jr-cmp-nov3' : 'jr-cmp-nov');
+      o.hidden = !ok;
     }
     /* Handy und niedrige Bildschirme: Bildmodus zuerst; «3D-Ansicht starten» startet dieselbe Szene im Stationsmodus
        (gleicher Fortschritt, gleiche Schleife, kein Festhalten beim Scrollen) innerhalb des Bildrahmens. Läuft sie auf dem
@@ -2857,7 +2967,8 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
        im Bildmodus zeigt «Vorher» das Bild derselben Kamera im Ausgangszustand. Stationswechsel stellt den Fortschrittszustand her. */
     function cmpUi(v) {
       var stEl = root.querySelectorAll('.jr-st')[cur]; if (!stEl) return;
-      stEl.querySelectorAll('[data-cmp]').forEach(function (b) { b.setAttribute('aria-pressed', String(v !== null && +b.dataset.cmp === (v >= 0.5 ? 1 : 0) && (v === 0 || v === 1))); });
+      Array.prototype.forEach.call(stEl.querySelectorAll('[data-cmp]'), function (b) { b.setAttribute('aria-pressed', String(v !== null && +b.dataset.cmp === (v >= 0.5 ? 1 : 0) && (v === 0 || v === 1))); });
+      root.querySelectorAll('.jr-cmpo [data-cmp]').forEach(function (b) { b.setAttribute('aria-pressed', String(v !== null && +b.dataset.cmp === (v >= 0.5 ? 1 : 0) && (v === 0 || v === 1))); });
       var r = stEl.querySelector('[data-cmpr]'); if (r) { var val = Math.round((v === null ? cmpAuto() : v) * 100); r.value = val; r.setAttribute('aria-valuetext', val + ' % gereinigt'); }
     }
     function cmpAuto() { var k = ST[cur].k, z = DZ.filter(function (x) { return x.st === k; })[0]; return z ? dzClean(z, mode === 'static' ? ST[cur].hold : ps) : 1; }
@@ -2890,6 +3001,23 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
     function syncDet(q) {
       var best = null, bd = 0.012; root.querySelectorAll('.jr-st.on [data-det]').forEach(function (b) { var d = Math.abs(+b.dataset.det - q); if (d < bd) { bd = d; best = b; } });
       if (best) root.querySelectorAll('.jr-st.on [data-det]').forEach(function (b) { b.setAttribute('aria-pressed', String(b === best)); });
+      /* Überarbeitung 2: Nahansicht (Waschtisch, WC) → kompakter Stationstext */
+      root.classList.toggle('jr-close', !!best && best.dataset.detI !== '-1');
+      /* Vergleich nur, wo er etwas zeigt: wie im Bildmodus gilt das «Vorher»-Bild derselben Ansicht als Beleg (render-stills verwirft es
+         ohne sichtbaren Unterschied, z. B. WC – dort liegt keine Reinigungszone im Bild). Ohne Vorher-Bilder im Dokument (Komponente)
+         lässt sich das nicht beurteilen; der Vergleich bleibt dann sichtbar. */
+      var g = root.querySelector('.jr-st.on .jr-cmp');
+      if (g && root.querySelector('.jr-still-v')) {
+        var dk = best ? +best.dataset.detI : -1, im = dk >= 0 ? root.querySelector('.jr-still[data-det-still="' + dk + '"]') : root.querySelectorAll('.jr-still')[stationOf(q)], n = im && im.dataset.n;
+        g.classList.toggle('jr-cmp-nov3', !!n && !root.querySelector('.jr-still-v[data-v="' + n + '"]'));
+      }
+      cmpoSync();
+    }
+    /* «Details ansehen»: erklärende Überlagerungen zurücknehmen (Titel, Vergleich, Stationen und Anfrage bleiben) */
+    function setClean(on) {
+      root.classList.toggle('jr-clean', !!on);
+      root.querySelectorAll('[data-view]').forEach(function (b) { b.setAttribute('aria-pressed', String(!!on)); b.textContent = on ? 'Text einblenden' : 'Details ansehen'; });
+      if (running) request();
     }
     /* Auswahl in der Wohnung (Reinigung · Räumung · Leerstand): Klick, Tastatur, Touch – Text immer sichtbar */
     function choose(btn, focus) {
@@ -2904,8 +3032,9 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
       win.scrollTo({ top: Math.round(y), behavior: RMQ.matches ? 'instant' : 'smooth' });
     }
     on(root, 'click', function (e) {
+      var vw = e.target.closest('[data-view]'); if (vw && root.contains(vw)) { e.preventDefault(); setClean(!root.classList.contains('jr-clean')); return; }
       var dm = e.target.closest('[data-demo]'); if (dm && root.contains(dm)) { e.preventDefault(); if (dm.dataset.demo === 'stop') demoStop(false); else if (demo) demoPause(); else demoStart(); return; }
-      /* jede andere Bedienung (Station, Vergleich, Nahansicht, Anfrage, Überspringen) beendet die Demo; die Lichtwahl nicht */
+      /* jede andere Bedienung (Station, Vergleich, Nahansicht, Anfrage, Überspringen) beendet die Demo; Licht und Ansicht nicht */
       if (demo && e.target.closest('a,button,input') && !e.target.closest('[data-light]')) demoStop(false);
       var ch = e.target.closest('[data-choice]'); if (ch && root.contains(ch)) { e.preventDefault(); choose(ch, false); return; }
       var lb = e.target.closest('[data-light]'); if (lb && root.contains(lb)) { e.preventDefault(); setDaylight(lb.dataset.light === 'tag'); return; }
@@ -3058,6 +3187,7 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
       /* Bedienung von aussen (Velo, iFrame, Tests) beendet eine laufende Demo wie ein Klick */
       goStation: function (i) { if (demo) demoStop(false); goStation(i); }, setProgress: function (q) { if (demo) demoStop(false); setProgress(q); }, glide: function (q, ms) { if (demo) demoStop(false); glide(q, ms); }, destroy: destroy, start3D: start3D, stop3D: function () { end3d(); }, setDaylight: function (on) { setDaylight(on); }, lightMode: function () { return { light: DAY ? 'tag' : 'nacht', switchMs: lcMs }; }, setClean: function (st, v) { dzOv = (v === null || v === undefined) ? null : { st: st, v: Math.max(0, Math.min(1, +v)) }; if (running) request(); }, cleanZones: function () { return DZ.map(function (z) { return { id: z.id, st: z.st, v: dzClean(z, ps) }; }); },
       /* Demo-Rundlauf: start · pause (umschalten oder fest) · stop; demoSeek(t) zeichnet die Demo-Zeit t (Aufnahme, Nahtprüfung) */
+      setDetailsView: function (on) { setClean(on); }, detailsView: function () { return root.classList.contains('jr-clean'); },
       demoStart: demoStart, demoPause: demoPause, demoStop: function () { demoStop(false); },
       demoState: function () { return { on: !!demo, paused: !!(demo && demo.paused), t: demo ? +demo.el.toFixed(3) : null, loops: demo ? demo.loops : 0, duration: DM ? DM.duration : 0, seam: !!demoCam, available: canDemo() }; },
       demoSeek: function (t) { if (!demo) return null; demo.el = ((t % DM.duration) + DM.duration) % DM.duration; var s = demoApply(demo.el); if (running) request(); return { q: s.q, seam: !!s.cam, clean: s.clean }; },
@@ -3127,7 +3257,7 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
         return { vertices: all.reduce(function (a, x) { return a + x.P.length / 3; }, 0) + FOL.P.length / 3 + GZ.P.length / 3 + (TG.P.length + TGD.P.length + TGT.P.length) / 3 + HAL.P.length / 3,
           surfaces: all.reduce(function (a, x) { return a + x.P.length / 3; }, 0), foliage: FOL.P.length / 3, cards: FOL.P.length / 18, panes: GZ.P.length / 18, glass: (TG.P.length + TGD.P.length + TGT.P.length) / 18, halos: HAL.P.length / 18,
           lines: all.reduce(function (a, x) { return a + x.LP.length / 6; }, 0), lights: LIT.length, occluders: OCC.length, colliders: WALLS.length, renderScale: rs, buildMs: buildMs, bakeMs: bakeMs,
-          prebaked: pbUsed, bakeState: pbState, textures: TX.state, derivatives: EXT.der, anisotropy: EXT.anMax, softwareGL: EXT.sw,
+          prebaked: pbUsed, bakeChannels: pbUsed ? pbK : 0, bakeState: pbState, textures: TX.state, derivatives: EXT.der, anisotropy: EXT.anMax, softwareGL: EXT.sw,
           probes: PROBES.filter(function (pb) { return !!pb.tex; }).map(function (pb) { return pb.id; }), probeMs: Math.round(probeMs), mirrorFrames: MIR.frames, alphaToCoverage: A2C,
           glResources: { buffers: buffers.length, textures: textures.length, programs: progs.length } };
       },
@@ -3135,7 +3265,7 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
       bakeKit: function () {
         ensureGeo(); function pk(x) { return { name: x.name, P: Array.prototype.slice.call(x.P), N: Array.prototype.slice.call(x.N), M: Array.prototype.slice.call(x.M) }; }
         function mv(x, Mx) { var o = pk(x); for (var i = 0; i < o.P.length; i += 3) { var a = o.P[i], b = o.P[i + 1], c = o.P[i + 2]; o.P[i] = Mx[0] * a + Mx[4] * b + Mx[8] * c + Mx[12]; o.P[i + 1] = Mx[1] * a + Mx[5] * b + Mx[9] * c + Mx[13]; o.P[i + 2] = Mx[2] * a + Mx[6] * b + Mx[10] * c + Mx[14]; } return o; }
-        return { hash: geoHash(), sets: [pk(G), pk(INT), pk(ENV)], movers: [mv(D, doorM(0)), mv(A, aptM(0)), mv(TT, terM(0))], foliage: { P: FOL.P.slice() }, lights: LIT.map(function (l) { return l.slice(); }) };
+        return { hash: geoHash(), sund: SUND.slice(), sets: [pk(G), pk(INT), pk(ENV)], movers: [mv(D, doorM(0)), mv(A, aptM(0)), mv(TT, terM(0))], foliage: { P: FOL.P.slice() }, lights: LIT.map(function (l) { return l.slice(); }) };
       },
       lightW: function (q, n, m) { return lightW(q, n, m); },
       roomOf: function (q) { return roomOf(q); },

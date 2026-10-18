@@ -28,10 +28,13 @@ const PORTRAIT = {
   for (const fmt of [{ w: 1440, h: 900, suffix: '' }, { w: 960, h: 864, suffix: '-hoch' }]) {
     const p = await b.newPage({ viewport: { width: fmt.w, height: fmt.h } });
     /* Bildproduktion: volle Qualität auch in der Software-Grafik dieser Umgebung (anisotrope Filterung, volle Auflösung) */
-    await p.addInitScript(() => { window.IR_FORCE_HQ = true; });
+    /* Überarbeitung 2: im Bildmodus steht der Stationstext unter dem Bild (Desktop) bzw. darunter (Handy) – kein Freiraum für
+       überlagerten Text nötig, deshalb der geplante Bildwinkel ohne die Ausschnittregel keyframes[].fit (IR_NO_FIT) */
+    await p.addInitScript(() => { window.IR_FORCE_HQ = true; window.IR_NO_FIT = true; });
     await p.goto(PAGE);
     await p.evaluate(() => { const r = document.getElementById('reise'); if (r) r.scrollIntoView({ block: 'start', behavior: 'instant' }); }); await p.waitForFunction(() => window.__jr === true && window.__JR.state().scan.state === 'done', null, { timeout: 60000 });
-    await p.addStyleTag({ content: '.jr-ui,.jr-tag,.jr-tech,.jr-hot{display:none!important}.jr-stage::after{display:none!important}.hdr,.demo,.mbar{display:none!important}' });
+    /* Überarbeitung 2: Die Bühne beginnt im Scrollmodus unter dem sichtbaren Kopf (--hdrv); ohne Kopf volle Bildgrösse 1440×900 bzw. 960×864 */
+    await p.addStyleTag({ content: '.jr-ui,.jr-tag,.jr-tech,.jr-hot{display:none!important}.jr-stage::after{display:none!important}.hdr,.demo,.mbar{display:none!important}.jr-live{--hdrv:0px!important}' });
     await p.evaluate(() => { window.__JR.setScale(1, true); });
     /* Stationen und ihre Nahansichten (rise.json → details): gleiche Szene, gleiches Licht */
     const JOBS = [];
@@ -55,6 +58,7 @@ const PORTRAIT = {
       const png = path.join(TMP, `${s.still}${fmt.suffix}.png`);
       /* V17.1: Ausschnitt der Bühne statt Element-Screenshot (kein Warten auf «stabil» bei langsamer Software-Grafik) */
       const bb = await p.evaluate(() => { const r = document.querySelector('#reise .jr-stage').getBoundingClientRect(); return { x: r.left, y: r.top, width: r.width, height: r.height }; });
+      if (Math.abs(bb.width - fmt.w) > 1 || Math.abs(bb.height - fmt.h) > 1) throw new Error(`Bühne ${bb.width}×${bb.height} statt ${fmt.w}×${fmt.h} – Bild wäre verzerrt`);
       await p.screenshot({ path: png, clip: bb, timeout: 300000 });
       const out = path.join(ROOT, 'assets/tour', `${s.still}${fmt.suffix}.webp`);
       execFileSync('python3', ['-c', `from PIL import Image;im=Image.open(${JSON.stringify(png)}).convert('RGB');im=im.resize((${fmt.w},${fmt.h}),Image.LANCZOS) if im.size!=(${fmt.w},${fmt.h}) else im;im.save(${JSON.stringify(out)},'WEBP',quality=82,method=6)`]);

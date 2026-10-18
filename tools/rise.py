@@ -125,6 +125,16 @@ def _demo_rules(t):
             errors.append('Reinigungszone %s: walk = höchstens 2 Laufwege [x0, z0, x1, z1]' % z.get('id'))
         if 'entry' in z and len(z['entry']) != 2:
             errors.append('Reinigungszone %s: entry = [x, z]' % z.get('id'))
+        # Überarbeitung 2: Entstehungsorte [x, y, z, Radius m, Gewicht 0–1] und Zielort des Wischwegs, beide in oder an der Box
+        fc = z.get('focus', [])
+        if len(fc) > 4 or any(len(f) != 5 or not (0 < f[3] <= 0.5) or not (0 < f[4] <= 1) for f in fc):
+            errors.append('Reinigungszone %s: focus = höchstens 4 Orte [x, y, z, Radius 0–0,5 m, Gewicht 0–1]' % z.get('id'))
+        lo, hi = z.get('box', [[0, 0, 0], [0, 0, 0]])
+        for f in fc + ([z['wipeTo']] if 'wipeTo' in z else []):
+            if len(f) >= 3 and not all(a - 0.05 <= v <= b + 0.05 for a, v, b in zip(lo, f[:3], hi)):
+                errors.append('Reinigungszone %s: Ort %s liegt nicht in der Box' % (z.get('id'), f[:3]))
+        if 'wipeTo' in z and len(z['wipeTo']) != 3:
+            errors.append('Reinigungszone %s: wipeTo = [x, y, z]' % z.get('id'))
     if t.get('light', 'tag') not in ('tag', 'nacht'):
         errors.append('tour.light muss tag oder nacht sein')
     dm = t.get('demo')
@@ -379,13 +389,13 @@ def tour_config(d):
         'version': d['metadata']['release'].lstrip('V'),
         'eventsVersion': d['events']['version'],
         'stations': [{'k': s['key'], 'a': s['range'][0], 'b': s['range'][1], 'hold': s['hold'], 'nav': s['nav'], 'ps': s.get('portraitShift', [0, 0]), 'det': [d['q'] for d in s.get('details', [])]} for s in t['stations']],
-        'keyframes': [[k['p'], k['pos'], k['lookAt'], k['fovRad']] for k in t['keyframes']],
+        'keyframes': [[k['p'], k['pos'], k['lookAt'], k['fovRad']] + ([k['fit']] if k.get('fit') else []) for k in t['keyframes']],
         'doors': {x['id']: dict({'open': x['open'], 'close': x['close']}, **({'angle': x['angleRad']} if 'angleRad' in x else {'slide': x['slideM']})) for x in t['doors']},
         'highlights': {x['id']: {'in': x['in'], 'out': x['out']} for x in t['highlights']},
         'smoothing': t['smoothing'],
         'light': t.get('light', 'tag'),
         'demo': t.get('demo'),
-        'cleaning': {'zones': [{k: z[k] for k in ('id', 'st', 'type', 'label', 'box', 'dir', 'edge', 'mat', 'strength', 'seed', 'p', 'walk', 'entry', 'range') if k in z} for z in t.get('cleaning', {}).get('zones', [])]},
+        'cleaning': {'zones': [{k: z[k] for k in ('id', 'st', 'type', 'label', 'box', 'dir', 'edge', 'mat', 'strength', 'seed', 'p', 'walk', 'entry', 'range', 'focus', 'wipeTo') if k in z} for z in t.get('cleaning', {}).get('zones', [])]},
         'routeClearance': t['routeClearance'],
         'wind': {'idleMs': t['wind']['idleMs'], 'maxFps': t['wind']['maxFps']},
         'label': t['scene']['label'],
@@ -491,6 +501,13 @@ def tour_markup(d, still_src, inline_arrow=False, page=True, vorher_src=None):
             out.append('<a class="jr-hot" href="#offerte" data-pre="%s" data-hot="%s" data-st="%d" aria-label="%s – Offerte anfragen">'
                        '<span class="jr-hot-d" aria-hidden="true"></span><span class="jr-hot-l">%s</span></a>'
                        % (h['service'], ','.join('%g' % v for v in h['at']), i, _e(h['label']), _e(h['label'])))
+    # Überarbeitung 2: Vergleich direkt am Bild (Handy, Bildmodus, Handy-3D) – wer «Vorher» drückt, sieht die Wirkung ohne Zurückscrollen.
+    # Sichtbar nur, wo die gezeigte Ansicht einen Vergleich hat (Kern: cmpoSync); auf dem Desktop bleibt er im Stationstext.
+    if clean_st:
+        out.append('<div class="jr-cmpo" role="group" aria-label="Vorher und Nachher am Bild" hidden>'
+                   '<button type="button" class="jr-cmpob" data-cmp="0" aria-pressed="false">Vorher</button>'
+                   '<button type="button" class="jr-cmpob" data-cmp="1" aria-pressed="false">Nachher</button>'
+                   '<span class="jr-cmpon">Illustration · kein Kundenergebnis</span></div>')
     out.append('<span class="jr-tag">%s</span></div>' % _e(t['scene']['label']))
     out.append('<div class="jr-ui wrap">')
     for i, s in enumerate(st):
@@ -534,10 +551,10 @@ def tour_markup(d, still_src, inline_arrow=False, page=True, vorher_src=None):
     out.append('<nav class="jr-nav" aria-label="Stationen des Rundgangs"><ol>%s</ol><div class="jr-bar" aria-hidden="true"><i></i></div></nav>' % nav)
     if page:
         out.append('<p class="jr-3d-note" role="status" hidden></p>')
-        out.append('<div class="jr-skip"><div class="jr-demo" role="group" aria-label="Demo-Rundlauf"><button type="button" class="jr-db" data-demo="toggle" aria-pressed="false"><span>Demo-Rundlauf starten</span></button><button type="button" class="jr-db" data-demo="stop" hidden>Beenden</button></div><div class="jr-light" role="group" aria-label="Licht der Visualisierung"><button type="button" class="jr-lb" data-light="tag" aria-pressed="true">Tageslicht</button><button type="button" class="jr-lb" data-light="nacht" aria-pressed="false">Dämmerung</button></div><button type="button" class="jr-3d-btn" data-3d hidden aria-pressed="false"><span>3D-Ansicht starten</span></button><a href="#ablauf" class="jr-skip-a">Tour überspringen %s</a><a href="#offerte" class="jr-skip-o">Offerte anfragen</a></div>' % a)
+        out.append('<div class="jr-skip"><div class="jr-demo" role="group" aria-label="Demo-Rundlauf"><button type="button" class="jr-db" data-demo="toggle" aria-pressed="false"><span>Demo-Rundlauf starten</span></button><button type="button" class="jr-db" data-demo="stop" hidden>Beenden</button></div><button type="button" class="jr-viewb" data-view aria-pressed="false">Details ansehen</button><div class="jr-light" role="group" aria-label="Licht der Visualisierung"><button type="button" class="jr-lb" data-light="tag" aria-pressed="true">Tageslicht</button><button type="button" class="jr-lb" data-light="nacht" aria-pressed="false">Dämmerung</button></div><button type="button" class="jr-3d-btn" data-3d hidden aria-pressed="false"><span>3D-Ansicht starten</span></button><a href="#ablauf" class="jr-skip-a">Tour überspringen %s</a><a href="#offerte" class="jr-skip-o">Offerte anfragen</a></div>' % a)
     else:
         out.append('<p class="jr-3d-note" role="status" hidden></p>')
-        out.append('<div class="jr-skip"><div class="jr-demo" role="group" aria-label="Demo-Rundlauf"><button type="button" class="jr-db" data-demo="toggle" aria-pressed="false"><span>Demo-Rundlauf starten</span></button><button type="button" class="jr-db" data-demo="stop" hidden>Beenden</button></div><div class="jr-light" role="group" aria-label="Licht der Visualisierung"><button type="button" class="jr-lb" data-light="tag" aria-pressed="true">Tageslicht</button><button type="button" class="jr-lb" data-light="nacht" aria-pressed="false">Dämmerung</button></div><button type="button" class="jr-3d-btn" data-3d hidden aria-pressed="false"><span>3D-Ansicht starten</span></button><button type="button" class="jr-skip-a" data-skip>Tour überspringen %s</button><a href="#offerte" class="jr-skip-o">Offerte anfragen</a></div>' % a)
+        out.append('<div class="jr-skip"><div class="jr-demo" role="group" aria-label="Demo-Rundlauf"><button type="button" class="jr-db" data-demo="toggle" aria-pressed="false"><span>Demo-Rundlauf starten</span></button><button type="button" class="jr-db" data-demo="stop" hidden>Beenden</button></div><button type="button" class="jr-viewb" data-view aria-pressed="false">Details ansehen</button><div class="jr-light" role="group" aria-label="Licht der Visualisierung"><button type="button" class="jr-lb" data-light="tag" aria-pressed="true">Tageslicht</button><button type="button" class="jr-lb" data-light="nacht" aria-pressed="false">Dämmerung</button></div><button type="button" class="jr-3d-btn" data-3d hidden aria-pressed="false"><span>3D-Ansicht starten</span></button><button type="button" class="jr-skip-a" data-skip>Tour überspringen %s</button><a href="#offerte" class="jr-skip-o">Offerte anfragen</a></div>' % a)
     out.append('<div class="jr-steps" role="group" aria-label="Rundgang steuern"><button type="button" class="jr-stepb" data-step="-1" aria-label="Vorherige Station">← Zurück</button><button type="button" class="jr-stepb" data-step="1" aria-label="Nächste Station">Weiter →</button></div>')
     out.append('</div></div></section>')
     if page:

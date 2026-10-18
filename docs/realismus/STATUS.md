@@ -214,3 +214,105 @@ Die Rohbilder (PNG) liegen in `shots/realismus/` (nicht im Repository): `baselin
 7. **Leistung auf echter Hardware nicht gemessen:** Alle Messungen stammen aus Headless-Chromium mit SwiftShader. Echte GPUs (Mac/Windows), echtes iPhone und Android, Safari und der Wix-Live-Test stehen aus. Browseremulation ersetzt keinen echten Gerätetest.
 8. **Tageslicht:** Die Putzstruktur der Fassade wirkt im Tageslicht fleckiger als in der Dämmerung (nicht geändert).
 9. **Nicht veröffentlicht:** keine Domain, keine Wix-Seite verändert. Das im Auftrag genannte Repository `infoimmoready-commits/immoready` wurde nicht berührt.
+
+---
+
+# Überarbeitung 2 (18.10.2026)
+
+Auftrag: «3D-Reise so realistisch wie mit der tatsächlichen technischen Grundlage möglich» (Ergänzung zum Masterprompt).
+
+## Ausgangspunkt gesichert
+
+- Branch `v17.1-release-candidate`, Commit `ade7f1a`, lokaler Tag `realismus-r6-stand`.
+  - Das Hochladen des Tags lehnt der Git-Proxy ab (403, nur der Arbeitsbranch ist freigegeben).
+  - Der Remote-Branch steht auf demselben Commit.
+- `python3 build.py` erzeugt byteweise denselben Stand wie im Repository.
+- Die private Vorschau (Artefakt, Version 26) enthält genau diesen Build (Vergleich der Dateien: identisch bis auf die Hülle des Dienstes).
+- **Freigabe der Vorschau:** Der Artefakt-Dienst meldet beim Lesen «shared with anyone with the link». Die Vorschau ist also derzeit **für alle mit dem Link** offen, nicht privat. Die frühere Angabe «privat» aus der Veröffentlichungsmeldung war damit falsch. Claude kann die Freigabe nicht ändern (Teilen-Menü der Seite).
+- Das hochgeladene Archiv `immoready-website-v17-final.zip` (9.10.2026, V17, ohne Reinigung, Demo und Prüfungen ab t20) ist älter. Es wurde nur angesehen, nicht entpackt und nicht verwendet.
+
+## Runde 7 – Beurteilung wie ein Architekturvisualisierer
+
+Bilder: `shots/beurteilung/r7vorher-*` (Kundenansicht mit Kopf und Bedienung sowie reine Szene; 1280×720, 1440×900, Handy-Bildmodus und Handy-3D), Werkzeug `tools/beurteilung-bilder.js`. Konsole ohne Fehler.
+
+Stärkste sichtbare Ursachen, nach Wirkung geordnet (Fläche × Blickpunkt):
+
+| # | Bereich | Beobachtung |
+|---|---|---|
+| 1 | Kamera/Bildausschnitt | Die 3D-Bühne liegt im Scrollmodus **unter dem festen Kopf**. Die obersten 74–112 px sind verdeckt: Bei 1280×720 fehlt die Armatur oben, der WC-Deckel ist angeschnitten, an der Fassade fehlen die oberen Balkone. |
+| 2 | Kamera/Bildausschnitt | Waschtisch-Nahansicht: Kamera zu nah und zu tief. Die Aussenschürze füllt die untere Bildhälfte, das Becken wirkt wie eine übergrosse Wanne. Beim WC liegt das Motiv unter dem Textblock. |
+| 3 | Überlagerung | Bad-Übersicht 1280×720: «Ablaufventil» über dem Titel, «Siphon und Eckventile …» über dem Regler, «Schematische Kennzeichnung» im Textblock, «Armatur» am Kopf. Wohnung: Textblock höher als die Bühne, der Anfrageknopf liegt über der Kennzeichnung unten links. In Nahansichten bleibt der ganze Text (Absatz, Regler, Auswahl, Aktionen) stehen. |
+| 4 | Licht | Tageslicht gleichmässig grau, ohne Richtung: kaum Schlagschatten von Gebäude, Balkonen und Bäumen auf Boden und Fassade. Innen fast keine Kontaktschatten unter Tisch, Stühlen und Sofa. Die Raumtiefe geht verloren. |
+| 5 | Pflanzen | In allen Beeten dieselben ockergelben Gräserbüschel mit gleicher Silhouette und Farbe – die Wiederholung ist schon aus der Gesamtansicht erkennbar. Sträucher als gleichmässig grüne Kugeln ohne Tiefe. Kein Bodenkontakt (keine Verschattung am Fuss, flache braune Erde). Rasen einheitlich grün. |
+| 6 | Material | Gartenweg als einheitliche Betonfläche ohne Plattenfugen und ohne Alterung – im «Nachher» fabrikneu. Parkett ohne Brettgrenzen. Fassadenputz mit grossen, wolkigen Flecken statt feiner Körnung. |
+| 7 | Schmutz | Wasserränder als verteilte Ringe ähnlicher Grösse über das ganze Becken (dekorativ statt aus Tropfwasser entstanden). Keine Unterscheidung von Beckenboden, Rückwand und Ablage. |
+| 8 | Handy | Vergleichsknöpfe stehen weit unter dem Bild und am Eingang teilweise hinter der Kontaktleiste. Wer «Vorher» drückt, sieht die Wirkung erst nach dem Zurückscrollen. |
+| 9 | Demo-Naht | Bild nahtlos, der Stationstext springt aber sichtbar von Station 6 auf Station 1. |
+| 10 | Geometrie | Sofa und Sitzbank aus wenigen gefasten Quadern. Nachbarhäuser als einfache Kisten mit Fensterraster (in der Gesamtansicht gross im Bild). |
+
+**Titelbild und Rundgang:** Das Titelbild (KI-Symbolbild: beiger Bau mit Loggien, Abendlicht) und der Rundgang (weisser Putzbau, Tageslicht) zeigen verschiedene Gebäude. Beide sind gekennzeichnet («Symbolbild (KI)», «Illustrative Visualisierung · kein Referenzobjekt»). Der Rundgang darf nicht als dasselbe Objekt erscheinen.
+
+**Reihenfolge der Arbeit:**
+1. Kamera und Bildausschnitt, Überlagerungen (1–3, 9).
+2. Licht (4).
+3. Pflanzen (5).
+4. Material (6).
+5. Schmutz (7).
+6. Handy (8).
+Geometrie (10) nur dort, wo sie gross im Bild ist.
+
+**Titelbild und Rundgang (geprüft):** Der Knopf im Einstieg heisst «Gebäude entdecken» (Vorgabe Premium-Durchgang) und führt zum Rundgang. Weder dort noch im Rundgang steht, dass Titelbild und Rundgang dasselbe Gebäude zeigen. Die Szene trägt durchgehend «Illustrative Visualisierung · kein Referenzobjekt», das Titelbild «Symbolbild (KI)». Unverändert gelassen.
+
+## Runde 8 – Bühne, Bad-Kamera und Überlagerungen (Befunde 1, 2, 3, 9)
+
+Bilder: `shots/beurteilung/r8*` (Kundenansicht und reine Szene), Werkzeug `tools/beurteilung-bilder.js` (neu: `PUNKTE=5-bad` für einzelne Punkte).
+
+| Befund | Änderung | Nachweis |
+|---|---|---|
+| Bühne unter dem festen Kopf | Die Zeichenfläche beginnt unter dem sichtbaren Kopf: `--hdrv` = gemessene Kopfhöhe `--hdrh` minus dem Teil, der beim Scrollen über den Rand gleitet (36 px, ≤ 980 px Breite 26 px). 1280×720: Bühne 1280×623 ab y 97. Erster Versuch mit `--hdrh` allein ergab ein dunkles Band (sticky top −36 px); korrigiert. | t29: Oberkante = Kopfunterkante ± 1,5 px bei 1280×720, 1440×900, 1920×1080 |
+| Stationstext in der Bedienleiste | Alle Texte stehen in derselben Rasterzeile; ihre Höhe bestimmte der höchste, ausgeblendete Text (Wohnung 636 px) und schob kürzere nach unten. Jetzt `grid-template-rows:minmax(0,1fr)`; niedrige Desktops (≤ 820 px hoch) mit kompaktem Text (440 px, kleinere Titel). | t29: alle Stationen und Nahansichten über der Bedienleiste, links der Stationsleiste |
+| Bad-Kameras (Waschtisch zu nah und zu tief, Armatur oben abgeschnitten, WC unter dem Text) | Übersicht aus der Raumecke bei der Tür (x 4,9 m, Bildwinkel 1,04): Waschtisch, Spiegelschrank, Vorwand und WC gemeinsam. Waschtisch (0,66 statt 0,56, Blick leicht nach rechts): Armatur, Becken, Ablauf, Schürze und Unterschrank. WC weiter zurück (0,82) mit Betätigungsplatte. Ein erster Übersichtspunkt (x 5,05) stiess an Türzarge und Badtürflügel (`checkRoute`: Körper 183/185) – nach innen versetzt. | Route kollisionsfrei, grösste Drehung 30,4° je 1 % (p 0,424, unverändert), Nahebene ≥ 0,203 m |
+| Motiv wird auf grossen Bildschirmen grösser als der freie Bereich | **Bildausschnitt in Bildpunkten** (`rise.json → keyframes[].fit`): Stationstext und Stationsleiste haben feste Grössen; auf Bühnen höher als 623 px weitet der Kern den Bildwinkel, damit das Motiv seine Grösse in Bildpunkten behält. Nur Querformat, nur die drei Badansichten; Stationsbilder ohne diese Regel (Text steht dort unter dem Bild). | t29: Waschtisch 479 px breit bei 1280×720, 1440×900 und 1920×1080 (± 3 %) |
+| Beschriftungen über Titel, Regler und Kopf | Eine Beschriftung erscheint nur innerhalb der Bühne und ohne Überschneidung mit der ganzen Textspalte, Stationsleiste, Bedienleiste, Kennzeichnung oder einer anderen Beschriftung. «Schematische Kennzeichnung» steht unter oder über den sichtbaren Markierungen, ohne Markierung entfällt sie. In der WC-Nahansicht stehen keine Waschtisch-Beschriftungen mehr am Bildrand. | t29 |
+| Vergleich ohne sichtbare Wirkung | Im 3D wie im Bildmodus: Vergleich nur, wo ein «Vorher»-Bild derselben Ansicht existiert (WC-Nahansicht und Bad-Übersicht ohne Vergleich). | t29, t28 |
+| Viel Text in Nahansichten | Nahansichten (Waschtisch, WC): Absatz ausgeblendet, Text 440 px. Neuer Knopf **«Details ansehen»** in der Bedienleiste: nimmt Absatz, Auswahl, Leistungspunkte, Beschriftungen und den dunklen Verlauf zurück; Titel, Vergleich, Stationen, «Tour überspringen» und «Offerte anfragen» bleiben. «Text einblenden» stellt alles wieder her. Maus, Enter, Leertaste, sichtbarer Fokus, 44 px. Nur im 3D (im Bildmodus steht der Text unter dem Bild). | t29 |
+| Demo-Naht: Text springt von Station 6 auf 1 | Während die Hecke das Bild verdeckt (46,9 s bis 0,9 s), ist kein Stationstext sichtbar; der Wechsel geschieht verdeckt. | t29 (46,4 s Station 6 · 47,5 s und 0,3 s kein Text · 1,6 s Station 1) |
+
+Nebenbefund: `render-stills.js` hätte nach der Kopfregel verzerrte Bilder erzeugt (Bühne 1440×803, auf 1440×900 gestreckt). Jetzt volle Bildgrösse (`--hdrv:0`) und Abbruch, wenn die Bühne nicht die Bildgrösse hat.
+
+## Runde 9a – Waschtisch: Schmutz aus seiner Entstehung (Befund 7)
+
+Anlass: Im ruhigeren Ausschnitt (Waschtisch ≈ 480 px breit, rund 1 Bildpunkt je mm) fiel der Vorher/Nachher-Unterschied unter die Sichtbarkeitsschwelle der Stationsbilder (0,06 % der Bildpunkte, Schwelle 0,1 %). Die Ringe waren gleichmässig über Becken und Ablage verteilt, die Armatur rundum fleckig. Mehr Schmutz wäre die falsche Antwort gewesen; geändert wurde der **Ort**:
+
+- `rise.json → tour.cleaning.zones[].focus`: Entstehungsorte [x, y, z, Radius, Gewicht], der erste ist der Hauptort. `wipeTo`: Zielort des Wischwegs. Geprüft in `tools/rise.py` (höchstens 4 Orte, Radius ≤ 0,5 m, Orte in der Box).
+- **Armatur (Kalk):** Kalkfuss über der Rosette (1–2 cm, ausgefranster Rand), Kruste am Strahlregler (Hauptort), wenige eingetrocknete Tropfen vorne am Körper (Spritzrichtung). Kein flächiges Fleckenmuster mehr.
+- **Waschtisch (Wasser und Seife):** matter, beige-grauer Seifen- und Kalkfilm um den Ablauf mit Schmutzring am Rand des Ablaufdeckels; eingetrocknete Tropfenränder (Ø 6–12 mm, zu einer Seite offen) um Armaturenfuss und Seifenspender, sonst vereinzelt; aussen an der Schürze wenige blasse Laufspuren mit Tropfen am Ende. Die Beckenwände bleiben weitgehend frei (dort läuft Wasser ab). Grössen auf den Bildmassstab abgestimmt – feinere Spuren erschienen in der Prüfung als dunkle «Pfefferpunkte» und feine Kratzer.
+- **Wischweg:** Becken vom Rand zum Ablauf (radial, leicht wellige Front), Armatur von oben nach unten. Nasskante je Material: Keramik und Chrom glänzender und nur 7 % dunkler, schmal hinter dem Tuch; Böden wie bisher (22 %, breit). Zustand weiter nur aus dem Fortschritt.
+- **Leistung** (Software-Grafik SwiftShader dieser Umgebung, 1440×900, ohne `IR_FORCE_HQ`; keine Messung auf echter GPU): Nahansicht «Vorher» 928 ms (Ausgangsstand 869 ms), sauber 663 ms (577 ms – der weitere Ausschnitt zeichnet mehr Raum), Anfahrt p 0,705/0,715: 1340/1319 ms (1475/1277 ms). Zusatzkosten der Schmutzschicht 265 ms (Ausgangsstand 292 ms). Eine erste Fassung mit zwei Ringlagen und `atan` je Bildpunkt kostete 362 ms und wurde vereinfacht.
+
+## Runde 9b – Materialien (Befund 6)
+
+- **Gartenweg, Veloplatz, Terrasse:** Seit V17 enthält die Plattentextur keine eingebrannten Fugen mehr (innen zeichnet der Shader die Fugen); die Beläge aussen waren dadurch durchgehende Flächen. Jetzt einzelne Platten (Gehweg ≈ 52 × 50 cm, Veloplatz ≈ 56 × 50 cm, Terrasse ≈ 79 × 60 cm – illustrative Masse, keine Normangabe) mit 8-mm-Fugen über einem dunklen Sandbett, Fase 4 mm, Ton je Platte ±5 %, Höhe je Platte ±1 mm, einzelne Platten verwittert dunkler. Das vorab gerechnete Licht dunkelt die Fugen zusätzlich ab.
+- **Parkett:** Die Holztextur enthält 19-cm-Dielen mit Stössen; deren Fugen verschwanden in der Texturfilterung. Die Längsfugen werden jetzt je Bildpunkt nachgezeichnet (1,6 mm, mit Kantenglättung, nur am Boden), passend zum Raster der Textur.
+- **Fassadenputz:** Die «Wolken» waren keine Textur, sondern Interpolationsfahnen des je Eckpunkt gebackenen Lichts. Mit Sonnenschatten wären sie deutlicher geworden; Vorder- und Seitenfassade sind deshalb auf 17 cm statt 34 cm gerastert (+48 000 Eckpunkte im Gebäude, Backen 88 s statt 81 s). Baum- und Balkonschatten sind jetzt klar umrissen.
+- **Trennung der Ebenen** (unverändert und geprüft): Grundfarbe je Eckpunkt, feine Struktur aus der Textur, Rauheit/Glanz aus der Materialtabelle, dauerhafte Alterung als Farbabweichung und Verlaufsflächen (Fassade, Platten), entfernbare Verschmutzung als eigene Schicht (Reinigungszonen), Feuchte nur an der Wischkante.
+
+## Runde 10 – Licht und Vegetation (Befunde 4 und 5)
+
+**Licht.** Vorher kamen 84 % des Tageslichts gleichmässig vom Himmel, die Sonne trug 16 % bei – ohne Schatten. Jetzt:
+- Lichtwerkzeug mit zwei weiteren Kanälen je Eckpunkt (4 statt 2 Byte, `assets/bake/licht.json` 510 KB statt 404 KB):
+  - **Sonnensichtbarkeit** – 16 Strahlen in Sonnenrichtung (Höhe 58°), Kegel ±1,5°, Laub lässt 45 % durch;
+  - **Himmel durch Öffnungen** innen – 192 Strahlen, über 35 cm innerhalb desselben Raums geglättet.
+- Gemessen (`WS_STATS=1 node tools/bake-light.js`): Wohnraum Boden Median 0,8 % Himmel, 90 % bei 1,9 % – realistische Tageslichtquotienten. Bad ohne Fenster ≈ 0 (Leuchten tragen das Licht).
+- Die erste Abtastung mit 40 Strahlen ergab fleckige Wände (Median 0); verworfen.
+- Aussen: Himmel (20–50 %) plus Sonne (bis 62 %) mit Schatten, Sonnenglanz im Schatten aus. Innen: Grundaufhellung plus Fensterlicht, das mit dem Abstand zur Öffnung abnimmt, plus Sonnenflecken durch die Fenster.
+- Dämmerung unverändert.
+- Ohne Lichtdaten (Handy-3D lädt keine) bleibt es bei Licht ohne Schatten.
+- Kein zusätzlicher Dunst, keine Abdunklung, keine Unschärfe, kein Leuchtschimmer.
+
+**Vegetation.**
+- Beete in Gruppen («Drifts») aus drei Grassorten statt gleicher Büschel in Reihe: ockerfarbenes Lampenputzergras, niedriger blaugrauer Schwingel, grüne Segge. Dazu Stauden, Grössen gestreut, Mindestabstand 26 cm.
+- Bodenkontakt: dunklere Erde direkt unter jeder Pflanze mit weichem Verlauf; das Laub verschattet zusätzlich im vorab gerechneten Licht.
+- Heckenkarten bewegen sich im Wind kaum noch (geschnittene Hecke). Stämme und Äste waren schon unbewegt.
+- Rasen mit dezenten Mähstreifen (0,6 m, ±6 %).
+- **Pflanzenassets geprüft:** Im Projekt liegen keine lizenzierten Pflanzenmodelle oder -texturen. Vorhanden ist nur der eigene, prozedural erzeugte Laubatlas `assets/tex/laub.webp` (`tools/make-textures.py`, `assets/tex/LIZENZ.txt`: eigenes Werk). Es wurde nichts heruntergeladen.

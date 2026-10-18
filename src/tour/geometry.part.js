@@ -246,8 +246,15 @@
     MAT=ERD;withSub(0.5,function(){box(-5.19,-0.05,ZF+0.225,7.62,0.08,0.45,'#9b968d',0,0);box(3.69,-0.05,ZF+0.225,4.12,0.08,0.45,'#9b968d',0,0);box(XS+0.225,-0.05,0.225,0.45,0.08,DEP+0.45,'#9b968d',0,0);
       box(0,-0.05,-ZF-0.225,W+0.9,0.08,0.45,'#9b968d',0,0);box(-XS-0.225,-0.05,0.0,0.45,0.08,DEP,'#9b968d',0,0);},'up');
     MAT=MET;box(-5.19,-0.05,ZF+0.453,7.62,0.1,0.006,'#4b4845',0,0);box(3.69,-0.05,ZF+0.453,4.12,0.1,0.006,'#4b4845',0,0);box(XS+0.453,-0.05,0.0,0.006,0.1,DEP,'#4b4845',0,0);MAT=PUTZ;
-    /* Gehweg: Betonplatten 50 cm, Granit-Randsteine in 1-m-Stücken */
-    MAT=PLA;withSub(0.5,function(){box(0,-0.05,13.45,1.6,0.1,11.6,'#a8a39b',0,0);},'up');
+    /* Überarbeitung 2: Plattenbeläge aus einzelnen Platten statt einer durchgehenden Fläche (seit V17 enthält die Plattentextur keine
+       eingebrannten Fugen mehr – innen zeichnet der Shader die Fugen). Fugen 8 mm über einem dunklen Sandbett, Fase 4 mm, Ton je
+       Platte ±5 %, Höhe je Platte ±1 mm, einzelne Platten verwittert dunkler. Masse illustrativ (Annahme, keine Normangabe). */
+    function slabs(x0,x1,z0,z1,ytop,nx,lz,col,th){var J=0.008,w=(x1-x0-(nx+1)*J)/nx,c=hex(col);th=th||0.04;
+      MAT=ERD;withSub(0.5,function(){box((x0+x1)/2,ytop-th-0.01,(z0+z1)/2,x1-x0,th+0.004,z1-z0,'#5d584f',0,0);},'up');
+      MAT=PLA;BEV=0.004;for(var zz=z0+J;zz<z1-0.05;zz+=lz+J){var l=Math.min(lz,z1-J-zz);for(var i=0;i<nx;i++){var k=0.95+0.1*rnd(),u=rnd()*2-1;if(rnd()<0.12)k*=0.9;
+        var cc=[c[0]*k*(1+0.02*u),c[1]*k,c[2]*k*(1-0.02*u)];withSub(0.5,function(){box(x0+J+w/2+i*(w+J),ytop-th+(rnd()-0.5)*0.002,zz+l/2,w,th,l,cc,0,0);},'up');}}BEV=0;}
+    /* Gehweg: Betonplatten ≈ 52 × 50 cm, Granit-Randsteine in 1-m-Stücken */
+    slabs(-0.8,0.8,7.65,19.25,0.05,3,0.5,'#a8a39b');
     MAT=STE;BEV=0.01;for(var z=7.65;z<19.25;z+=1.0){var l=Math.min(0.994,19.25-z);box(-0.84,-0.1,z+l/2,0.08,0.18,l,'#a29d95',0,0);box(0.84,-0.1,z+l/2,0.08,0.18,l,'#a29d95',0,0);}BEV=0;
     MAT=PUTZ;
     /* Beete: Erde mit Stahlkante, Pflanzen sitzen in der Erde */
@@ -257,25 +264,40 @@
     var Y=0.045;
     /* linkes Beet: Felsenbirne (mehrstämmig), Sträucher, Gräser, Stauden in Gruppen */
     treeC(-3.9,10.1,1.15,'#8a9a72',[[-0.12,0],[0.1,0.08],[0.02,-0.12]]);
-    shrubC(-5.4,Y,9.0,0.42,0.75,LEAF[1]);shrubC(-5.6,Y,11.1,0.36,0.62,LEAF[3]);shrubC(-2.0,Y,11.2,0.34,0.55,LEAF[0]);shrubC(-1.85,Y,8.9,0.3,0.5,LEAF[4]);
-    [[-4.7,8.75],[-4.4,9.05],[-2.9,8.7],[-2.6,11.4],[-3.1,11.55],[-5.0,11.45],[-1.75,10.1]].forEach(function(g,i){grassC(g[0],Y,g[1],0.55+rnd()*0.3,['#c9bf8a','#b8b480','#cfc394'][i%3]);});
-    [[-4.9,10.2],[-4.6,10.6],[-2.4,9.6],[-2.2,10.4],[-3.4,9.2],[-5.3,10.0],[-2.9,10.95]].forEach(function(g){perC(g[0],Y,g[1],0.42+rnd()*0.2,['#b5c19c','#c2c6a2','#adbb94'][(rnd()*3)|0]);});
+    /* Überarbeitung 2: Bodenkontakt – dunklere, feuchtere Erde direkt unter jeder Pflanze (weicher Verlauf zum Beet hin; das
+       vorab gerechnete Licht verschattet zusätzlich durch das Laub) */
+    var SOIL=C3('#6b5947');
+    function foot(x,z,r){r*=1.3;var cd=[SOIL[0]*0.48,SOIL[1]*0.46,SOIL[2]*0.44],up=[0,1,0],c=[x,Y+0.0015,z],N=10,a0=rnd()*6.283;MAT=ERD;
+      for(var i=0;i<N;i++){var a=a0+i/N*6.283,b=a0+(i+1)/N*6.283,ra=r*(0.85+0.3*h2(i,x)),rb=r*(0.85+0.3*h2((i+1)%N,x));vert(c,up,cd,0);vert([x+Math.cos(b)*rb,Y+0.0015,z+Math.sin(b)*rb],up,SOIL,0);vert([x+Math.cos(a)*ra,Y+0.0015,z+Math.sin(a)*ra],up,SOIL,0);}MAT=PUTZ;}
+    /* Pflanzen in Gruppen («Drifts») wie bei einer Beetpflanzung: je Gruppe eine Sorte, Abstand je Pflanze, Grösse gestreut */
+    function drift(cx,cz,rx,rz,n,fn){var pts=[],tries=0;while(pts.length<n&&tries<80){tries++;var a=rnd()*6.283,d=Math.sqrt(rnd()),x=cx+Math.cos(a)*rx*d,z=cz+Math.sin(a)*rz*d;
+      if(pts.some(function(q){return Math.hypot(q[0]-x,q[1]-z)<0.26;}))continue;pts.push([x,z]);fn(x,z,pts.length-1);}}
+    /* Sorten (Tönung der Laubkarten, Höhe in m): Lampenputzergras ocker, Blauschwingel blaugrau und niedrig, Segge grün, Stauden */
+    function gOcker(x,z){var h=0.55+rnd()*0.3;foot(x,z,0.17+h*0.12);grassC(x,Y,z,h,['#c9bf8a','#bfb582','#cfc394'][(rnd()*3)|0],5+((rnd()*3)|0));}
+    function gBlau(x,z){var h=0.24+rnd()*0.1;foot(x,z,0.13);grassC(x,Y,z,h,['#a3b2a4','#9eae9f'][(rnd()*2)|0],8);}
+    function gSegge(x,z){var h=0.36+rnd()*0.14;foot(x,z,0.15);grassC(x,Y,z,h,['#9bad76','#a4b47f'][(rnd()*2)|0],6+((rnd()*2)|0));}
+    function pStaude(x,z){var h=0.34+rnd()*0.22;foot(x,z,0.18);perC(x,Y,z,h,['#9cb07f','#a8b98c','#8ea374'][(rnd()*3)|0]);}
+    function sh(x,z,r,hg,c){foot(x,z,r*1.15);shrubC(x,Y,z,r,hg,c);}
+    sh(-5.4,9.0,0.42,0.75,LEAF[1]);sh(-5.6,11.1,0.36,0.62,LEAF[3]);sh(-2.0,11.2,0.34,0.55,LEAF[0]);sh(-1.85,8.9,0.3,0.5,LEAF[4]);
+    foot(-3.9,10.1,0.45);
+    drift(-4.55,8.9,0.5,0.28,4,gOcker);drift(-2.9,11.45,0.55,0.2,5,gBlau);drift(-5.05,10.35,0.32,0.45,3,gSegge);
+    drift(-2.45,9.95,0.4,0.42,4,pStaude);drift(-3.15,9.0,0.3,0.25,2,pStaude);drift(-1.7,10.15,0.15,0.3,2,gOcker);
     /* rechtes Beet */
-    shrubC(4.3,Y,10.9,0.4,0.7,LEAF[2]);shrubC(4.35,Y,13.0,0.36,0.6,LEAF[0]);shrubC(1.9,Y,13.15,0.3,0.48,LEAF[3]);
-    [[1.8,10.8],[2.2,11.2],[3.1,10.7],[3.5,12.6],[2.6,13.3],[1.75,12.1]].forEach(function(g,i){grassC(g[0],Y,g[1],0.5+rnd()*0.3,['#c9bf8a','#bdb784'][i%2]);});
-    [[2.6,11.8],[3.2,11.6],[2.1,12.6],[3.9,12.0],[3.0,12.7]].forEach(function(g){perC(g[0],Y,g[1],0.4+rnd()*0.2,['#b5c19c','#c2c6a2'][(rnd()*2)|0]);});
+    sh(4.3,10.9,0.4,0.7,LEAF[2]);sh(4.35,13.0,0.36,0.6,LEAF[0]);sh(1.9,13.15,0.3,0.48,LEAF[3]);
+    drift(2.0,11.0,0.35,0.35,3,gOcker);drift(3.35,12.55,0.4,0.3,3,gSegge);drift(2.6,13.3,0.45,0.18,4,gBlau);
+    drift(2.95,11.8,0.55,0.45,5,pStaude);drift(1.75,12.15,0.15,0.3,2,gOcker);
     /* Pflanzstreifen vor den Fenstern: niedrige, geschnittene Sträucher */
     /* Pflanzstreifen vor den Fenstern: lockere Gruppen aus Kugelsträuchern, Stauden und Gräsern – kein Raster */
     function strip(x0,x1){var px=x0;while(px<x1){var z=ZF+0.62+rnd()*0.38,r=rnd();
-      if(r<0.55){var rr=0.2+rnd()*0.12;shrubC(px,Y,z,rr,rr*1.5,LEAF[(rnd()*5)|0]);px+=rr*1.6+rnd()*0.35;}
-      else if(r<0.8){perC(px,Y,z,0.32+rnd()*0.2,['#b5c19c','#aebb92'][(rnd()*2)|0]);px+=0.35+rnd()*0.3;}
-      else{grassC(px,Y,z,0.4+rnd()*0.2,'#c2bb88');px+=0.3+rnd()*0.3;}}}
+      if(r<0.55){var rr=0.2+rnd()*0.12;foot(px,z,rr*1.1);shrubC(px,Y,z,rr,rr*1.5,LEAF[(rnd()*5)|0]);px+=rr*1.6+rnd()*0.35;}
+      else if(r<0.8){foot(px,z,0.16);perC(px,Y,z,0.32+rnd()*0.2,['#9cb07f','#a8b98c'][(rnd()*2)|0]);px+=0.35+rnd()*0.3;}
+      else{foot(px,z,0.14);grassC(px,Y,z,0.4+rnd()*0.2,['#c2bb88','#9bad76'][(rnd()*2)|0]);px+=0.3+rnd()*0.3;}}}
     strip(-8.35,-1.85);strip(1.9,4.9);
     /* Grasbüschel am Beetrand und im Rasen (lockert die Kanten auf) */
     for(var k=0;k<70;k++){var gx=-15+rnd()*30,gz=6.2+rnd()*12.8;if(Math.abs(gx)<1.3)continue;if(gx>-6.4&&gx<-1.05&&gz>8.1&&gz<12.1)continue;if(gx>1.05&&gx<5.1&&gz>10.1&&gz<13.9)continue;if(gx>5.6&&gx<9.2&&gz<8.9)continue;
       card(gx,0.0,gz,0.22,0.12,rnd()*3,1,'#9aa070',{ao:0.6,sw:0.4});}
     /* Veloabstellplatz neben dem Weg: Platten, drei Anlehnbügel (Chromstahl), zwei Velos */
-    MAT=PLA;withSub(0.5,function(){box(2.55,-0.05,7.75,2.3,0.1,1.5,'#a8a39b',0,0);},'up');
+    slabs(1.4,3.7,7.0,8.5,0.05,4,0.5,'#a8a39b');
     MAT=EDS;[1.9,2.6,3.3].forEach(function(bx){var pts=[];for(var i=0;i<=16;i++){var t=i/16,z,y;if(t<0.3){z=7.35;y=t/0.3*0.62;}else if(t>0.7){z=8.15;y=(1-t)/0.3*0.62;}else{var a=(t-0.3)/0.4*Math.PI;z=7.75-0.4*Math.cos(a);y=0.62+0.16*Math.sin(a);}pts.push([bx,y+0.05,z]);}
       bogen(pts,0.02,0.02,10,'#a7a8a6',0);WALLS.push([bx-0.05,bx+0.05,0,0.85,7.3,8.2]);});
     function velo(x,z0,col){var P=function(a,u){return [x,0.05+u,z0-a];};MAT=TEX;[[0,0.34],[1.06,0.34]].forEach(function(w){var ring=[],rim=[];for(var i=0;i<=36;i++){var t=i/36*Math.PI*2;ring.push(P(w[0]+0.34*Math.cos(t),w[1]+0.34*Math.sin(t)));rim.push(P(w[0]+0.3*Math.cos(t),w[1]+0.3*Math.sin(t)));}
@@ -296,7 +318,7 @@
     function hedge(x0,x1,z0,z1,hgt){MAT=HEC;withSub(0.6,function(){box((x0+x1)/2,0,(z0+z1)/2,x1-x0,hgt,z1-z0,'#4e5f40',0,0);},'all');MAT=PUTZ;
       var lx=x1-x0,lz=z1-z0,along=lx>lz,L=Math.max(lx,lz),n=Math.round(L/0.45);
       for(var i=0;i<n;i++){var t=(i+0.5)/n,cx=along?x0+lx*t:(x0+x1)/2,cz=along?(z0+z1)/2:z0+lz*t,yaw=along?0:Math.PI/2,th=Math.min(lx,lz)/2;
-        [-1,1].forEach(function(sd){var ox=along?0:sd*th,oz=along?sd*th:0;card(cx+ox*0.96+(rnd()-0.5)*0.1,hgt-0.34+rnd()*0.12,cz+oz*0.96+(rnd()-0.5)*0.1,0.55+rnd()*0.25,0.5+rnd()*0.08,yaw+(rnd()-0.5)*0.4,0,'#a3b28c',{cx:(x0+x1)/2,cz:(z0+z1)/2,ao:0.7,sw:0.35,tilt:sd*(along?1:-1)*0.35});});
+        [-1,1].forEach(function(sd){var ox=along?0:sd*th,oz=along?sd*th:0;card(cx+ox*0.96+(rnd()-0.5)*0.1,hgt-0.34+rnd()*0.12,cz+oz*0.96+(rnd()-0.5)*0.1,0.55+rnd()*0.25,0.5+rnd()*0.08,yaw+(rnd()-0.5)*0.4,0,'#a3b28c',{cx:(x0+x1)/2,cz:(z0+z1)/2,ao:0.7,sw:0.12,tilt:sd*(along?1:-1)*0.35});});
         /* V17.1: Oberseite aus zwei kleineren, gegeneinander geneigten Karten statt einer flachen Platte (wirkt aus der Nähe gewölbt) */
         [-1,-0.5,0,0.5,1].forEach(function(sd){var ox=along?(rnd()-0.5)*0.3:sd*th*0.55,oz=along?sd*th*0.55:(rnd()-0.5)*0.3;card(cx+ox,hgt-0.12+rnd()*0.06,cz+oz,0.36+rnd()*0.16,0.32+rnd()*0.12,yaw+(rnd()-0.5)*1.2,0,['#a3b28c','#9aab84','#a8b690'][(rnd()*3)|0],{cx:(x0+x1)/2,cz:(z0+z1)/2,ao:0.88,sw:0.35,tilt:(sd||(rnd()<0.5?-1:1))*(along?-1:1)*(0.7+rnd()*0.35)});});
         /* V17: unregelmässige Oberkante – einzelne Triebe ragen 5–15 cm über den Schnitt */
@@ -305,7 +327,9 @@
     hedge(-15.6,-1.62,18.55,19.25,1.3);hedge(1.62,15.6,18.55,19.25,1.3);hedge(-15.6,-14.9,6.0,18.55,1.3);hedge(14.9,15.6,6.0,18.55,1.3);
     /* Terrasse vor dem Wohnraum: grossformatige Platten, Stufe zum Rasen, Pflanzkübel, Wandleuchte */
     grp('Terrasse',G);
-    MAT=PLA;withSub(0.45,function(){box(7.37,-0.05,ZF+1.4,3.16,0.49,2.8,'#b3aea5',0,0);box(7.37,-0.05,ZF+2.97,3.16,0.27,0.34,'#aaa59c',0,0);},'up');
+    MAT=PLA;withSub(0.45,function(){box(7.37,-0.05,ZF+1.4,3.16,0.445,2.8,'#aaa59c',0,0);box(7.37,-0.05,ZF+2.97,3.16,0.27,0.34,'#aaa59c',0,0);},'up');
+    /* Terrasse: grossformatige Platten ≈ 79 × 60 cm auf dem Unterbau (Oberkante wie bisher 0,44 m) */
+    slabs(5.79,8.95,ZF,ZF+2.8,0.44,4,0.6,'#b3aea5',0.035);
     MAT=BET;withBev(0.015,function(){box(8.55,0.44,ZF+2.3,0.7,0.5,0.5,'#8e8a83',0,0.2);});MAT=ERD;box(8.55,0.94,ZF+2.3,0.62,0.01,0.42,'#3d3129',0,0);MAT=PUTZ;
     grassC(8.55,0.95,ZF+2.3,0.7,'#c4bc8a',4);WALLS.push([8.2,8.9,0.44,1.6,ZF+2.05,ZF+2.55]);
     MAT=MET;box(8.75,2.45,ZF+0.04,0.12,0.2,0.08,'#3a3a39',0,0);MAT=LEU;box(8.75,2.44,ZF+0.06,0.09,0.012,0.05,'#ffe2b6',1.2,0);MAT=PUTZ;light(8.7,2.3,ZF+0.35,4.2,'#ffc98c',0.8,0);halo(8.75,2.42,ZF+0.09,0.3,'#ffcf98',0.28);
@@ -334,8 +358,9 @@
     WIN.forEach(function(o){var hh={u0:o.u-o.w/2,u1:o.u+o.w/2,y0:o.y,y1:o.y+o.h};(o.F===FRONT?HF:o.F===SIDE?HS:o.F===BACK?HB:HL).push(hh);});
     /* Fassadenflächen (WDVS, Abriebputz), fein gerastert für Licht und Umgebungsverdeckung */
     MAT=PUTZ;
-    /* V17.1: Vorder- und Seitenfassade (Hauptansichten) feiner gerastert – Balkonschatten ohne schräge Interpolationsfahnen */
-    withSub(0.34,function(){holed(FRONT,-XS,XS,FLOOR,PAR,0,HF,[0,0,1],FAC,true);holed(SIDE,-ZI,ZI,FLOOR,PAR,0,HS,[1,0,0],FAC,true);},'v');
+    /* V17.1: Vorder- und Seitenfassade (Hauptansichten) feiner gerastert – Balkonschatten ohne schräge Interpolationsfahnen.
+       Überarbeitung 2: 17 cm (Sonnenschatten von Balkonen, Vordach und Baum werden je Eckpunkt gebacken; bei 34 cm verschmierten sie) */
+    withSub(0.17,function(){holed(FRONT,-XS,XS,FLOOR,PAR,0,HF,[0,0,1],FAC,true);holed(SIDE,-ZI,ZI,FLOOR,PAR,0,HS,[1,0,0],FAC,true);},'v');
     withSub(0.55,function(){
       holed(BACK,-XS,XS,FLOOR,PAR,0,HB,[0,0,-1],FAC,true);holed(LEFT,-ZI,ZI,FLOOR,PAR,0,HL,[-1,0,0],FAC,true);
       /* Wandstirnen an den Ecken (gehören optisch zur Seitenfassade) */

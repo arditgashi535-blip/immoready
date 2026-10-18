@@ -8,4 +8,4 @@ model/geo.json
 !tests/fixtures/*.png
 __pycache__/
 *.pyc
-immoready-website-final-production.zip
+immoready-website-*.zip

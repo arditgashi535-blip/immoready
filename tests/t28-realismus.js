@@ -51,10 +51,16 @@ const nextFrame = async (p, f0) => p.waitForFunction(f => window.__JR.state().fr
       const dd = await p.evaluate(([st, q]) => { const t = window.__JR; t.jump(q); t.setClean(st, 0); const a = t.frameGrid(24, 15, 0); t.setClean(st, 1); const c = t.frameGrid(24, 15, 0); t.setClean(st, null); return [a, c]; }, [st, q]);
       ok(gdiff(dd[0], dd[1]) > 0.0015, 'Station ' + st + ': Vorher/Nachher sichtbar verschieden (' + gdiff(dd[0], dd[1]).toFixed(4) + ')');
     }
-    /* 2 Vergleichsbedienung */
+    /* 2 Vergleichsbedienung – Überarbeitung 2: der Vergleich steht nur dort, wo eine Reinigungszone im Bild liegt; in der Bad-Übersicht
+       ist der Unterschied unsichtbar (kein «Vorher»-Bild), an der Nahansicht Waschtisch wird er angeboten */
     await p.evaluate(() => window.__JR.goStation(4)); await p.waitForTimeout(800);
+    await p.waitForFunction(() => { const s = window.__JR.state(); return Math.abs(s.p - s.ps) < 0.002; }, null, { timeout: 120000 }).catch(() => {});
+    ok(await p.evaluate(() => { const g = document.querySelector('#reise .jr-st.on .jr-cmp'); return !!g && getComputedStyle(g).display === 'none'; }), 'Bad-Übersicht (Reinigung im Bild nicht erkennbar): kein Vergleich');
+    await p.click('#reise .jr-st.on [data-det-i="0"]');
+    await p.waitForFunction(() => { const s = window.__JR.state(); return Math.abs(s.p - 0.752) < 0.002 && Math.abs(s.p - s.ps) < 0.002; }, null, { timeout: 120000 }).catch(() => {});
+    await p.waitForTimeout(300);
     const cmp0 = await p.evaluate(() => { const s = document.querySelector('#reise .jr-st.on'), g = s.querySelector('.jr-cmp'); return g && { b: [...g.querySelectorAll('[data-cmp]')].map(x => x.textContent.trim()), r: !!g.querySelector('input[type=range][data-cmpr]'), rl: g.querySelector('.jr-cmpr span').textContent.trim(), n: g.querySelector('.jr-cmpn').textContent.trim(), h: Math.min(...[...g.querySelectorAll('[data-cmp]')].map(x => x.getBoundingClientRect().height)), aria: g.getAttribute('role') }; });
-    ok(cmp0 && cmp0.b.join() === 'Vorher,Nachher' && cmp0.r && cmp0.rl === 'Reinigungsfortschritt' && cmp0.aria === 'group', 'Station Bad: «Vorher», «Nachher» und Regler «Reinigungsfortschritt»');
+    ok(cmp0 && cmp0.b.join() === 'Vorher,Nachher' && cmp0.r && cmp0.rl === 'Reinigungsfortschritt' && cmp0.aria === 'group', 'Bad, Nahansicht Waschtisch: «Vorher», «Nachher» und Regler «Reinigungsfortschritt»');
     ok(cmp0 && /kein Kundenergebnis/.test(cmp0.n) && cmp0.h >= 44, 'Hinweis «Illustration eines Arbeitsablaufs, kein Kundenergebnis.», Knöpfe ≥ 44 px');
     await p.click('#reise .jr-st.on [data-cmp="0"]');
     const c1 = await p.evaluate(() => ({ v: window.__JR.cleanZones().filter(x => x.st === 'bad').map(x => x.v), pr: document.querySelector('#reise .jr-st.on [data-cmp="0"]').getAttribute('aria-pressed'), r: +document.querySelector('#reise .jr-st.on [data-cmpr]').value }));
@@ -161,18 +167,22 @@ const nextFrame = async (p, f0) => p.waitForFunction(f => window.__JR.state().fr
     p = await b.newPage(mob); await p.addInitScript(() => { window.IR_NO_PERF_FALLBACK = true; }); await p.goto(url); await p.waitForTimeout(800);
     await p.evaluate(() => document.getElementById('reise').scrollIntoView({ block: 'start', behavior: 'instant' })); await p.waitForTimeout(400);
     await p.evaluate(() => document.querySelectorAll('#reise .jr-nav button')[1].click()); await p.waitForTimeout(300);
-    const h0 = await p.evaluate(() => { const r = document.getElementById('reise'), g = r.querySelector('.jr-st.on .jr-cmp'); return { st: r.classList.contains('jr-static'), cmp: g && getComputedStyle(g).display !== 'none', range: g && getComputedStyle(g.querySelector('.jr-cmpr')).display, demo: getComputedStyle(r.querySelector('.jr-demo')).display }; });
-    ok(h0.st && h0.cmp && h0.range === 'none' && h0.demo === 'none', 'Handy-Bildmodus: Vorher/Nachher an der Station, ohne Regler und ohne Demo');
-    await p.click('#reise .jr-st.on [data-cmp="0"]'); await p.waitForTimeout(200);
+    /* Überarbeitung 2: Vergleich direkt am Bild (Knöpfe im Stationstext entfallen im Bildmodus) */
+    const h0 = await p.evaluate(() => { const r = document.getElementById('reise'), o = r.querySelector('.jr-cmpo'), st = r.querySelector('.jr-stage').getBoundingClientRect(), g = r.querySelector('.jr-st.on .jr-cmp');
+      const bs = o ? [...o.querySelectorAll('[data-cmp]')].map(b => b.getBoundingClientRect()) : [], or = o && o.getBoundingClientRect();
+      return { st: r.classList.contains('jr-static'), cmp: !!o && !o.hidden && getComputedStyle(o).display !== 'none', inImg: !!or && or.left >= st.left && or.right <= st.right && or.top >= st.top && or.bottom <= st.bottom,
+        h: bs.length ? Math.min(...bs.map(b => b.height)) : 0, note: !!o && /kein Kundenergebnis/.test(o.textContent), dup: !!g && getComputedStyle(g).display !== 'none', range: r.querySelector('.jr-st.on .jr-cmpr') && getComputedStyle(r.querySelector('.jr-st.on .jr-cmpr')).display, demo: getComputedStyle(r.querySelector('.jr-demo')).display }; });
+    ok(h0.st && h0.cmp && h0.inImg && h0.h >= 44 && h0.note && !h0.dup && h0.range === 'none' && h0.demo === 'none', 'Handy-Bildmodus: Vorher/Nachher direkt im Bild (Knöpfe ' + Math.round(h0.h) + ' px, Hinweis «kein Kundenergebnis»), nicht doppelt im Text, ohne Regler und ohne Demo');
+    await p.click('#reise .jr-cmpo [data-cmp="0"]'); await p.waitForTimeout(200);
     const h1 = await p.evaluate(() => { const v = document.querySelector('#reise .jr-still-v.on'), base = document.querySelector('#reise .jr-still[data-n="' + (v && v.dataset.v) + '"]'); return { v: v && v.dataset.v, vis: v && +getComputedStyle(v).opacity, base: base && base.classList.contains('on'), alt: v && v.alt }; });
     ok(h1.v === RT.stations[1].still && !h1.base && /Zustand vorher/.test(h1.alt || '') && /kein Referenzobjekt/.test(h1.alt || ''), '«Vorher» zeigt das Bild derselben Kamera im Ausgangszustand (' + h1.v + ')');
-    await p.click('#reise .jr-st.on [data-cmp="1"]'); await p.waitForTimeout(200);
+    await p.click('#reise .jr-cmpo [data-cmp="1"]'); await p.waitForTimeout(200);
     ok(await p.evaluate(n => !document.querySelector('#reise .jr-still-v.on') && document.querySelector('#reise .jr-still.on').dataset.n === n, RT.stations[1].still), '«Nachher» zeigt wieder das Stationsbild');
-    await p.click('#reise .jr-st.on [data-cmp="0"]'); await p.evaluate(() => document.querySelectorAll('#reise .jr-nav button')[2].click()); await p.waitForTimeout(200);
+    await p.click('#reise .jr-cmpo [data-cmp="0"]'); await p.evaluate(() => document.querySelectorAll('#reise .jr-nav button')[2].click()); await p.waitForTimeout(200);
     ok(await p.evaluate(() => !document.querySelector('#reise .jr-still-v.on')), 'Stationswechsel blendet das «Vorher»-Bild aus');
     /* Bad: in der Übersicht und am WC ohne sichtbaren Unterschied → kein Vergleich; an der Nahansicht Waschtisch mit Vergleich */
     await p.evaluate(() => document.querySelectorAll('#reise .jr-nav button')[4].click()); await p.waitForTimeout(200);
-    const vis = () => p.evaluate(() => { const g = document.querySelector('#reise .jr-st.on .jr-cmp'); return !!g && getComputedStyle(g).display !== 'none'; });
+    const vis = () => p.evaluate(() => { const o = document.querySelector('#reise .jr-cmpo'); return !!o && !o.hidden && getComputedStyle(o).display !== 'none'; });
     const bv0 = await vis();
     await p.click('#reise .jr-st.on [data-det-i="0"]'); await p.waitForTimeout(200); const bv1 = await vis();
     await p.click('#reise .jr-st.on [data-det-i="1"]'); await p.waitForTimeout(200); const bv2 = await vis();

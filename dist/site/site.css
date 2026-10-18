@@ -2006,6 +2006,18 @@ body.hdr-compact .hdr{background:var(--ivory)}
 .jr-cmpn{flex:1 1 100%;margin:0;font-size:.75rem;color:rgba(252,248,245,.62)}
 .jr-static .jr-cmpr{display:none}
 .jr-static:not(.jr-3d) .jr-cmp-nov{display:none}
+/* Überarbeitung 2: Vergleich am Bild (Handy, Bildmodus, Handy-3D) – oben rechts im Bild, Hinweis darunter; im Bildmodus ersetzt er
+   die Knöpfe im Stationstext, im Handy-3D bleibt dort der Regler. Auf dem Desktop (Scrollmodus) steht der Vergleich im Stationstext. */
+.jr-cmpo{position:absolute;right:10px;top:10px;z-index:5;display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:6px;max-width:calc(100% - 20px)}
+.jr-cmpo[hidden],.jr-live:not(.jr-3d) .jr-cmpo{display:none}
+.jr-cmpob{min-height:44px;padding:8px 14px;border-radius:999px;border:1px solid rgba(252,248,245,.55);background:rgba(20,22,28,.62);color:var(--ivory);font:inherit;font-size:.9rem;font-weight:600;cursor:pointer}
+.jr-cmpob[aria-pressed="true"]{background:var(--lime);border-color:var(--lime);color:var(--ink)}
+.jr-cmpob:focus-visible{outline:3px solid var(--lime);outline-offset:2px}
+.jr-cmpon{flex:1 1 100%;text-align:right;font-size:.7rem;color:var(--ivory);text-shadow:0 1px 6px rgba(0,0,0,.7)}
+.jr-static:not(.jr-3d) .jr-st .jr-cmp{display:none}
+.jr-3d .jr-st .jr-cmp .jr-cmpb{display:none}
+/* 3D: Ansicht ohne Reinigungszone im Bild (WC-Nahansicht) – kein Vergleich, der nichts zeigt (Kern: syncDet) */
+.jr-live .jr-cmp-nov3,.jr-button .jr-cmp-nov3,.jr-3d .jr-cmp-nov3{display:none}
 .jr-static.jr-3d .jr-cmpr{display:flex}
 .jr-still-v{opacity:0}
 .jr-still-v.on{opacity:1}
@@ -2026,3 +2038,58 @@ body.hdr-compact .hdr{background:var(--ivory)}
 .jr-lb[aria-pressed="true"]{background:var(--ivory);color:var(--ink)}
 .jr-lb:focus-visible{outline:3px solid var(--lime);outline-offset:2px}
 .jr-static:not(.jr-3d) .jr-light{display:none}
+/* ===================== Überarbeitung 2 (Realismus): Bühne unter dem Kopf, mehr sichtbare Szene ===================== */
+/* Scrollmodus: Die Bühne beginnt unter dem sichtbaren Kopf (--hdrh aus p3b abzüglich des Teils, der beim Scrollen unter den
+   Rand gleitet: sticky top −36 px bzw. −26 px). Kein Bildteil liegt hinter dem Kopf, die
+   Zeichenfläche hat genau die sichtbare Grösse; unten bleibt Platz für die Bedienleiste (Text überdeckt sie nie). */
+.jr-live{--hdrv:calc(env(safe-area-inset-top,0px) + var(--hdrh,133px) - 36px)}
+@media (max-width:980px){.jr-live{--hdrv:calc(env(safe-area-inset-top,0px) + var(--hdrh,104px) - 26px)}}
+.jr-live .jr-sticky{top:var(--hdrv);height:calc(100vh - var(--hdrv));height:calc(100svh - var(--hdrv))}
+/* Innenabstand: Desktop – oben knapp (die Bühne liegt schon unter dem Kopf), unten Platz für die Bedienleiste;
+   ≤ 980 px – Text an derselben Stelle wie vor der Kopfregel (110 px ab Fensteroberkante), unten die Werte der Tablet-Regeln */
+@media (min-width:981px){.jr-live .jr-ui{padding-top:22px;padding-bottom:96px}}
+@media (max-width:980px){.jr-live .jr-ui{padding-top:32px}}
+/* Alle Stationstexte liegen in derselben Rasterzeile; ohne Begrenzung wird sie so hoch wie der höchste Text (auch wenn er
+   ausgeblendet ist) und schiebt kürzere Texte nach unten in die Bedienleiste. Die Zeile hat genau die verfügbare Höhe. */
+.jr-live .jr-ui{grid-template-rows:minmax(0,1fr)}
+/* niedrige Desktop-Bildschirme (z. B. 1280×720): kompakter Stationstext */
+@media (min-width:981px) and (max-height:820px){
+  .jr-live .jr-cmp{gap:6px 8px}
+  .jr-live .jr-cmpr{flex:1 1 110px}
+  .jr-live .jr-cmpr span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .jr-live .jr-choice-opts{display:flex;flex-wrap:wrap}
+  .jr-live .jr-choice-opts button{flex:0 1 auto}
+  .jr-live .jr-choice-t{font-size:.92rem;margin-bottom:12px}
+  .jr-live .jr-st:not(.jr-st0){padding:20px 24px 18px;max-width:440px}
+  .jr-live .jr-t{font-size:clamp(1.6rem,2.5vw,2.3rem);margin-bottom:12px}
+  .jr-live .jr-big{font-size:clamp(1.8rem,2.8vw,2.7rem);margin-bottom:14px}
+  .jr-live .jr-d,.jr-live .jr-q{font-size:1rem;margin-bottom:14px}
+  .jr-live .jr-k{margin-bottom:10px}
+  .jr-live .jr-choice-opts{gap:4px;margin-bottom:10px}
+  .jr-live .jr-choice-opts button{min-height:44px;padding:8px 12px}
+  .jr-live .jr-cmp{margin:0 0 10px}
+  .jr-live .jr-det{margin:0 0 14px}
+}
+/* Nahansicht (Waschtisch, WC): der Absatz tritt zurück – Titel, Vergleich, Ansichtswahl und Anfrage bleiben. Auf allen
+   Desktopgrössen schmaler Stationstext (440 px), damit das Motiv zwischen Text und Stationsleiste frei liegt (Kern: fit) */
+.jr-live.jr-close .jr-st.on .jr-d,.jr-live.jr-close .jr-st.on .jr-t span{display:none}
+@media (min-width:981px){
+  .jr-live.jr-close .jr-st.on:not(.jr-st0){max-width:440px;padding:20px 24px 18px}
+  .jr-live.jr-close .jr-st.on .jr-t{font-size:clamp(1.5rem,2.2vw,2.1rem);margin-bottom:12px}
+}
+/* «Details ansehen»: erklärende Überlagerungen zurücknehmen. Titel, Vergleich, Stationen, «Tour überspringen» und
+   «Offerte anfragen» bleiben bedienbar; «Text einblenden» stellt alles wieder her */
+.jr-clean .jr-st.on>:not(.jr-k):not(.jr-t):not(.jr-big):not(.jr-cmp){display:none}
+.jr-clean .jr-st.on .jr-t span,.jr-clean .jr-cmpn{display:none}
+.jr-clean .jr-hot,.jr-clean .jr-tech{display:none!important}
+.jr-clean .jr-stage::after{opacity:0}
+.jr-clean .jr-st:not(.jr-st0){max-width:380px;padding:16px 20px 14px}
+.jr-clean .jr-t,.jr-clean .jr-big{font-size:clamp(1.3rem,1.9vw,1.8rem);margin-bottom:10px}
+.jr .jr-skip .jr-viewb,.jr-viewb{min-height:44px;padding:6px 14px;border-radius:999px;border:1px solid rgba(252,248,245,.25);background:rgba(20,22,28,.35);color:var(--ivory);font:inherit;font-size:.9rem;font-weight:600;cursor:pointer}
+.jr-viewb[aria-pressed="true"]{background:var(--ivory);color:var(--ink)}
+.jr-viewb:focus-visible{outline:3px solid var(--lime);outline-offset:2px}
+.jr-static .jr-viewb{display:none}
+/* Beschriftungen im Bad: nur ohne Überschneidung mit Text, Stationen und Bedienung und innerhalb der Bühne (Kern setzt .off) */
+.jr-tech span.off,.jr-tech-c.off{opacity:0;visibility:hidden}
+/* Demo-Naht: Während die Hecke das Bild verdeckt, blendet der Stationstext aus; der Wechsel von Station 6 auf 1 geschieht unsichtbar */
+.jr-live.jr-seam .jr-st,.jr-3d.jr-seam .jr-st{opacity:0!important;transition:opacity 450ms var(--ease-out)!important}

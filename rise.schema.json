@@ -506,6 +506,12 @@
                 "type": "number",
                 "exclusiveMinimum": 0.2,
                 "maximum": 1.4
+              },
+              "fit": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "description": "Bildausschnitt in Bildpunkten halten (0–1): auf Bühnen höher als 1280×720 unter dem Kopf weitet der Kern den Bildwinkel, damit das Motiv zwischen Stationstext und Stationsleiste bleibt"
               }
             }
           }

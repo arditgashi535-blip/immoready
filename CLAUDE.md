@@ -74,6 +74,23 @@ mit `<still>-vorher(-hoch).webp` (`render-stills.js`). Licht: Tageslicht Standar
 `[data-demo]`, Naht vor der Hecke, Zeit nach Weg und Drehung, nicht bei «Bewegung reduzieren»). Aufnahme `npm run aufnahme:demo`,
 Belege `docs/realismus/` (STATUS.md, Collagen `python3 tools/realismus-collage.py`, Bilder `node tools/realismus-bilder.js`), Prüfung t28.
 
+**Überarbeitung 2 (18.10.2026):** Bühne im Scrollmodus unter dem sichtbaren Kopf (`--hdrv` = `--hdrh` − 36 px bzw. − 26 px ≤ 980 px;
+`render-stills.js` setzt `--hdrv:0` und bricht bei falscher Bühnengrösse ab). Stationstexte in einer Rasterzeile `minmax(0,1fr)`, niedrige
+Desktops (≤ 820 px hoch) und Nahansichten (`jr-close`) kompakt (440 px). **Bildausschnitt in Bildpunkten:** `keyframes[].fit` (0–1) weitet
+auf Bühnen höher als 623 px (1280×720 unter dem Kopf) den Bildwinkel, damit ein Motiv zwischen Stationstext und Stationsleiste bleibt
+(nur Querformat; Bad 0,73/0,752/0,772). Beschriftungen nur ohne Überschneidung (ganze Textspalte, Stationsleiste, Bedienleiste,
+untereinander) und innerhalb der Bühne (`.off`). Vergleich im 3D nur, wo ein «Vorher»-Bild derselben Ansicht existiert (`jr-cmp-nov3`).
+«Details ansehen» (`[data-view]`, `jr-clean`, `setDetailsView()`) nimmt erklärende Überlagerungen zurück. Demo-Naht: Text aus (`jr-seam`).
+Schmutz aus der Entstehung: `tour.cleaning.zones[].focus` ([x, y, z, Radius, Gewicht], erster = Hauptort) und `wipeTo` (Wischweg zum
+Ort, z. B. Ablauf); Nasskante je Material (`wk` in `dirtSrc`). **Tageslicht mit Richtung:** `licht.json` hat 4 Bytes je Eckpunkt
+(ao, lv, **Sonnensichtbarkeit** sv, **Himmel durch Öffnungen** ws innen); `bakeOne(q,n,m,spec,ao,lv,sv,ws)`, `WSREF` 2 % (Verteilung mit
+`WS_STATS=1 node tools/bake-light.js`), Sonnenglanz aussen im Schatten aus (Glanzfarbe trägt sv). Vorder-/Seitenfassade 17 cm gerastert.
+Aussenbeläge aus einzelnen Platten (`slabs()`), Parkett-Längsfugen je Pixel, Beete in Gruppen (`drift()`, `foot()` Bodenkontakt),
+Mähstreifen im Rasen. Handy/Bildmodus: Vergleich direkt am Bild (`.jr-cmpo`, `cmpoSync`). Stationsbilder ohne fit (`IR_NO_FIT`).
+Beurteilungsbilder: `node tools/beurteilung-bilder.js` (`PUNKTE=5-bad`); Belege: `node tools/bad-zustaende.js`, `node tools/vergleich-3d.js`,
+`node tools/demo-dreimal.js` (Echtzeit-Wiedergabe, drei Durchläufe, Naht-Text), `python3 tools/ueberarbeitung2-collage.py`. Prüfung `tests/t29-buehne.js`,
+Bericht `docs/realismus/STATUS.md` (Überarbeitung 2).
+
 **Einzige Quelle für Fakten und Tour: `rise.json`** (geprüft gegen `rise.schema.json` und die Regeln in
 `tools/rise.py`). Firmen-/Kontaktdaten, Leistungsschlüssel, Stationen und Texte, Kameraroute, Türen,
 Hervorhebung, Ereignisse und Wix-Regeln werden **nur dort** geändert, nie direkt im erzeugten Code.
@@ -263,7 +280,7 @@ Ausgaben in `dist/`:
   und Wind; die Belichtung springt.
 - **Licht:** `bakeOne()` pro Eckpunkt (Himmel der blauen Stunde, Leuchten je Raum `roomOf`, indirektes Raumlicht).
   Dazu **vorab gerechnetes Licht** aus `tools/bake-light.js` (Raytracing über BVH: Umgebungsverdeckung und weiche
-  Schatten der Leuchten, Laub verschattet teilweise) – je Eckpunkt 2 Bytes, zlib + base64 in
+  Schatten der Leuchten, Laub verschattet teilweise; seit Überarbeitung 2 auch Sonne und Himmel durch Öffnungen) – je Eckpunkt 4 Bytes, zlib + base64 in
   `assets/bake/licht.json` mit Prüfsumme `geoHash()`. **Nach jeder Geometrieänderung `npm run bake`**, sonst
   rechnet der Rundgang ohne Schatten (Hinweis in der Konsole). Grosse Flächen werden gerastert (`withSub`).
 - **Materialien:** 8 prozedurale Graustufen-Texturen werden zur Laufzeit in 2 RGBA-Texturen gepackt (T1 Putz,
@@ -318,7 +335,7 @@ Ausgaben in `dist/`:
 python3 tools/rise.py             # rise.json prüfen
 python3 build.py                  # baut dist/ (prüft rise.json zuerst)
 npm install && npx playwright install chromium
-npm test                          # Build, RISE, Velo (t15), t7 Seite, t9 Interaktionen, t11 Rundgang, t14 V13/V14, t16 V14, t17 V15, t18 V16, t19 V17, t20 V17.1, t21 Fertigstellung, t22 Handy, t23 GmbH/Startsperre, t24 Inhalte, t25 Premium, t26 Videos, t27 Reise, t28 Realismus
+npm test                          # Build, RISE, Velo (t15), t7 Seite, t9 Interaktionen, t11 Rundgang, t14 V13/V14, t16 V14, t17 V15, t18 V16, t19 V17, t20 V17.1, t21 Fertigstellung, t22 Handy, t23 GmbH/Startsperre, t24 Inhalte, t25 Premium, t26 Videos, t27 Reise, t28 Realismus, t29 Bühne
 npm run abnahme                   # 32 Abnahmebilder + Übersicht/Vergleich → docs/v171/
 npm run bake                      # Build → Licht vorab rechnen → Build (nach Geometrieänderungen Pflicht)
 npm run perf                      # Ladeleistung gedrosselt (Server: python3 -m http.server 8702)

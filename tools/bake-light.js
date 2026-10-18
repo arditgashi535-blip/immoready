@@ -6,8 +6,11 @@
 //   ao  Aussen: Himmelssichtbarkeit (kosinusgewichtet, nach Himmelshelligkeit der blauen Stunde gewichtet)
 //       Innen:  Umgebungsverdeckung mit Distanzabfall (Ecken, Kanten, unter Möbeln)
 //   lv  Sichtbarkeit der Leuchten, gewichtet nach ihrem Beitrag (weiche Schatten durch Flächen-Abtastung)
+//   sv  Überarbeitung 2: Sichtbarkeit der Sonne (Tageslicht, Richtung aus dem Rundgang), Kegel ±1,5° → Schlagschatten aussen,
+//       Sonnenflecken innen (Strahlen durch die Fensteröffnungen)
+//   ws  Überarbeitung 2: innen Anteil der Himmelsstrahlen, die den Raum durch eine Öffnung verlassen (Lichtabfall vom Fenster)
 // Laubkarten verschatten teilweise (Durchlässigkeit 45 %). Ergebnis: assets/bake/licht.json {hash, data}
-// (data = zlib/deflate, base64; je Satz G, INT, ENV erst ao-, dann lv-Bytes). Der Rundgang prüft den Hash
+// (data = zlib/deflate, base64; je Satz G, INT, ENV nacheinander ao-, lv-, sv- und ws-Bytes). Der Rundgang prüft den Hash
 // und rechnet ohne passende Daten zur Laufzeit (ohne Schatten).
 //
 // Aufruf: python3 build.py && node tools/bake-light.js && python3 build.py
@@ -110,7 +113,7 @@ function trace(bvh, ox, oy, oz, dx, dy, dz, tmax, any) {
   const BO = buildBVH(Float32Array.from(opaque)), BL = buildBVH(Float32Array.from(leaves));
   console.log('BVH:', BO.n, 'Dreiecke,', BL.n, 'Laubdreiecke ·', ((Date.now() - t0) / 1000).toFixed(1), 's');
 
-  const LIT = kit.lights, KEY = [-0.857, 0.302, 0.423], XW = 5.4;
+  const LIT = kit.lights, KEY = [-0.857, 0.302, 0.423], XW = 5.4, SUN = kit.sund, NSUN = 16, SUNR = Math.tan(1.5 * Math.PI / 180);
   const kl = Math.hypot(...KEY); KEY[0] /= kl; KEY[1] /= kl; KEY[2] /= kl;
   function roomOf(q) { if (q[1] < 0.45 || q[1] > 3.2 || q[0] < -3.1 || q[0] > 8.7 || q[2] < -1.1 || q[2] > 5.2) return 0; if (q[0] < 3) return 1; if (q[0] < XW) return q[2] > 2.4 ? 2 : 3; return 4; }
   function lightW(q, n, m) {
@@ -124,8 +127,9 @@ function trace(bvh, ox, oy, oz, dx, dy, dz, tmax, any) {
     return out;
   }
   /* Hemisphärenrichtungen (kosinusgewichtet, Fibonacci) */
-  const NS = 40, HS = [];
+  const NS = 40, HS = [], NWS = 192, HW = [];
   for (let i = 0; i < NS; i++) { const u = (i + 0.5) / NS, r = Math.sqrt(u), ph = i * 2.399963; HS.push([r * Math.cos(ph), Math.sqrt(1 - u), r * Math.sin(ph)]); }
+  for (let i = 0; i < NWS; i++) { const u = (i + 0.5) / NWS, r = Math.sqrt(u), ph = i * 2.399963; HW.push([r * Math.cos(ph), Math.sqrt(1 - u), r * Math.sin(ph)]); }
   function frame(n) { const a = Math.abs(n[1]) < 0.9 ? [0, 1, 0] : [1, 0, 0]; let t = [n[1] * a[2] - n[2] * a[1], n[2] * a[0] - n[0] * a[2], n[0] * a[1] - n[1] * a[0]]; const tl = Math.hypot(...t); t = t.map(x => x / tl); const bt = [n[1] * t[2] - n[2] * t[1], n[2] * t[0] - n[0] * t[2], n[0] * t[1] - n[1] * t[0]]; return [t, bt]; }
   function hash(i) { let x = Math.imul(i ^ 0x9e3779b9, 0x85ebca6b); x ^= x >>> 13; x = Math.imul(x, 0xc2b2ae35); x ^= x >>> 16; return (x >>> 0) / 4294967296; }
   function vis(ox, oy, oz, dx, dy, dz, tmax) {
@@ -154,6 +158,15 @@ function trace(bvh, ox, oy, oz, dx, dy, dz, tmax, any) {
       }
     }
     const ao = acc / wsum;
+    /* innen: Himmel durch Öffnungen – eigene, dichtere Abtastung (NWS Richtungen, kosinusgewichtet): Fensteröffnungen sind klein
+       im Halbraum, mit den 40 Strahlen der Verdeckung blieb der Wert bei der Hälfte der Punkte 0 und wurde fleckig */
+    let wsk = 0;
+    if (rm) for (let i = 0; i < NWS; i++) {
+      const h = HW[i], hx = h[0] * cr - h[2] * sr, hz = h[0] * sr + h[2] * cr;
+      const dx = t[0] * hx + n[0] * h[1] + bt[0] * hz, dy = t[1] * hx + n[1] * h[1] + bt[1] * hz, dz = t[2] * hx + n[2] * h[1] + bt[2] * hz;
+      if (trace(BO, ox, oy, oz, dx, dy, dz, 40, true) < 40) continue;
+      wsk += trace(BL, ox, oy, oz, dx, dy, dz, 40, true) < 40 ? 0.45 : 1;
+    }
     /* Leuchten: weiche Schatten (Kugelquelle r ≈ 8 cm, 8 Proben); Treffer in den letzten 15 cm (Leuchtengehäuse) zählen nicht */
     const ws = lightW(q, n, m); let lw = 0, lsum = 0;
     for (const [li, w] of ws) {
@@ -168,43 +181,78 @@ function trace(bvh, ox, oy, oz, dx, dy, dz, tmax, any) {
       lw += w * v / NLS; lsum += w;
     }
     const lv = lsum > 0 ? lw / lsum : 1;
-    return [ao, lv];
+    /* Sonne: nur für Flächen, die ihr zugewandt sind; Kegel ±1,5° (weiche Schattenkante), Laub lässt 45 % durch */
+    let sv = 0; const nl = n[0] * SUN[0] + n[1] * SUN[1] + n[2] * SUN[2];
+    if (nl > 0.0) {
+      const [st, sb] = frame(SUN);
+      for (let k = 0; k < NSUN; k++) {
+        const a = (k + hash(vi * 7 + k)) / NSUN * Math.PI * 2, r = Math.sqrt((k + 0.5) / NSUN) * SUNR;
+        let dx = SUN[0] + (st[0] * Math.cos(a) + sb[0] * Math.sin(a)) * r, dy = SUN[1] + (st[1] * Math.cos(a) + sb[1] * Math.sin(a)) * r, dz = SUN[2] + (st[2] * Math.cos(a) + sb[2] * Math.sin(a)) * r;
+        const dl = Math.hypot(dx, dy, dz); dx /= dl; dy /= dl; dz /= dl;
+        sv += vis(ox, oy, oz, dx, dy, dz, 200);
+      }
+      sv /= NSUN;
+    }
+    return [ao, lv, sv, rm ? wsk / NWS : 1];
   }
 
   const parts = [], info = {};
   let vi = 0;
   for (const S of kit.sets) {
-    const nv = S.P.length / 3, AO = new Uint8Array(nv), LV = new Uint8Array(nv), cache = new Map();
+    const nv = S.P.length / 3, AO = new Uint8Array(nv), LV = new Uint8Array(nv), SV = new Uint8Array(nv), WS = new Uint8Array(nv), cache = new Map();
     let uniq = 0; const ts = Date.now();
     const U = [], vk = new Array(nv);
     for (let v = 0; v < nv; v++) {
       const q = [S.P[v * 3], S.P[v * 3 + 1], S.P[v * 3 + 2]], n = [S.N[v * 3], S.N[v * 3 + 1], S.N[v * 3 + 2]];
       const key = q.map(x => Math.round(x * 1000)).join(',') + '|' + n.map(x => Math.round(x * 100)).join(',') + '|' + S.M[v];
       let r = cache.get(key);
-      if (r === undefined) { const sm = sample(q, n, S.M[v], vi++); r = U.length; U.push({ q, n, ao: sm[0], lv: sm[1] }); cache.set(key, r); uniq++; }
+      if (r === undefined) { const sm = sample(q, n, S.M[v], vi++); r = U.length; U.push({ q, n, ao: sm[0], lv: sm[1], sv: sm[2], ws: sm[3] }); cache.set(key, r); uniq++; }
       vk[v] = r;
     }
     /* V17: Rauschen glätten – Mittel über Nachbarn im Umkreis von 5 cm mit ähnlicher Normale (Abstand und Winkel gewichtet).
        Verhindert Flecken und Fächermuster auf fein unterteilten Nahobjekten (WC-Deckel, Keramik, Platten); grosse Flächen bleiben unverändert. */
     const R = 0.05, cell = new Map(), ck = (x, y, z) => x + ',' + y + ',' + z;
     U.forEach((u, i) => { const k = ck(Math.floor(u.q[0] / R), Math.floor(u.q[1] / R), Math.floor(u.q[2] / R)); if (!cell.has(k)) cell.set(k, []); cell.get(k).push(i); });
-    const AOs = new Float32Array(U.length), LVs = new Float32Array(U.length);
+    const AOs = new Float32Array(U.length), LVs = new Float32Array(U.length), SVs = new Float32Array(U.length), WSs = new Float32Array(U.length);
     U.forEach((u, i) => {
-      const cx = Math.floor(u.q[0] / R), cy = Math.floor(u.q[1] / R), cz = Math.floor(u.q[2] / R); let wa = 0, sa = 0, sl = 0;
+      const cx = Math.floor(u.q[0] / R), cy = Math.floor(u.q[1] / R), cz = Math.floor(u.q[2] / R); let wa = 0, sa = 0, sl = 0, ss = 0, sw = 0;
       for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) for (let dz = -1; dz <= 1; dz++) {
         const L = cell.get(ck(cx + dx, cy + dy, cz + dz)); if (!L) continue;
         for (const j of L) { const o = U[j], d = Math.hypot(o.q[0] - u.q[0], o.q[1] - u.q[1], o.q[2] - u.q[2]); if (d > R) continue;
           const nd = o.n[0] * u.n[0] + o.n[1] * u.n[1] + o.n[2] * u.n[2]; if (nd < 0.8) continue;
-          const w = (1 - d / R) * (nd - 0.8) / 0.2 + (j === i ? 1 : 0); wa += w; sa += w * o.ao; sl += w * o.lv; }
+          const w = (1 - d / R) * (nd - 0.8) / 0.2 + (j === i ? 1 : 0); wa += w; sa += w * o.ao; sl += w * o.lv; ss += w * o.sv; sw += w * o.ws; }
       }
-      AOs[i] = sa / wa; LVs[i] = sl / wa;
+      AOs[i] = sa / wa; LVs[i] = sl / wa; SVs[i] = ss / wa; WSs[i] = sw / wa;
     });
-    for (let v = 0; v < nv; v++) { const r = vk[v]; AO[v] = Math.round(Math.max(0, Math.min(1, AOs[r])) * 255); LV[v] = Math.round(Math.max(0, Math.min(1, LVs[r])) * 255); }
-    parts.push(AO, LV); info[S.name] = { vertices: nv, unique: uniq, s: +((Date.now() - ts) / 1000).toFixed(1) };
+    /* ws ändert sich im Raum nur langsam (Fensterlicht): zusätzlich über 35 cm glätten – nur Punkte desselben Raums mit ähnlicher
+       Normale (keine Mischung durch Wände hindurch); Kanten der Sonnenflecken (sv) bleiben unberührt */
+    const RW = 0.35, cw = new Map(), cwk = (x, y, z) => x + ',' + y + ',' + z, rmU = U.map(u => roomOf(u.q));
+    U.forEach((u, i) => { if (!rmU[i]) return; const k = cwk(Math.floor(u.q[0] / RW), Math.floor(u.q[1] / RW), Math.floor(u.q[2] / RW)); if (!cw.has(k)) cw.set(k, []); cw.get(k).push(i); });
+    const WS2 = Float32Array.from(WSs);
+    U.forEach((u, i) => {
+      if (!rmU[i]) return; const cx = Math.floor(u.q[0] / RW), cy = Math.floor(u.q[1] / RW), cz = Math.floor(u.q[2] / RW); let wa = 0, sw = 0;
+      for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) for (let dz = -1; dz <= 1; dz++) {
+        const L = cw.get(cwk(cx + dx, cy + dy, cz + dz)); if (!L) continue;
+        for (const j of L) { if (rmU[j] !== rmU[i]) continue; const o = U[j], d = Math.hypot(o.q[0] - u.q[0], o.q[1] - u.q[1], o.q[2] - u.q[2]); if (d > RW) continue;
+          const nd = o.n[0] * u.n[0] + o.n[1] * u.n[1] + o.n[2] * u.n[2]; if (nd < 0.9) continue; const w = 1 - d / RW; wa += w; sw += w * WSs[j]; }
+      }
+      if (wa > 0) WS2[i] = sw / wa;
+    });
+    WS2.forEach((v, i) => { WSs[i] = v; });
+    const c01 = x => Math.round(Math.max(0, Math.min(1, x)) * 255);
+    for (let v = 0; v < nv; v++) { const r = vk[v]; AO[v] = c01(AOs[r]); LV[v] = c01(LVs[r]); SV[v] = c01(SVs[r]); WS[v] = c01(WSs[r]); }
+    /* Verteilung von ws innen (zum Abgleich mit WSREF im Rundgang) */
+    const wsIn = U.filter(u => u.ws < 1).map(u => u.ws).sort((a, b) => a - b), pc = f => wsIn.length ? +wsIn[Math.floor(f * (wsIn.length - 1))].toFixed(3) : null;
+    if (wsIn.length) console.log(S.name, 'ws innen: 10/50/90/99 %', pc(0.1), pc(0.5), pc(0.9), pc(0.99));
+    if (process.env.WS_STATS) [1, 2, 3, 4].forEach(r => ['Boden', 'Wand'].forEach(kind => {
+      const a = U.map((u, i) => [u, i]).filter(([u, i]) => roomOf(u.q) === r && (kind === 'Boden' ? u.n[1] > 0.7 : Math.abs(u.n[1]) < 0.3)).map(([u, i]) => WSs[i]).sort((x, y) => x - y);
+      if (a.length) console.log('  Raum', r, kind, a.length, 'ws 10/50/90 %', +a[Math.floor(0.1 * (a.length - 1))].toFixed(3), +a[Math.floor(0.5 * (a.length - 1))].toFixed(3), +a[Math.floor(0.9 * (a.length - 1))].toFixed(3));
+    }));
+    parts.push(AO, LV, SV, WS); info[S.name] = { vertices: nv, unique: uniq, s: +((Date.now() - ts) / 1000).toFixed(1) };
     console.log(S.name, info[S.name]);
   }
   const raw = Buffer.concat(parts.map(a => Buffer.from(a.buffer))), z = zlib.deflateSync(raw, { level: 9 });
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
-  fs.writeFileSync(OUT, JSON.stringify({ hash: kit.hash, data: z.toString('base64'), info: { rays: 'AO ' + NS + ' je Eckpunkt, 8 je Leuchte (innen 16), geglättet r = 5 cm', bytes: raw.length, deflate: z.length, sets: info, created: new Date().toISOString() } }));
+  fs.writeFileSync(OUT, JSON.stringify({ hash: kit.hash, data: z.toString('base64'), info: { rays: 'AO ' + NS + ' je Eckpunkt, innen Himmel durch Öffnungen ' + NWS + ' (geglättet 35 cm im Raum), 8 je Leuchte (innen 16), Sonne ' + NSUN + ' (±1,5°), geglättet r = 5 cm', bytes: raw.length, deflate: z.length, sets: info, created: new Date().toISOString() } }));
   console.log('geschrieben:', path.relative(ROOT, OUT), raw.length, 'Bytes roh,', z.length, 'Bytes komprimiert ·', ((Date.now() - t0) / 1000).toFixed(1), 's');
 })();
