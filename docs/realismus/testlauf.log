@@ -1,0 +1,659 @@
+
+> test
+> npm run build && python3 tests/test_rise.py && node tests/t15-velo.js && node tests/t7.js && node tests/t9.js && node tests/t11.js && node tests/t14-v13.js && node tests/t16-v14.js && node tests/t17-v15.js && node tests/t18-v16.js && node tests/t19-v17.js && node tests/t20-v171.js && node tests/t21-fertigstellung.js && node tests/t22-mobil.js && node tests/t23-gmbh.js && node tests/t24-inhalte.js && node tests/t25-premium.js && node tests/t26-videos.js && node tests/t27-reise.js && node tests/t28-realismus.js
+
+
+> build
+> python3 build.py
+
+Seite: 4364066 Zeichen
+Komponente: 431508 Bytes (inline: 2281979 )
+Produktionsform dist/site/: index.html 64244 Bytes, site.css 152124, site.js 388336, gesamt 3561791 Bytes
+PASS rise.json ist gültig
+PASS Lücke zwischen Stationen wird erkannt
+PASS hold ausserhalb des Bereichs wird erkannt
+PASS nicht aufsteigende Keyframes werden erkannt
+PASS Tür schliesst vor dem Öffnen → Fehler
+PASS unbekannte Leistung im CTA → Fehler
+PASS «ß» im Text → Fehler
+PASS Veröffentlichen ohne Freigabe → Fehler
+PASS Hauswartung nicht Priorität 1 → Fehler
+PASS Ursprung ohne https → Fehler
+PASS erfundene Qualifikation → Fehler
+PASS Auswahl mit unbekannter Leistung → Fehler
+PASS Schluss ohne Kontakt-Aktion → Fehler
+PASS Schluss ohne allgemeine Offerte → Fehler
+PASS Scan-Kante länger als 1400 ms → Fehler
+PASS Tür ohne Winkel und ohne Schiebeweg → Fehler
+PASS Ereignis request-contact fehlt → Fehler
+PASS GmbH in Gründung mit Livegang-Freigabe → Fehler
+PASS «eingetragen» ohne bestätigte Gründung → Fehler
+PASS «eingetragen» mit offenen Registerangaben → Fehler
+PASS Firmenname ohne «GmbH» → Fehler
+PASS UID im falschen Format → Fehler
+PASS «GmbH» in öffentlichem Rundgangtext während der Gründung → Fehler
+PASS Startsperre: --launch meldet 23 offene Punkte (Gründung, Registerangaben, Freigabe)
+PASS nach Eintragung: Impressum, Datenschutz und Footer vollständig aus firm.company (Testdaten)
+PASS in Gründung: öffentlicher Teil ohne «GmbH», Entwurf nur als interner Prüfhinweis
+PASS gebaute Seite verwendet exakt die Tour-Konfiguration aus rise.json
+PASS Komponente enthält Stationen und Texte aus rise.json
+PASS gebaute Seite enthält Titel, Wohnungs-Auswahl und Kontakt-Aktion aus rise.json
+PASS alle 12 Stationsbilder vorhanden (quer und hoch)
+PASS Adapter registriert request-quote, request-contact, station-change, tour-error auf #immoreadyTour
+PASS Offerte mit Leistung → /offerte?leistung=sanitaer
+PASS Allgemeine Offerte ohne Leistung → /offerte
+PASS Unbekannte Leistung wird verworfen (kein Parameter)
+PASS Fremde Quelle → keine Navigation
+PASS Falsche Ereignisversion → keine Navigation
+PASS Unbekannte Station → keine Navigation
+PASS Leere oder falsche Nutzdaten → keine Navigation
+PASS Kontakt → Kontaktseite (Pfad vor dem Einbau prüfen)
+PASS Kontakt aus fremder Quelle → keine Navigation
+PASS 1440 Logo: Proportion 1.318/1.318, 148px breit, frei, scharf
+PASS 1440 Scroll-Reveals warten (32), Bildmaske bereit
+PASS 1440 alle Abschnitte nach Scrollen sichtbar
+PASS 1440 Bildenthüllung abgeschlossen (none)
+PASS 1440 alle Bilder nachgeladen
+PASS 1440 keine JS-Fehler 
+PASS 1440 Hover wechselt Bild (Reinigung)
+PASS 1440 Tastaturfokus wechselt Bild (Sanitär)
+PASS 1440 schnelles Überfahren ohne Bildflackern (Wechsel: 2)
+PASS 1440 Dropdown öffnet animiert
+PASS 1440 Dropdown schliesst (Esc)
+PASS 1440 Link aus Leistungsübersicht wählt Leistung vor
+PASS 1440 Fehlermeldungen
+PASS 1440 Fehlerfelder geben Rückmeldung (Schütteln)
+PASS 1440 gültiges Feld wird bestätigt
+PASS 1440 sichtbarer Fokuszustand
+PASS 1440 Ladezustand und Sperre gegen Doppelklick
+PASS Fehlerfall: Eingaben bleiben erhalten
+PASS 1440 kein vorgetäuschter Versand
+PASS 1440 Abschluss-Chip wählt Leistung im Formular vor
+PASS 1440 FAQ öffnet vollständig (nichts abgeschnitten)
+PASS 1440 FAQ unterbrechbar (schnell zu/auf)
+PASS 768 Logo: Proportion 1.318/1.318, 116px breit, frei, scharf
+PASS 768 Scroll-Reveals warten (32), Bildmaske bereit
+PASS 768 alle Abschnitte nach Scrollen sichtbar
+PASS 768 Bildenthüllung abgeschlossen (none)
+PASS 768 alle Bilder nachgeladen
+PASS 768 keine JS-Fehler 
+PASS 768 Leistungen vertikal: 8 Einträge mit Bild und Text sichtbar, nichts versteckt
+PASS 768 Menü öffnet mit Übergang
+PASS 768 Menü schliesst
+PASS 768 Link aus Leistungsübersicht wählt Leistung vor
+PASS 768 Fehlermeldungen
+PASS 768 Fehlerfelder geben Rückmeldung (Schütteln)
+PASS 768 gültiges Feld wird bestätigt
+PASS 768 sichtbarer Fokuszustand
+PASS 768 Ladezustand und Sperre gegen Doppelklick
+PASS Fehlerfall: Eingaben bleiben erhalten
+PASS 768 kein vorgetäuschter Versand
+PASS 768 Abschluss-Chip wählt Leistung im Formular vor
+PASS 768 FAQ öffnet vollständig (nichts abgeschnitten)
+PASS 768 FAQ unterbrechbar (schnell zu/auf)
+PASS 390 Logo: Proportion 1.318/1.318, 137px breit, frei, scharf
+PASS 390 Scroll-Reveals warten (32), Bildmaske bereit
+PASS 390 alle Abschnitte nach Scrollen sichtbar
+PASS 390 Bildenthüllung abgeschlossen (none)
+PASS 390 alle Bilder nachgeladen
+PASS 390 keine JS-Fehler 
+PASS 390 Leistungen vertikal: 8 Einträge mit Bild und Text sichtbar, nichts versteckt
+PASS 390 Menü öffnet mit Übergang
+PASS 390 Menü schliesst
+PASS 390 Link aus Leistungsübersicht wählt Leistung vor
+PASS 390 Fehlermeldungen
+PASS 390 Fehlerfelder geben Rückmeldung (Schütteln)
+PASS 390 gültiges Feld wird bestätigt
+PASS 390 sichtbarer Fokuszustand
+PASS 390 Ladezustand und Sperre gegen Doppelklick
+PASS Fehlerfall: Eingaben bleiben erhalten
+PASS 390 kein vorgetäuschter Versand
+PASS 390 Abschluss-Chip wählt Leistung im Formular vor
+PASS 390 Kontaktleiste weicht dem Abschlussformular
+PASS 390 FAQ öffnet vollständig (nichts abgeschnitten)
+PASS 390 FAQ unterbrechbar (schnell zu/auf)
+PASS Einstieg: Kontaktaktionen ab Start sichtbar
+PASS Einstieg nach ~1.1 s abgeschlossen
+PASS Layoutverschiebung beim Laden < 0.05 (CLS 0.001)
+PASS Bewegung reduzieren während der Nutzung: Inhalte sofort sichtbar (nach 45 ms, nächstes Bild in SwiftShader)
+PASS Reduzierte Bewegung: alles sofort sichtbar
+PASS Kopfzeile kompakt ohne Layoutsprung (12544/12544)
+PASS Logo im kompakten Kopf vollständig sichtbar, Proportion 1.318 {"hb":97,"lt":2.1295127868652344,"lb":89.51618576049805,"lw":115.19485473632812,"lh":87.38667297363281}
+PASS Bildkarte neigt sich max. 3° (rx 2.4, ry 2.7)
+PASS Bildkarte kehrt in Ausgangslage zurück
+PASS Kein Magnet-Effekt: Schaltfläche und Beschriftung bleiben unter dem Zeiger stehen
+PASS Kein eigener Cursor (cursor:none nirgends gesetzt)
+PASS Aktive Markierung wandert zum gewählten Eintrag {"m":389,"t":389,"ih":78,"h":78,"on":"5"}
+PASS Tastatur: Pfeil ab wählt nächste Leistung {"on":"6","act":"6"}
+PASS keine JS-Fehler 
+PASS Touch: Bildkarte bleibt stabil
+PASS Menü: Fokus springt auf Schliessen
+PASS Menü: Fokus bleibt im Menü (Shift+Tab)
+PASS Menü: Fokus bleibt im Menü (Tab)
+PASS Menü: Esc schliesst, Fokus zurück auf Menübutton
+PASS Smartphone: Kopfzeile kompakt ohne Layoutsprung
+PASS Reduziert: keine Neigung
+PASS Reduziert: kein Press-Effekt
+PASS Reduziert: keine Kamerafahrt, Stationsbilder
+PASS Standbild, Überschrift und Aktionen vor der 3D-Szene; alle 6 Stationstexte als HTML [true,1440,"visible",6]
+PASS Seitenstart ohne 3D-Last: Szene startet nicht, solange der Rundgang weit unterhalb liegt {"jr":false,"ready":false,"top":5704,"vh":900}
+PASS 3D-Szene gestartet (WebGL), sobald der Rundgang sichtbar ist
+PASS Kameraroute frei: 2000 Punkte, 0 Wandkontakte (Abstand ≥ 12 cm)
+PASS Vorwärts: Station 1 (aussen) eingeblendet
+PASS Vorwärts: Station 2 (garten) eingeblendet
+PASS Vorwärts: Station 3 (eingang) eingeblendet
+PASS Vorwärts: Station 4 (wohnung) eingeblendet
+PASS Vorwärts: Station 5 (bad) eingeblendet
+PASS Vorwärts: Station 6 (zurueck) eingeblendet
+PASS Rückwärts: Station 6 (zurueck) eingeblendet
+PASS Rückwärts: Station 5 (bad) eingeblendet
+PASS Rückwärts: Station 4 (wohnung) eingeblendet
+PASS Rückwärts: Station 3 (eingang) eingeblendet
+PASS Rückwärts: Station 2 (garten) eingeblendet
+PASS Rückwärts: Station 1 (aussen) eingeblendet
+PASS Wohnungstür: öffnet vor dem Durchfahren, schliesst, wenn die Kamera im Bad ist
+PASS Haustür: zu → offen beim Eintreten → zu, bevor die Rückfahrt beginnt; rückwärts identisch
+PASS Terrassentür: gleitet vor der Durchfahrt 1,0 m auf, schliesst danach [0,1,1,0]
+PASS Bad: technisches Overlay sichtbar
+PASS Overlay ausserhalb des Bads aus
+PASS Ruhezustand innen ohne Dauerschleife (0 Frames)
+PASS Wind aussen aktiv, gedrosselt (5 Aufrufe in 2 s, Grenze 30 Bilder/s)
+PASS Ruhezustand: 15 s nach der letzten Eingabe steht auch der Wind still (0 Frames)
+PASS Stationsnavigation (Maus): Sprung zum Bad
+PASS Stationsnavigation (Tastatur): Sprung zum Garten
+PASS «Gebäude entdecken» startet die Fahrt
+PASS «Tour überspringen» führt zum nächsten Abschnitt (Ablauf) und überspringt die Fahrt
+PASS Station «Wohnung» → Anfrage mit vorgewählter Räumung
+PASS Szene pausiert ausserhalb des Sichtbereichs
+PASS Desktop: kein seitliches Scrollen
+PASS keine JS-Fehler 
+PASS Ohne WebGL: Stationsbilder, kurzer Abschnitt
+PASS Ohne WebGL: Stationswechsel mit Bild und Text
+PASS Smartphone: keine Pflicht-Kamerafahrt, Stationsbilder
+PASS Smartphone: kurze Stationswechsel per Berührung
+PASS Pfeiltasten wechseln Stationen
+PASS Smartphone: kein seitliches Scrollen
+PASS Scan-Kante: geplante Dauer 1200 ms (Vorgabe 900–1400 ms)
+PASS Scan-Kante startet erst nach dem ersten fertigen Bild und endet nach 1237 ms (gemessen in SwiftShader, Bildtakt ≈ 0,3–0,5 s)
+PASS Kameraroute (4000 interpolierte Punkte) ohne Kontakt zu Wänden und Möbeln (Abstand ≥ 0.12 Szeneneinheiten)
+PASS Keine abrupten Blickwechsel: max. 30.4° je 1 % Fortschritt (bei p=0.423; V12: 459°)
+PASS Kein extremer Weitwinkel: max. vertikaler Bildwinkel 53.9°
+PASS Türdurchfahrt erst bei ausreichender Öffnung: haustuer@0.3757 100°, wohnungstuer@0.512 -92°, terrassentuer@0.8968 1 m
+PASS Kein Überschlag: Neigung der Kamera bleibt unter ±69°, Horizont ohne Rollen (Oben-Vektor fest)
+PASS Kamera ist eine reine Funktion des Fortschritts (rückwärts identisch)
+PASS Keine doppelt belegten Wandflächen (Ursache für flackernde Flächen) []
+PASS Sanitär-Kontur: kurz hervorgehoben (Spitze 0.95), danach ausgeblendet (0.00)
+PASS Bad: drei Beschriftungen, ausdrücklich als «Schematische Kennzeichnung» markiert
+PASS Wohnung: drei Leistungen als Auswahl (role=radio), Beschreibung ohne Hover sichtbar
+PASS Auswahl per Klick: Leerstandsmanagement → Aktion «Leerstandsbetreuung anfragen»
+PASS Auswahl per Tastatur (Pos1 → Reinigung, Fokus folgt)
+PASS Sichtbarer Tastaturfokus
+PASS Abschluss: «Eine Immobilie. Viele Aufgaben. Ein Ansprechpartner.»
+PASS «Kontakt aufnehmen» → Kontaktseite, Ereignis request-contact
+PASS Allgemeine «Offerte anfragen» ohne vorgewählte Leistung
+PASS Formular bleibt als Demo gekennzeichnet
+PASS keine JS-Fehler 
+PASS 1440 px: alle 6 Stationen – kein Überlauf, Überschriften vollständig, Schaltflächen nicht verdeckt, Stationsknöpfe ≥ 40 px, Logo unverzerrt 
+PASS 1440 px: «Tour überspringen» sichtbar und bedienbar
+PASS 768 px: alle 6 Stationen – kein Überlauf, Überschriften vollständig, Schaltflächen nicht verdeckt, Stationsknöpfe ≥ 40 px, Logo unverzerrt 
+PASS 768 px: «Tour überspringen» sichtbar und bedienbar
+PASS 390 px: alle 6 Stationen – kein Überlauf, Überschriften vollständig, Schaltflächen nicht verdeckt, Stationsknöpfe ≥ 40 px, Logo unverzerrt 
+PASS 390 px: Hochformat-Stationsbild 960×864 (V17: 10:9)
+PASS 390 px: Stationswahl direkt unter dem Bild (überdeckt keine Bilddetails)
+PASS 390 px: Kontaktleiste (Anrufen / Offerte) ab Seitenstart erreichbar
+Info: Belichtung aussen 1.000 → innen 0.854
+PASS Materialtexturen geladen und gepackt (Zustand ready, Anisotropie 1, Software-Grafik true)
+PASS Vorab gerechnetes Licht passt zur Geometrie (Umgebungsverdeckung + weiche Schatten aktiv)
+PASS Fenster mit Raumtiefe 128, echte Glasflächen 9, Laubkarten 4405, Lichthöfe 13
+PASS Kennzeichnung sichtbar: «Illustrative Visualisierung · kein Referenzobjekt»
+PASS Stationsbilder: Alternativtext «Illustrative Visualisierung … – kein Referenzobjekt»
+PASS Aussenwand mit Dämmung und Putz: 0.38 m stark
+PASS Lichte Türöffnungen (m): Haustür 1.09, Wohnungstür 0.91, Bad 0.8, Durchgang Wohnen 1.1, Terrassentür-Rahmen 1.86
+PASS Innenwände mit lichter Raumhöhe 2,60 m (10 Wandkörper, Boden 0,50 → Decke 3,10)
+PASS Senkrechte Kanten bleiben senkrecht bei p=0.03 (Abweichung 0.000 % der Bildbreite über 11 m Höhe)
+PASS Senkrechte Kanten bleiben senkrecht bei p=0.235 (Abweichung 0.000 % der Bildbreite über 11 m Höhe)
+PASS Keine ausgebrannten Fenster/Leuchten: Anteil weisser Pixel je Station aussen 0.00 %, garten 0.00 %, eingang 0.00 %, wohnung 0.00 %, bad 0.00 %, zurueck 0.00 %
+PASS Belichtung je Station im brauchbaren Bereich (mittlere Helligkeit 0.338, 0.26, 0.568, 0.471, 0.546, 0.337)
+PASS Innenräume ausreichend hell (min. 0.471) gegenüber der Dämmerung aussen (max. 0.338)
+PASS Weiche Belichtungsanpassung beim Eintreten: 5 Zwischenwerte (1 → 0.867 → 0.867 → 0.859 → 0.859 → 0.859 → 0.856 → 0.856 …)
+PASS keine JS-Fehler 
+PASS Bewegung reduzieren: keine Pflanzenbewegung
+PASS Ersatzweg ohne vorab gerechnetes Licht: Szene läuft (Licht zur Laufzeit, Texturen ready)
+PASS Ersatzweg ohne Materialtexturen: Szene läuft (Licht vorab, Texturen off)
+PASS Smartphone: Stationsbilder, Texturen und Lichtdaten werden nicht geladen/entpackt
+PASS Nahebene schneidet keine Wand und keinen Türflügel (3001 Punkte, kleinster Abstand 0.241 m bei p=0.5197, Körper 168)
+PASS Reflexionsaufnahme (Würfeltextur) des Bads aufgenommen, sobald es sichtbar ist: bad (2 ms)
+PASS Badspiegel: echte planare Spiegelung gerendert (2 Spiegelbilder bisher)
+PASS Spiegel wird ausserhalb des Bads nicht gerechnet (Garten: 2 → 2)
+PASS Haustür: Licht zu/offen überblendet (Mischwert 0.00 → 1.00 → 0.00)
+PASS Leistungspunkte aus rise.json: gartenunterhalt@1, hauswartung@2, reinigung@3, sanitaer@4
+PASS Leistungspunkte nur an ihrer Station sichtbar, sonst unsichtbar und nicht fokussierbar: aussen 0, garten 1, eingang 1, wohnung 1, bad 1, zurueck 0
+PASS Leistungspunkte frei klickbar (Punkt und Beschriftung oben): gartenunterhalt:frei, hauswartung:frei, reinigung:frei, sanitaer:frei
+PASS Trefferfläche der Leistungspunkte ≥ 44 px (44, 44, 44, 44)
+PASS Leistungspunkt liegt oben und ist klickbar (Element unter dem Punkt: hot)
+PASS Klick → request-quote {"service":"gartenunterhalt","station":"garten","source":"tour","version":1}
+PASS Offertformular geöffnet, Leistung vorausgewählt (#offerte · gartenunterhalt)
+PASS Ruhige Kamera: mittlere Pixeldifferenz zweier aufeinanderfolgender Bilder 0.235: 0.0000, 0.44: 0.0000, 0.73: 0.0000
+PASS Wandseiten dem richtigen Raum zugeordnet (kein Leuchtenlicht durch Wände): Bad|Flur 3|2, Halle|Bad 1|3, Bad|Wohnen 3|4, Wohnen|Fassade 4|0
+PASS Flurseite der Badwand und Fassade vor dem Wohnraum ohne Licht der Nachbarräume (Flur 0.5916/0.5595/0.5351, Fassade 0.5412/0.5553/0.5806)
+PASS 8 schnelle Sprünge: Endstation 2 (p=0.440), keine Fehler
+PASS Entfernen gibt alle GPU-Puffer, Texturen (inkl. Reflexionsaufnahmen) und Programme frei (99 → 0)
+PASS keine JS- oder WebGL-Fehler 
+PASS Treppe: Kopfhöhe über allen 11 Stufen ≥ 2,00 m (kleinste 2.05 m)
+PASS Schrittmass 2 × 17,6 cm + 29 cm = 64.2 cm (Richtwert 63 cm)
+PASS WC: Schüssel mit Tiefe – Wasserfläche 0.245 m über Boden, 0.155 m unter dem Rand
+PASS WC: Schüsselöffnung frei (über der Schüssel erst in 2.60 m Höhe eine Fläche – Deckel hochgeklappt)
+PASS WC: Sitzhöhe vorne 0.424 m (Brille auf dem Keramikrand)
+PASS Wohnungstür ungefähr 90 cm: lichte Breite 0.91 m
+PASS Badtür: lichte Breite 0.8 m
+PASS Hauseingang breiter als die Wohnungstür (1.09 m)
+PASS Fenster mit Raumtiefe ringsum: 128 Scheiben (V15: 56, nur Vorder- und rechte Seitenfassade)
+PASS Vorab gerechnetes Licht passt zur neuen Geometrie (Prüfsumme)
+PASS Bad: Ansicht wählen (Übersicht · Waschtisch · WC)
+PASS 3D: «WC» fährt zur Nahansicht (p 0.768), Station bleibt «Bad», Auswahl markiert
+PASS Nahebene auch mit den Nahansichten frei (kleinster Abstand 0.242 m)
+PASS keine JS-Fehler 
+PASS Smartphone 360 px: Bildmodus, kein seitliches Scrollen, Bild 360 px breit, Stationsknöpfe 44 px, Ansichtswahl 45 px, Detailbild Waschtisch (0) und zurück zur Übersicht, «Offerte» 48 px
+PASS Smartphone 390 px: Bildmodus, kein seitliches Scrollen, Bild 390 px breit, Stationsknöpfe 44 px, Ansichtswahl 45 px, Detailbild Waschtisch (0) und zurück zur Übersicht, «Offerte» 48 px
+PASS Smartphone 430 px: Bildmodus, kein seitliches Scrollen, Bild 430 px breit, Stationsknöpfe 44 px, Ansichtswahl 45 px, Detailbild Waschtisch (0) und zurück zur Übersicht, «Offerte» 48 px
+fatal: invalid object name 'v16-stand'.
+fatal: invalid object name 'v16-stand'.
+fatal: invalid object name 'v16-stand'.
+fatal: invalid object name 'v16-stand'.
+fatal: invalid object name 'v16-stand'.
+fatal: invalid object name 'v16-stand'.
+fatal: invalid object name 'v16-stand'.
+fatal: invalid object name 'v16-stand'.
+fatal: invalid object name 'v16-stand'.
+fatal: invalid object name 'v16-stand'.
+fatal: invalid object name 'v16-stand'.
+fatal: invalid object name 'v16-stand'.
+fatal: invalid object name 'v16-stand'.
+fatal: invalid object name 'v16-stand'.
+fatal: invalid object name 'v16-stand'.
+fatal: invalid object name 'v16-stand'.
+PASS 360 px: kein seitliches Scrollen (Dokument 360 px, Layout-Viewport 360 px)
+PASS 360 px: Kontaktleiste flach (56 px), alle Bedienelemente ≥ 44 px (kleinstes 46 px)
+PASS 360 px: Titel im Foto-Einstieg vollständig sichtbar und nicht unter der Kontaktleiste (Titel 510–615, Leiste ab 744)
+PASS 360 px: Stationsleiste über der Kontaktleiste, waagrecht scrollbar, Anfang nicht abgeschnitten
+PASS 360 px: Platz für die Kontaktleiste unten reserviert (padding-bottom 56 px ≥ Leiste 56 px)
+PASS 360 px: Original-Logo vollständig, unverzerrt (127×96 px, Seitenverhältnis 1.318), ohne Filter
+PASS 360 px: Einstiegsfoto beginnt direkt unter dem Kopf (keine leeren Platzhalter davor)
+PASS 360 px: «Offerte anfragen» im Einstieg früh erreichbar und frei über der Kontaktleiste
+PASS 360 px: aktive Station «Offerte» in der Leiste ganz sichtbar (Rand links 236 px, rechts 32 px)
+PASS 360 px: Fusszeile am Seitenende nicht verdeckt (letzte Zeile endet 704, Leiste ab 744)
+PASS 360 px: Kontaktleiste bei geöffneter Tastatur (Textfeld fokussiert) ausgeblendet
+PASS 360 px: keine JS-Fehler 
+PASS 390 px: kein seitliches Scrollen (Dokument 390 px, Layout-Viewport 390 px)
+PASS 390 px: Kontaktleiste flach (56 px), alle Bedienelemente ≥ 44 px (kleinstes 46 px)
+PASS 390 px: Titel im Foto-Einstieg vollständig sichtbar und nicht unter der Kontaktleiste (Titel 526–639, Leiste ab 788)
+PASS 390 px: Stationsleiste über der Kontaktleiste, waagrecht scrollbar, Anfang nicht abgeschnitten
+PASS 390 px: Platz für die Kontaktleiste unten reserviert (padding-bottom 56 px ≥ Leiste 56 px)
+PASS 390 px: Original-Logo vollständig, unverzerrt (137×104 px, Seitenverhältnis 1.318), ohne Filter
+PASS 390 px: Einstiegsfoto beginnt direkt unter dem Kopf (keine leeren Platzhalter davor)
+PASS 390 px: «Offerte anfragen» im Einstieg früh erreichbar und frei über der Kontaktleiste
+PASS 390 px: aktive Station «Offerte» in der Leiste ganz sichtbar (Rand links 266 px, rechts 32 px)
+PASS 390 px: Fusszeile am Seitenende nicht verdeckt (letzte Zeile endet 748, Leiste ab 788)
+PASS 390 px: Kontaktleiste bei geöffneter Tastatur (Textfeld fokussiert) ausgeblendet
+PASS 390 px: keine JS-Fehler 
+PASS 393 px: kein seitliches Scrollen (Dokument 393 px, Layout-Viewport 393 px)
+PASS 393 px: Kontaktleiste flach (56 px), alle Bedienelemente ≥ 44 px (kleinstes 46 px)
+PASS 393 px: Titel im Foto-Einstieg vollständig sichtbar und nicht unter der Kontaktleiste (Titel 528–642, Leiste ab 796)
+PASS 393 px: Stationsleiste über der Kontaktleiste, waagrecht scrollbar, Anfang nicht abgeschnitten
+PASS 393 px: Platz für die Kontaktleiste unten reserviert (padding-bottom 56 px ≥ Leiste 56 px)
+PASS 393 px: Original-Logo vollständig, unverzerrt (137×104 px, Seitenverhältnis 1.318), ohne Filter
+PASS 393 px: Einstiegsfoto beginnt direkt unter dem Kopf (keine leeren Platzhalter davor)
+PASS 393 px: «Offerte anfragen» im Einstieg früh erreichbar und frei über der Kontaktleiste
+PASS 393 px: aktive Station «Offerte» in der Leiste ganz sichtbar (Rand links 269 px, rechts 32 px)
+PASS 393 px: Fusszeile am Seitenende nicht verdeckt (letzte Zeile endet 756, Leiste ab 796)
+PASS 393 px: Kontaktleiste bei geöffneter Tastatur (Textfeld fokussiert) ausgeblendet
+PASS 393 px: keine JS-Fehler 
+PASS 430 px: kein seitliches Scrollen (Dokument 430 px, Layout-Viewport 430 px)
+PASS 430 px: Kontaktleiste flach (56 px), alle Bedienelemente ≥ 44 px (kleinstes 46 px)
+PASS 430 px: Titel im Foto-Einstieg vollständig sichtbar und nicht unter der Kontaktleiste (Titel 564–689, Leiste ab 876)
+PASS 430 px: Stationsleiste über der Kontaktleiste, waagrecht scrollbar, Anfang nicht abgeschnitten
+PASS 430 px: Platz für die Kontaktleiste unten reserviert (padding-bottom 56 px ≥ Leiste 56 px)
+PASS 430 px: Original-Logo vollständig, unverzerrt (148×112 px, Seitenverhältnis 1.318), ohne Filter
+PASS 430 px: Einstiegsfoto beginnt direkt unter dem Kopf (keine leeren Platzhalter davor)
+PASS 430 px: «Offerte anfragen» im Einstieg früh erreichbar und frei über der Kontaktleiste
+PASS 430 px: aktive Station «Offerte» in der Leiste ganz sichtbar (Rand links 303 px, rechts 35 px)
+PASS 430 px: Fusszeile am Seitenende nicht verdeckt (letzte Zeile endet 836, Leiste ab 876)
+PASS 430 px: Kontaktleiste bei geöffneter Tastatur (Textfeld fokussiert) ausgeblendet
+PASS 430 px: keine JS-Fehler 
+PASS 360 px: Leistungskarten 1-spaltig, kein Text läuft über
+PASS 360 px: «Einmalig / Regelmässig» als Segmentwahl (44/44 px), Formular vor den Kontaktangaben
+PASS 360 px: ganze Fläche wählbar (Leistung fotografie, Art laufend), Auswahl farbig markiert
+PASS 360 px: Absenden erreichbar (Knopf frei, nicht verdeckt) – Demo-Hinweis «keine Übermittlung», keine falsche Erfolgsmeldung
+PASS 390 px: Leistungskarten 2-spaltig, kein Text läuft über
+PASS 390 px: «Einmalig / Regelmässig» als Segmentwahl (44/44 px), Formular vor den Kontaktangaben
+PASS 390 px: ganze Fläche wählbar (Leistung fotografie, Art laufend), Auswahl farbig markiert
+PASS 390 px: Absenden erreichbar (Knopf frei, nicht verdeckt) – Demo-Hinweis «keine Übermittlung», keine falsche Erfolgsmeldung
+PASS Vorab gerechnetes Licht passt zur endgültigen Geometrie (Prüfsumme)
+PASS Geometrie nicht pauschal erhöht: 436158 Eckpunkte (V16: 361 344, Grenze +25 %)
+PASS Bad: Beschriftungen nur als Attribut an den Markierungen (Armatur · Ablaufventil · Siphon und Eckventile im Unterschrank), kein loser Text im Dokument
+PASS Genau eine sichtbare Hauptüberschrift (h1) auf der Startseite (1)
+PASS Bad-Beschriftung erst sichtbar, wenn die Kamera im Bad ist (nicht während der Fahrt; p 0.15)
+PASS «Schematische Kennzeichnung» direkt bei den Markierungen, Markierungen im Bild
+PASS Desktop: keine JS-Fehler 
+PASS Offertseite: genau eine sichtbare h1 (1)
+PASS Mobiles Menü: öffnet (Hintergrund gesperrt), schliesst per Knopf, Escape und Link (true/true/true/true), Logo im Menü unverzerrt
+PASS Textvergrösserung 200 % (390 px, #start): kein seitliches Scrollen, nichts abgeschnitten (Dokument 390 px)
+PASS Textvergrösserung 200 % (390 px, #offerte): kein seitliches Scrollen, nichts abgeschnitten (Dokument 390 px)
+PASS Textvergrösserung 200 % (390 px, #leistungen): kein seitliches Scrollen, nichts abgeschnitten (Dokument 390 px)
+PASS Textvergrösserung 200 % (390 px, #sanitaer): kein seitliches Scrollen, nichts abgeschnitten (Dokument 390 px)
+PASS Smartphone quer 844×390: kein seitliches Scrollen, Bedienelemente ≥ 44 px, keine JS-Fehler
+PASS Desktop 1024 px: 9 Seiten ohne seitliches Scrollen, Logo unverzerrt
+PASS Desktop 1280 px: 9 Seiten ohne seitliches Scrollen, Logo unverzerrt
+PASS Desktop 1440 px: 9 Seiten ohne seitliches Scrollen, Logo unverzerrt
+PASS Keine doppelten IDs
+PASS Alle Bilder mit Alttext und Quelle (ohne Alt: 0, ohne Quelle: 0)
+PASS Desktop 1920 px: 9 Seiten ohne seitliches Scrollen, Logo unverzerrt
+PASS Desktop 1440 bei 200 % Zoom (720 px): 9 Seiten ohne seitliches Scrollen, Logo unverzerrt
+PASS Produktionsform dist/site/ (HTTP): Rundgang mit Lichtdaten aus licht.json, keine Base64-Daten im Dokument, Logo aus Datei
+PASS Produktionsform 390 px: Hochformatbild aus Datei (960×864)
+PASS Alle 16 Stations- und Detailbilder vorhanden
+PASS Keine V16-Bilder im V17-Stand (alle neu gerendert)
+PASS Hochformatbilder 960×864 (10:9)
+PASS 320×640 (Touch): 17 Seiten ohne seitliches Scrollen, Kopf ohne Überlappung, Logo unverzerrt, Bedienelemente ≥ 44 px, Kontaktleiste deckend ≤ 60 px mit Platz
+PASS 360×800 (Touch): 17 Seiten ohne seitliches Scrollen, Kopf ohne Überlappung, Logo unverzerrt, Bedienelemente ≥ 44 px, Kontaktleiste deckend ≤ 60 px mit Platz
+PASS 375×812 (Touch): 17 Seiten ohne seitliches Scrollen, Kopf ohne Überlappung, Logo unverzerrt, Bedienelemente ≥ 44 px, Kontaktleiste deckend ≤ 60 px mit Platz
+PASS 390×844 (Touch): 17 Seiten ohne seitliches Scrollen, Kopf ohne Überlappung, Logo unverzerrt, Bedienelemente ≥ 44 px, Kontaktleiste deckend ≤ 60 px mit Platz
+PASS 393×852 (Touch): 17 Seiten ohne seitliches Scrollen, Kopf ohne Überlappung, Logo unverzerrt, Bedienelemente ≥ 44 px, Kontaktleiste deckend ≤ 60 px mit Platz
+PASS 414×896 (Touch): 17 Seiten ohne seitliches Scrollen, Kopf ohne Überlappung, Logo unverzerrt, Bedienelemente ≥ 44 px, Kontaktleiste deckend ≤ 60 px mit Platz
+PASS 430×932 (Touch): 17 Seiten ohne seitliches Scrollen, Kopf ohne Überlappung, Logo unverzerrt, Bedienelemente ≥ 44 px, Kontaktleiste deckend ≤ 60 px mit Platz
+PASS 844×390 (Touch): 17 Seiten ohne seitliches Scrollen, Kopf ohne Überlappung, Logo unverzerrt, Bedienelemente ≥ 44 px, Kontaktleiste deckend ≤ 60 px mit Platz
+PASS 768×1024 (Touch): 17 Seiten ohne seitliches Scrollen, Kopf ohne Überlappung, Logo unverzerrt, Bedienelemente ≥ 44 px, Kontaktleiste deckend ≤ 60 px mit Platz
+PASS 1024×768: 17 Seiten ohne seitliches Scrollen, Kopf ohne Überlappung, Logo unverzerrt, Bedienelemente ≥ 44 px, Kontaktleiste deckend ≤ 60 px mit Platz
+PASS 1280×800: 17 Seiten ohne seitliches Scrollen, Kopf ohne Überlappung, Logo unverzerrt, Bedienelemente ≥ 44 px, Kontaktleiste deckend ≤ 60 px mit Platz
+PASS 1440×900: 17 Seiten ohne seitliches Scrollen, Kopf ohne Überlappung, Logo unverzerrt, Bedienelemente ≥ 44 px, Kontaktleiste deckend ≤ 60 px mit Platz
+PASS 1920×1080: 17 Seiten ohne seitliches Scrollen, Kopf ohne Überlappung, Logo unverzerrt, Bedienelemente ≥ 44 px, Kontaktleiste deckend ≤ 60 px mit Platz
+PASS 320 px bei 200 % Textgrösse: 6 Seiten ohne seitliches Scrollen und ohne abgeschnittene Texte
+PASS 320 px Stationsleiste: Knöpfe ≥ 44 px (44), Einrasten (x), erste Station nicht abgeschnitten, kein seitliches Seiten-Scrollen
+PASS 320 px Stationsleiste: Touch wählt Station 5, Tastatur (Enter) Station 2, aktive Station jeweils ganz sichtbar
+PASS 390 px Stationsleiste: Knöpfe ≥ 44 px (44), Einrasten (x), erste Station nicht abgeschnitten, kein seitliches Seiten-Scrollen
+PASS 390 px Stationsleiste: Touch wählt Station 5, Tastatur (Enter) Station 2, aktive Station jeweils ganz sichtbar
+PASS 430 px Stationsleiste: Knöpfe ≥ 44 px (44), Einrasten (x), erste Station nicht abgeschnitten, kein seitliches Seiten-Scrollen
+PASS 430 px Stationsleiste: Touch wählt Station 5, Tastatur (Enter) Station 2, aktive Station jeweils ganz sichtbar
+PASS Menü 320×568: Hintergrund gesperrt, vollständig scrollbar (letzter Eintrag erreichbar), Escape schliesst, Fokus zurück auf den Menüknopf (burger)
+PASS 320 px Formular: Eingabetypen email/tel, Autofill (name, email, tel), sichtbare Beschriftungen, Leistungskarten 1-spaltig
+PASS 320 px Formular: Fokus auf erstem fehlerhaften Feld (leistung), im Bild, Fehlerübersicht sichtbar, Eingaben bleiben erhalten
+PASS 320 px Formular: Foto hinzufügen (1) und wieder entfernen (0)
+PASS 320 px Formular: Absenden frei erreichbar, Doppelklick gesperrt (1 Übermittlung trotz 3 Klicks), Fehlerfall zeigt Hinweis statt Erfolg
+PASS 320 px Formular: Demo-Modus deutlich – «keine Übermittlung», «nichts gesendet und nichts gespeichert», keine JS-Fehler
+PASS 390 px Formular: Eingabetypen email/tel, Autofill (name, email, tel), sichtbare Beschriftungen, Leistungskarten 2-spaltig
+PASS 390 px Formular: Fokus auf erstem fehlerhaften Feld (leistung), im Bild, Fehlerübersicht sichtbar, Eingaben bleiben erhalten
+PASS 390 px Formular: Foto hinzufügen (1) und wieder entfernen (0)
+PASS 390 px Formular: Absenden frei erreichbar, Doppelklick gesperrt (1 Übermittlung trotz 3 Klicks), Fehlerfall zeigt Hinweis statt Erfolg
+PASS 390 px Formular: Demo-Modus deutlich – «keine Übermittlung», «nichts gesendet und nichts gespeichert», keine JS-Fehler
+PASS Alle 21 Seitenanker führen über den Router zu einer Seite oder einem Element
+PASS Telefon- und E-Mail-Links einheitlich (Karriere mit Betreff) (tel:+41763404401 · mailto:info.immoready@gmail.com, mailto:info.immoready@gmail.com?subject=Initiativbewerbung%20ImmoReady)
+PASS Terminlink vorhanden (5×), externe Links nur HTTPS auf immoready.ch
+PASS Hash-Navigation und Browser-Zurück: zurück auf #kontakt (sichtbar: kontakt)
+PASS Skip-Link (#kontakt): erster Tabstopp beim Laden, sichtbar bei Fokus, führt zum Inhalt der aktuellen Seite (skip)
+PASS Links und Navigation: keine JS-Fehler 
+PASS Drehen 390×844 → 844×390 → 390×844 → 1280×800: Layout passt sich an, kein seitliches Scrollen, Stationsbild aktiv, keine JS-Fehler
+PASS Lichtdaten passen zur V17.1-Geometrie (Prüfsumme)
+PASS Treppenwange folgt der Steigung (Oberkante bei z 4.6/3.4/2.3: 0.99 / 1.72 / 2.38 m; erwartet 0.98 / 1.71 / 2.38 m – vorher waagrecht)
+PASS Kein schwarzblaues Band am Horizont (dunkle Pixel im oberen Bilddrittel: Dach 0, Gesamt 0)
+PASS Szene: keine JS-Fehler 
+PASS Alle 16 Stationsbilder aus der finalen Szene neu gerendert (gegenüber v17-ausgang verglichen: 16)
+offerte speichern Error: x
+    at insert (file:///tmp/velo-GvtHMD/http-functions.mjs:3:54)
+    at Module.post_offerte (file:///tmp/velo-GvtHMD/http-functions.mjs:74:53)
+    at async /home/user/immoready/tests/t21-fertigstellung.js:100:33
+PASS Mit Endpunkt: kein Demo-Hinweis «Formular nicht verbunden»
+PASS Ladezustand während der Übermittlung sichtbar («Anfrage wird übermittelt …»), noch keine Erfolgsmeldung
+PASS Doppelübermittlung verhindert: 1 Anfrage(n) trotz 3 Klicks
+PASS Foto zuerst hochgeladen (PUT mit Dateiname), Referenz in der Anfrage
+PASS Anfrage enthält gewählte Leistung und Angaben (sanitaer)
+PASS Erfolg erst nach bestätigter Annahme, mit Referenz
+PASS Netzwerkausfall: verständliche Meldung («Keine Verbindung zum Server – bitte prüfen Sie Ihre Internetverbindung.»), keine Erfolgsmeldung, Eingaben erhalten
+PASS Upload-Fehler: verständliche Meldung («Ein Foto konnte nicht hochgeladen werden. Sie können es entfernen und ohne Foto senden.»), keine Erfolgsmeldung, Eingaben erhalten, Anfrage nicht gesendet
+PASS Serverprüfung: verständliche Meldung («Der Server hat Angaben beanstandet – bitte prüfen Sie die markierten Felder.»), keine Erfolgsmeldung, Eingaben erhalten, Feld markiert
+PASS Antwort ohne Bestätigung: verständliche Meldung («Der Server hat die Anfrage nicht bestätigt.»), keine Erfolgsmeldung, Eingaben erhalten
+PASS Ohne Endpunkt (rise.json: [UNSPECIFIED]): Demo-Hinweis, keine Netzwerkanfrage (0)
+PASS Backend: gültige Anfrage gespeichert (Sammlung «Offertanfragen»), fremde Foto-Adresse verworfen, Antwort mit ID
+PASS Backend: serverseitige Prüfung lehnt ungültige Angaben mit Feldmeldungen ab, nichts gespeichert
+PASS Backend: fremder Ursprung 403, kaputtes JSON 400, Speicherfehler 500 ohne Erfolg
+PASS Backend: Upload-Adresse nur für Bilder ≤ 10 MB
+PASS Backend: CORS nur für www.immoready.ch / immoready.ch
+PASS Renderloop: ausserhalb des Sichtbereichs 0 Bilder trotz Scroll/Resize, im Bild wieder gezeichnet (3 Durchgänge: 0/14, 0/16, 0/16)
+PASS Direktaufruf und Neuladen von 10 Unterseiten zeigen die richtige Seite
+PASS Browser-Zurück/Vorwärts: kontakt → leistungen → kontakt
+PASS Produktionsform über HTTP 1440 px: alle Anfragen erfolgreich, keine Konsolenfehler
+PASS Produktionsform über HTTP 390 px: alle Anfragen erfolgreich, keine Konsolenfehler
+PASS keine pauschale Überlaufsperre auf html/body (visible/visible)
+PASS lange Wörter nur an Trennstellen umbrochen (4 Breiten × 16 Seiten)
+PASS weiche Trennstellen im sichtbaren Text, nicht im Seitentitel
+PASS Leistungsübersicht 320 px: Beschreibung in voller Breite (288/288/288/288/288/288/288/288)
+PASS Leistungsübersicht: kein doppelter Punkt
+PASS Kontaktseite 320 px einspaltig (Kontaktwege und Einsatzgebiet/Termin)
+PASS Rundgang 390 px: keine leere Fläche zwischen Station und Überspringen-Zeile (14 px)
+PASS «Tour überspringen» sichtbar, kein zweiter Offert-Knopf daneben (Offerte in Station und Kontaktleiste)
+PASS Station mit demselben Seitenrand wie die Abschnitte (Abweichung 0.0 px)
+PASS alle sechs Stationen ohne Leerraum darunter (14/14/14/14/14/14 px)
+PASS Menü öffnen/schliessen: Scrollposition bleibt (1500)
+PASS Menü offen → Desktopbreite: Menü geschlossen, Seite nicht gesperrt
+PASS Station garten: Offertformular mit Vorauswahl «gartenunterhalt» (gartenunterhalt)
+PASS Station eingang: Offertformular mit Vorauswahl «hauswartung» (hauswartung)
+PASS Station wohnung:reinigung: Offertformular mit Vorauswahl «reinigung» (reinigung)
+PASS Station wohnung:raeumung: Offertformular mit Vorauswahl «raeumung» (raeumung)
+PASS Station wohnung:leerstand: Offertformular mit Vorauswahl «leerstand» (leerstand)
+PASS Station bad: Offertformular mit Vorauswahl «sanitaer» (sanitaer)
+PASS Station zurueck: Offertformular ohne Vorauswahl (keine)
+PASS Anker #h-faq beginnt unter dem Kopf (126 ≥ 79)
+PASS Skip-Link: Fokus auf Inhalt, Beginn nicht hinter dem Kopf
+
+t22: 21/21 bestanden
+PASS rise.json: GmbH in Gründung, Gründung nicht bestätigt, Livegang nicht freigegeben
+PASS öffentliche Ansicht 390 px: «GmbH» auf keiner der 16 Seiten sichtbar
+PASS Impressum öffentlich: Marke und Ansprechperson, keine Rechtsform, Hinweis auf fehlende Angaben (390 px)
+PASS Footer: Marke ohne Rechtsform
+PASS öffentliche Ansicht 1280 px: «GmbH» auf keiner der 16 Seiten sichtbar
+PASS Impressum öffentlich: Marke und Ansprechperson, keine Rechtsform, Hinweis auf fehlende Angaben (1280 px)
+PASS Footer: Marke ohne Rechtsform
+PASS Prüfansicht: interner GmbH-Entwurf mit 7 offenen Registerangaben (7)
+PASS Entwurf enthält keine erfundene UID oder Registerangabe
+PASS Datenschutz: verantwortliche Stelle aus derselben Quelle (Adresse offen)
+PASS Vorschau und Produktionsform: noindex, nofollow, noarchive
+PASS dist/site/robots.txt sperrt alle Pfade
+PASS Startsperre: tools/rise.py --launch verweigert (Exit 1, offene Punkte)
+PASS Release-Build verweigert, solange offene Punkte bestehen
+
+t23: 14/14 bestanden
+PASS rise.json: nur «Fachmann Betriebsunterhalt EFZ»
+PASS Builds ohne WSF (Text, Metadaten, Skript)
+PASS Quellcode der Seite ohne WSF
+PASS sichtbarer Text auf 16 Seiten ohne WSF
+PASS Seitentitel und Beschreibungen ohne WSF
+PASS Startseite: Einstieg → Leistungen → Hauswartung → Sanitär → Familienbetrieb → Rundgang → Ablauf → Karriere (einstieg · leistungswelt · leistungen-start · sanitaer-start · familienbetrieb · sec · reise · ablauf · karriere · sec · anfrage)
+PASS Häufige Fragen und Kontakt/Offerte am Schluss
+PASS eigenständiger Abschnitt «Einsatzgebiet» entfernt
+PASS Nummerierung lückenlos 01–07 (01,02,03,04,05,06,07)
+PASS Zürich und Aargau kompakt im Einstieg, Kontaktbereich und Footer
+PASS genau eine h1, im Foto-Einstieg
+PASS Einstieg mit Überschrift, Beschreibung und zwei Aktionen
+PASS Rundgang: «Leistungen am Gebäude entdecken», als Illustration gekennzeichnet, «Tour überspringen» führt zum Ablauf
+PASS Startseite: Familienbetrieb mit Ardit Gashi und EFZ
+PASS kein künstliches Porträt im Familienbereich
+PASS Über uns: Familienbetrieb, Ansprechpartner ohne unbestätigte Funktion
+PASS Karrierebanner mit Überzeile, Überschrift und Knopf
+PASS Knopf: E-Mail an info.immoready@gmail.com mit Betreff, nicht als Offertanfrage
+PASS Hinweis auf E-Mail-Programm, keine erfundenen Stellen, Pensen oder Löhne
+PASS Anker #karriere landet unter dem Kopf
+PASS Klick auf «Initiativ bewerben»: keine Versandbestätigung, kein Wechsel ins Offertformular
+PASS Footer-Link «Karriere»
+PASS Startseite: 20 Bilder, alle einer Bildfläche zugeordnet und als Symbolbild (KI) gekennzeichnet
+PASS Einstieg zeigt die Bildfläche «hero» (geladen)
+PASS rise.json: jede Bildfläche mit Motiv, Alternativtext, Status, Quelle, Lizenz und Bildnachweis
+PASS Porträt: nur eigenes Foto vorgesehen, derzeit offen
+PASS 8 Leistungsseiten mit «Was wir übernehmen», «Geeignet für», «Das hilft bei Ihrer Anfrage», «So geht es weiter»
+PASS keine Floskeln oder unbelegten Versprechen (24/7, Garantie, höchste Qualität, beste Preise, massgeschneidert)
+PASS Bestätigung ohne bestätigte(r) Benachrichtigung: ["sent","stored"]
+PASS Bestätigung mit bestätigte(r) Benachrichtigung: ["sent","stored","notified"]
+
+t24: 30/30 bestanden
+PASS h1 «Ihre Liegenschaft. Unsere Verantwortung.» (Ihre Liegenschaft. Unsere Verantwortung.)
+PASS Beschreibung wie vorgegeben, Zürich und Aargau im Einstieg
+PASS Aktionen «Offerte anfragen» → #offerte, «Gebäude entdecken» → #reise
+PASS genau eine h1 auf der Startseite, höchstens eine je Seite
+PASS Rundgang beim Laden noch nicht gestartet (3D erst bei Annäherung)
+PASS sichtbare Aktionen mind. 48 px hoch (11)
+PASS dekorative Pfeile mit aria-hidden="true"
+PASS keine Buttons, die nur navigieren
+PASS Hover mit Maus: Rückmeldung über Schatten, Schaltfläche bleibt unter dem Zeiger stehen
+PASS «Gebäude entdecken» führt zum Rundgang (Oberkante unter dem Kopf: 145 px, Abstand oben 145 px) und startet 3D
+PASS 6 Stationen, 6 Navigationspunkte
+PASS jede Station mit Überzeile und Titel
+PASS Station 1 als Gesamtansicht bezeichnet
+PASS Eingang/Treppenhaus: Hauswartung und Reinigung anfragbar
+PASS Wohnung: Reinigung, Räumung, Leerstand
+PASS Bad: Sanitär
+PASS alle Vorauswahlen sind Leistungsschlüssel aus rise.json
+PASS Bad: erst Raum, dann Waschtisch und WC (Übersicht, Waschtisch, WC)
+PASS request-quote: Leistung «reinigung», Station «eingang» ({"service":"reinigung","station":"eingang","source":"tour","version":1})
+PASS Zeichenfläche ≤ 2 Mio. Bildpunkte (1886×1061, dpr 1, Faktor 0.982)
+PASS Pixeldichte höchstens 1,5
+PASS Seitenverhältnis der Zeichenfläche = Bühne
+PASS nach Grössenänderung: neue Zeichenfläche mit passendem Seitenverhältnis (900×1000)
+PASS Bewegung reduzieren: kein Anheben
+PASS Touch-Gerät: Hover-Regeln greifen nicht
+PASS Handy: Aktionen mind. 48 px
+
+t25: 26/26 bestanden
+PASS ohne Videodatei: kein öffentlicher Abschnitt, nur Prüfhinweis
+PASS 4 Videoflächen vorbereitet, alle «fehlt» (keine erfundenen Quellen)
+PASS Regel: Stockvideo ohne Nachweis abgelehnt
+PASS Regel: KI-Video nicht zulässig
+PASS Produktionsform: Video als Datei, nicht eingebettet
+PASS Abschnitt «Im Alltag» mit einem Clip direkt vor dem Rundgang
+PASS Stockclip als «Symbolvideo» gekennzeichnet
+PASS Video lädt nicht beim Seitenaufruf (erst im Sichtbereich)
+PASS stumm, Schleife, playsinline
+PASS Pause-/Abspieltaste mind. 48 px
+PASS Anfrage mit Leistungsschlüssel «reinigung»
+PASS Bildnachweis im Impressum
+PASS im Sichtbereich: lädt und spielt
+PASS Pause-Taste hält an (Zustand für Screenreader)
+PASS nach Pause durch Besucher kein erneutes Autoplay
+PASS «Im Rundgang ansehen» führt zur Station Eingang (Eingang, p 0.44)
+PASS Bewegung reduzieren: kein automatisches Abspielen
+PASS Handy 390 px: keine Überbreite
+
+t26: 18/18 bestanden
+PASS Kamerafahrt kollisionsfrei über 600 Schritte (checkRoute: [])
+PASS zusammenhängende Reise in 6 Stationen, 32 Stützpunkte
+PASS zwischen Haustür und Halt «Eingang» schwenkt die Kamera zur Treppe (Blickpunkt x -1.9 im Treppenlauf x −2,94…−1,77)
+PASS drei Türen: Haustür, Wohnungstür, Terrassentür
+PASS Blick durch die Badtür (p 0,70): echte Spiegelung statt grober Reflexionsaufnahme
+PASS Stationsknöpfe springen (auch rückwärts) und markieren die Station: [[4,0.73,true],[1,0.235,true],[5,1,true],[2,0.44,true]]
+PASS Scrollen steuert die Reise vorwärts und rückwärts (0.750 → 0.250)
+PASS «Tour überspringen» und «Offerte anfragen» erreichbar
+PASS nach der Rückkehr bleibt die Gesamtansicht stehen (keine automatische Wiederholung)
+PASS letzte Station: «Tour erneut starten»
+PASS «Tour erneut starten» führt zur Gesamtansicht am Anfang
+PASS Handy: Bildmodus mit «3D-Ansicht starten» (≥ 48 px) {"st":true,"btn":true,"h":49.1875,"label":"3D-Ansicht starten"}
+PASS Handy: 3D läuft im Bildrahmen (Stationsmodus)
+PASS Handy-3D ohne Scrollfalle: Abschnitt 1031 px hoch (Bildschirm 844 px), Seite scrollt normal
+PASS Handy-3D: Zeichenfläche passend zum Bildrahmen (318×286)
+PASS Handy-3D: Station «Sanitär» per Knopf
+PASS Handy-3D: Mausrad über der Szene scrollt die Seite weiter (kein Festhalten)
+PASS Umschalter heisst im 3D «Bilder statt 3D»
+PASS zurück zu Bildern: Renderschleife beendet, Stationsbild sichtbar
+PASS 3D lässt sich erneut starten (frische Zeichenfläche)
+PASS zu langsame Darstellung → Bilder derselben Szene mit Hinweis (tour-error TOO_SLOW)
+PASS Bewegung reduzieren: Bilder derselben Szene, 6 Stationen, Anfrageaktionen, Station «Bad» per Knopf
+PASS ohne WebGL (Desktop): Bilder derselben Szene, 6 Stationen, Anfrageaktionen, Station «Bad» per Knopf
+
+t27: 23/23 bestanden
+PASS Reinigungszonen aus rise.json: garten-weg, eingang-boden, wohnung-boden, bad-armatur, bad-auslauf, bad-waschtisch
+PASS Reinigungszustand nur aus dem Fortschritt: vorwärts = rückwärts (p 0,216: 0.5/0/0/0/0/0)
+PASS am Anfang alles «Vorher», am Ende alles «Nachher»
+PASS Bad: Vorher und Nachher sichtbar verschieden (grösste Änderung je Rasterfeld 8.9 %)
+PASS Bad: halber Zustand ist weder «Vorher» noch «Nachher» (Wischkante: 6.5 % / 8.5 %)
+PASS Bad: zwei Bilder bei gleicher Kamera und gleichem Zustand identisch – kein Flimmern (0.00000)
+PASS Wischkante (halb gereinigt): frameDiff 0.00000
+PASS Station garten: Vorher/Nachher sichtbar verschieden (0.0048)
+PASS Station eingang: Vorher/Nachher sichtbar verschieden (0.0027)
+PASS Station wohnung: Vorher/Nachher sichtbar verschieden (0.0070)
+PASS Station Bad: «Vorher», «Nachher» und Regler «Reinigungsfortschritt»
+PASS Hinweis «Illustration eines Arbeitsablaufs, kein Kundenergebnis.», Knöpfe ≥ 44 px
+PASS «Vorher»: Zonen der Station schmutzig, Knopf gedrückt, Regler 0
+PASS Regler per Tastatur (Ende): 100 % gereinigt
+PASS Regler per Pfeiltasten: 10 × 5 % zurück = halb gereinigt (0.5)
+PASS «Nachher»: Zonen sauber
+PASS Stationswechsel beendet den manuellen Vergleich (Knöpfe der neuen Station nicht gedrückt)
+PASS nach dem Wechsel gilt wieder der Fortschrittszustand (Wohnung sauber, Bad noch vor der Reinigung)
+PASS Start mit Tageslicht (Materialvergleich), Wahl «Tageslicht / Dämmerung»
+PASS Dämmerung umschaltbar und zurück (Helligkeit 0.456 → 0.337 → 0.456)
+PASS Demo startet nicht von selbst; Knopf «Demo-Rundlauf starten» (≥ 44 px), «Beenden» verborgen
+PASS Demo-Dauer 48 s, Zeitplan deterministisch
+PASS Kamera ohne Sprung (grösster Schritt je 0,05 s: 1.14 m bei 7.4 s; Naht 47,95 → 0 s: 0.002 m)
+PASS Drehung höchstens 90°/s (grösste 86°/s bei 41 s)
+PASS Reinigung ohne Sprung innerhalb des Rundlaufs
+PASS Demo läuft (Quelle «demo», t 0.517 s), Knopf «Pause», «Beenden» sichtbar
+PASS Pause hält die Demo an (t bleibt 1.017 s), Knopf «Fortsetzen»
+PASS Naht: Bild bei 47,99 s und 0 s gleich (Differenz 0.00006)
+PASS Naht 47,5 – 0,5 s: Hecke füllt das Bild (Grünanteil 1.00 / 1.00 / 1.00 / 1.00)
+PASS Rücksprung auf «Vorher» nur hinter der Hecke (47,99 s sauber, 0 s schmutzig)
+PASS eigenes Scrollen beendet die Demo (Quelle wieder «scroll»)
+PASS Stationsknopf beendet die Demo und springt zur Station
+PASS «Beenden»: Bild bleibt (p 0.752), Seite steht an derselben Stelle (0.752)
+PASS nach dem Beenden im Bad keine weiteren Bilder (keine zweite Schleife; 130 → 130)
+PASS keine Konsolenfehler
+PASS destroy() während der Demo: keine Schleife, keine Bilder mehr
+PASS Tageslicht aktiv
+PASS Tageslicht: keine ausgebrannten Flächen (weisse Pixel je Station aussen 0.00 %, garten 0.00 %, eingang 0.00 %, wohnung 0.00 %, bad 0.00 %, zurueck 0.00 %)
+PASS Tageslicht: Belichtung je Station im brauchbaren Bereich (0.456, 0.422, 0.662, 0.557, 0.677, 0.448)
+PASS Tageslicht: weiche Belichtungsanpassung beim Eintreten (0.920 → 0.92 → 0.92 → 0.92 → 1.062 → 1.103 → 1.103 → 1.12 → 1.12 …)
+PASS Handy-Bildmodus: Vorher/Nachher an der Station, ohne Regler und ohne Demo
+PASS «Vorher» zeigt das Bild derselben Kamera im Ausgangszustand (station-02-garten)
+PASS «Nachher» zeigt wieder das Stationsbild
+PASS Stationswechsel blendet das «Vorher»-Bild aus
+PASS Bildmodus Bad: Vergleich nur, wo ein Unterschied sichtbar ist (Übersicht false, Waschtisch true, WC false)
+PASS Handy-3D: Demo-Knopf vorhanden, kein seitliches Überlaufen (390/390)
+PASS Handy-3D: Demo läuft im Bildrahmen
+PASS Szene ausserhalb des Bildschirms: Demo steht still (t 0.217 s) und läuft beim Zurückkehren weiter
+PASS zurück im Bild: Demo läuft weiter
+PASS Bewegung reduzieren: keine automatische Kamerafahrt (Demo nicht angeboten, Start abgelehnt)
+
+t28: 50/50 bestanden
+PASS Eingebettet: SCENE_READY an freigegebene Elternseite
+PASS Eingebettet: Stationsmodus mit «Weiter»/«Zurück» (keine Scroll-Abhängigkeit)
+PASS GO_TO_STATION 4 → Bad
+PASS Ungültige Nachrichten werden ignoriert
+PASS SET_PROGRESS 0.235 → Garten
+PASS Anfrage-Knopf → REQUEST_QUOTE {leistung} an Elternseite, keine Formulardaten
+PASS «Weiter» → nächste Station
+PASS «Zurück» → vorherige Station
+PASS «Kontakt aufnehmen» → REQUEST_CONTACT an Elternseite (ohne Daten), keine interne Navigation
+PASS Allgemeine Offerte → REQUEST_QUOTE {leistung:""}
+PASS keine Fehler in der Elternseite
+PASS Fremder Ursprung erhält keine Nachrichten (kein SCENE_READY)
+PASS Fremder Ursprung kann die Szene nicht steuern
+PASS Fremder Ursprung erhält keine Anfrage-Nachricht
+PASS Zwei Instanzen gleichzeitig: beide melden tour-ready {version:"17", mode:"webgl"}
+PASS Attribut station="2" beim Start → station-change {station:"eingang", index:2}
+PASS setAttribute("station","4") steuert nur Instanz 1 (Bad), Instanz 2 bleibt
+PASS request-quote {service:"sanitaer", station:"bad", source:"tour", version:1}, keine interne Navigation
+PASS Unbekannte Leistung wird nicht weitergegeben (Whitelist aus rise.json)
+PASS «Zurück» in der Komponente → Station Wohnung
+PASS Auswahl in der Wohnung (Leerstand) → request-quote {service:"leerstand"}, Beschreibung sichtbar
+PASS Auswahl per Tastatur (Pfeiltaste) – Aktion übernimmt die Leistung
+PASS Kontakt aufnehmen → request-contact {station:"zurueck", source:"tour", version:1}, keine interne Navigation
+PASS Allgemeine Offertanfrage ohne Leistung → service ""
+PASS «Zurück» funktioniert erneut nach Stationswechseln
+PASS Tastatur (Enter auf Stationsknopf) im Shadow DOM
+PASS Stationsbilder als WebP aus assets/tour/ neben dem Skript
+PASS 4× entfernt/eingesetzt: keine verwaisten Listener (window/document: 21 → 21), Neustart funktioniert
+PASS disconnectedCallback: WebGL gestoppt, Listener entfernt, Shadow DOM geleert
+PASS Kontextverlust → tour-error {code:"WEBGL_CONTEXT_LOST", fallback:"stills"} und Stationsbilder
+PASS Nach Kontextverlust: Stationswechsel mit Bild weiterhin möglich
+PASS keine JS-Fehler 
+PASS Ohne WebGL: tour-error WEBGL_UNAVAILABLE und tour-ready {mode:"stills"}
+PASS Smartphone: Stationsbilder, kein WebGL-Start
+PASS Smartphone: kein seitliches Scrollen
+PASS Smartphone: Hochformat-Stationsbild (960×864) aus <picture>
+PASS Bewegung reduzieren: keine Scan-Kante, Stationswechsel ohne Kamerafahrt (sofort an der Station) {"ps":0.59,"scan":{"state":"done","start":0,"end":0,"count":0}}
+PASS Inline-Bundle: Stationsbilder eingebettet (eine Datei)
+GESAMT: 612 bestanden, 0 fehlgeschlagen (npm test exit 0, t12 exit 0, t13 exit 0)

@@ -114,13 +114,17 @@ def _demo_rules(t):
     for z in zones:
         if z.get('st') not in keys:
             errors.append('Reinigungszone %s: unbekannte Station' % z.get('id'))
-        if z.get('type') not in ('kalk', 'wasser', 'staub', 'laub'):
-            errors.append('Reinigungszone %s: Art muss kalk|wasser|staub|laub sein' % z.get('id'))
+        if z.get('type') not in ('kalk', 'wasser', 'staub', 'laub', 'schlieren'):
+            errors.append('Reinigungszone %s: Art muss kalk|wasser|staub|laub|schlieren sein' % z.get('id'))
         lo, hi = z.get('box', [[0, 0, 0], [0, 0, 0]])
         if not all(a < b for a, b in zip(lo, hi)):
             errors.append('Reinigungszone %s: Box nicht aufsteigend' % z.get('id'))
         if not (0 <= z['p'][0] < z['p'][1] <= 1):
             errors.append('Reinigungszone %s: Fortschrittsbereich ungültig' % z.get('id'))
+        if any(len(w) != 4 for w in z.get('walk', [])) or len(z.get('walk', [])) > 2:
+            errors.append('Reinigungszone %s: walk = höchstens 2 Laufwege [x0, z0, x1, z1]' % z.get('id'))
+        if 'entry' in z and len(z['entry']) != 2:
+            errors.append('Reinigungszone %s: entry = [x, z]' % z.get('id'))
     if t.get('light', 'tag') not in ('tag', 'nacht'):
         errors.append('tour.light muss tag oder nacht sein')
     dm = t.get('demo')
@@ -381,7 +385,7 @@ def tour_config(d):
         'smoothing': t['smoothing'],
         'light': t.get('light', 'tag'),
         'demo': t.get('demo'),
-        'cleaning': {'zones': [{k: z[k] for k in ('id', 'st', 'type', 'label', 'box', 'dir', 'edge', 'mat', 'strength', 'seed', 'p')} for z in t.get('cleaning', {}).get('zones', [])]},
+        'cleaning': {'zones': [{k: z[k] for k in ('id', 'st', 'type', 'label', 'box', 'dir', 'edge', 'mat', 'strength', 'seed', 'p', 'walk', 'entry', 'range') if k in z} for z in t.get('cleaning', {}).get('zones', [])]},
         'routeClearance': t['routeClearance'],
         'wind': {'idleMs': t['wind']['idleMs'], 'maxFps': t['wind']['maxFps']},
         'label': t['scene']['label'],

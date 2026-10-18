@@ -1,7 +1,7 @@
 // Stationsbilder aus der echten 3D-Szene rendern (gleiches Gebäude, gleiche Route wie der Rundgang).
 //   Querformat 1440×900  → assets/tour/station-0N-<key>.webp      (Desktop-Fallback, Komponente)
 //   Hochformat  960×864 (10:9, V17; vorher 960×1080) → assets/tour/station-0N-<key>-hoch.webp (Smartphone ≤700 px)
-// Aufruf: python3 build.py && node tools/render-stills.js && python3 build.py
+// Aufruf: python3 build.py && node tools/render-stills.js && python3 build.py   (NUR=eingang,bad: nur diese Stationen)
 // Realismus-Auftrag: Tageslicht (rise.json → tour.light) und je Station mit Reinigungszone ein «Vorher»-Bild <still>-vorher(-hoch).webp.
 // V14: alle zwölf Bilder stammen aus demselben Gebäudemodell und derselben Route wie der Rundgang (gleiches Licht, gleiche Texturen).
 // Hochformat: gleiche Kamerapositionen wie im Rundgang, Blickziel auf das Motiv zentriert
@@ -38,6 +38,9 @@ const PORTRAIT = {
     ST.forEach(s => { JOBS.push({ key: s.key, st: s.key, hold: s.hold, still: s.still }); (s.details || []).forEach(d => JOBS.push({ key: s.key + '-' + d.key, st: s.key, hold: d.q, still: d.still })); });
     /* Realismus-Auftrag: für Stationen mit Reinigungszonen zusätzlich «Vorher» aus derselben Kamera (Zonen der Station schmutzig) */
     const DIRTY = new Set(((cfg.tour.cleaning || {}).zones || []).map(z => z.st));
+    /* NUR=eingang,bad: nur diese Stationen (mit Nahansichten) neu rendern */
+    const NUR = process.env.NUR ? process.env.NUR.split(',') : null;
+    if (NUR) JOBS.splice(0, JOBS.length, ...JOBS.filter(j => NUR.includes(j.st)));
     for (let i = 0; i < JOBS.length; i++) {
       const s = JOBS[i];
       await p.evaluate(([q, cam]) => {

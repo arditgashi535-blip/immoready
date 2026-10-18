@@ -509,14 +509,37 @@
         '',
       /* Staub und Schuhspuren: Staub an den Wandkanten und als Film, Gehspuren (Schritt 34 cm, Sohlenprofil) nur am Boden;
          Runde 4: auch auf waagrechten Möbelflächen, Farbe aus der Grundhelligkeit (auf dunklem Parkett hell und grau) */
-      staub: 'float fl0=1.0-smoothstep(0.03,0.08,q.y);float wk=(1.0-smoothstep(0.02,0.4,min(o.x,o.z)))*fl0;float du=((wk*0.75+0.2+0.2*(1.0-fl0))*(0.62+0.38*n1.g)+smoothstep(0.55,0.95,n2.b)*0.18)*smoothstep(0.55,0.9,N.y);' +
-      'vec2 ax=abs(Cw.x)>0.5?vec2(q.z-ext.z*0.5,q.x):vec2(q.x-ext.x*0.5,q.z);float pr=0.0;' +
-      'for(int tk=0;tk<2;tk++){float off=tk==0?-0.35:0.5;float kz=floor(ax.y/0.34+float(tk)*0.5);float sd=mod(kz,2.0)<0.5?-1.0:1.0;' +
-      'vec2 lc=vec2(ax.x-off-sd*0.11-(dh3(vec3(kz,float(tk),9.0))-0.5)*0.05,fract(ax.y/0.34+float(tk)*0.5)*0.34-0.17);' +
-      'float sole=smoothstep(1.0,0.82,length(lc*vec2(1.0/0.052,1.0/0.13)))*(0.55+0.45*step(0.5,fract(lc.y*55.0)));pr=max(pr,sole*step(0.25,dh3(vec3(kz,float(tk),11.0))));}pr*=fl0;' +
+      staub: function (z) {
+        /* Laufwege (rise.json → walk: [x0, z0, x1, z1]): Schuhabdrücke links/rechts im Schritt 34 cm entlang des Wegs, vom Eingang
+           her dichter; ohne walk zwei Spuren entlang der Wischrichtung. entry: eingetragener Schmutz um die Tür, nach innen abnehmend */
+        var walk = (z.walk || []).map(function (w, k) {
+          var dx = w[2] - w[0], dz = w[3] - w[1], L = Math.hypot(dx, dz) || 1;
+          return '{vec2 wa=' + gv([w[0], w[1]]) + ',wd=' + gv([dx / L, dz / L]) + ';vec2 wr=P.xz-wa;float ws=dot(wr,wd),wl=dot(wr,vec2(-wd.y,wd.x));' +
+            'if(ws>0.0&&ws<' + gf(L) + '){float kz=floor(ws/0.34);float sd=mod(kz,2.0)<0.5?-1.0:1.0;' +
+            'vec2 lc=vec2(wl-sd*0.11-(dh3(vec3(kz,' + gf(k) + ',9.0))-0.5)*0.05,fract(ws/0.34)*0.34-0.17);' +
+            'float sole=smoothstep(1.0,0.82,length(lc*vec2(1.0/0.052,1.0/0.13)))*(0.55+0.45*step(0.5,fract(lc.y*55.0)));' +
+            'pr=max(pr,sole*step(0.2,dh3(vec3(kz,' + gf(k) + ',11.0)))*(1.0-0.55*ws/' + gf(L) + '));}}';
+        }).join('');
+        var entry = z.entry ? 'du+=(1.0-smoothstep(0.25,1.6,length(P.xz-' + gv(z.entry) + ')))*0.5*fl0*(0.6+0.4*n1.r);' : '';
+        return 'float fl0=1.0-smoothstep(0.03,0.08,q.y);float wk=(1.0-smoothstep(0.02,0.4,min(o.x,o.z)))*fl0;float du=((wk*0.75+0.2+0.2*(1.0-fl0))*(0.62+0.38*n1.g)+smoothstep(0.55,0.95,n2.b)*0.18)*smoothstep(0.55,0.9,N.y);' +
+          entry + (walk ? 'float pr=0.0;' + walk + 'pr*=fl0;' : 'vec2 ax=abs(Cw.x)>0.5?vec2(q.z-ext.z*0.5,q.x):vec2(q.x-ext.x*0.5,q.z);float pr=0.0;' +
+          'for(int tk=0;tk<2;tk++){float off=tk==0?-0.35:0.5;float kz=floor(ax.y/0.34+float(tk)*0.5);float sd=mod(kz,2.0)<0.5?-1.0:1.0;' +
+          'vec2 lc=vec2(ax.x-off-sd*0.11-(dh3(vec3(kz,float(tk),9.0))-0.5)*0.05,fract(ax.y/0.34+float(tk)*0.5)*0.34-0.17);' +
+          'float sole=smoothstep(1.0,0.82,length(lc*vec2(1.0/0.052,1.0/0.13)))*(0.55+0.45*step(0.5,fract(lc.y*55.0)));pr=max(pr,sole*step(0.25,dh3(vec3(kz,float(tk),11.0))));}pr*=fl0;') +
+
       /* Runde 4: Staub wirkt auf dunklem Parkett hell und grau, auf hellen Platten dunkler (Farbe aus der Grundhelligkeit vd.rgb) */
       'float al=smoothstep(0.12,0.42,dot(vd.rgb,vec3(0.3,0.59,0.11)));' +
-      'd=clamp(max(du*mix(0.85,0.6,al),pr*(0.5+0.5*n2.g)*0.85),0.0,1.0);kc=pr>du?mix(vec3(0.34,0.32,0.29),vec3(0.13,0.12,0.11),al):mix(vec3(0.46,0.44,0.41),vec3(0.24,0.22,0.2),al);kr=0.3;' +
+      'd=clamp(max(du*mix(0.85,0.72,al),pr*(0.5+0.5*n2.g)*0.85),0.0,1.0);kc=pr>du?mix(vec3(0.34,0.32,0.29),vec3(0.13,0.12,0.11),al):mix(vec3(0.46,0.44,0.41),vec3(0.24,0.22,0.2),al);kr=0.3;' +
+          '';
+      },
+      /* Fingerabdrücke und Schlieren auf Chromstahl/Glas (senkrechte Flächen): ovale Abdrücke mit Rillen in Griffhöhe, zur Mitte
+         (Türspalt) dichter, dazu lange, schräge Wischschlieren. Matt und weniger metallisch – sichtbar als trüber Fleck im Reflex */
+      schlieren: 'float hy=smoothstep(0.32,0.5,q.y)*(1.0-smoothstep(1.05,1.3,q.y));vec2 fg=wu*vec2(16.0,12.0)+sdw;vec2 fi=floor(fg),ff=fract(fg)-0.5;float fh=dh3(vec3(fi,21.0));' +
+      'vec2 fo=(vec2(dh3(vec3(fi,22.0)),dh3(vec3(fi,23.0)))-0.5)*0.4;float fe=length((ff-fo)*vec2(1.0,0.75));float gap=1.0-smoothstep(0.02,0.16,abs(q.x-ext.x*0.5));' +
+      'float fp=step(1.0-hy*(0.25+0.35*gap),fh)*(1.0-smoothstep(0.13,0.23,fe))*(0.75+0.25*sin(fe*95.0+fh*6.0));' +
+      'float sl=dot(wu,vec2(0.894,0.447)),sa=dot(wu,vec2(-0.447,0.894));float big=smoothstep(0.45,0.78,dzn(su*0.6+0.17).g);' +
+      'float st=smoothstep(0.66,0.88,dzn(vec2(sl*0.22,sa*3.0)+sdw).r)*big*(0.08+0.55*hy);' +
+      'd=clamp(max(fp*0.6,st*0.7),0.0,0.75);kc=vec3(0.44,0.44,0.43);kr=0.5;km=0.65;' +
         '',
       /* Laub, Moos und Schmutzfilm – Runde 4: zwei Blattgrössen (≈ 6 und 3 cm) gehäuft in Wolken und zu den Rändern hin, gedämpfte
          Brauntöne, spitz zulaufende Blattform; grünlich-grauer Film in Wolken, Moos an den Rändern und in den Fugen */
@@ -531,7 +554,7 @@
     };
     /* Sichtweite je Zone: Feinheiten sind darüber hinaus nicht mehr erkennbar; der Shader blendet zwischen 75 % und 100 % weich aus,
        drawSet schaltet jenseits davon auf das Programm ohne Schmutzschicht (kein sichtbarer Wechsel) */
-    function dzR(z) { return z.range || (z.type === 'laub' ? 30 : z.type === 'staub' ? 9 : 4); }
+    function dzR(z) { return z.range || (z.type === 'laub' ? 30 : z.type === 'staub' ? 9 : z.type === 'schlieren' ? 6 : 4); }
     function gf(v) { var t = (+v).toFixed(4); return t.indexOf('.') < 0 ? t + '.0' : t; }
     function gv(a) { return 'vec' + a.length + '(' + a.map(gf).join(',') + ')'; }
     function dirtSrc(zones, mask) {
@@ -547,7 +570,7 @@
           'float sv=(dot(q,Cw.xyz)-mn)/max(rg,0.001)+(n1.g-0.5)*0.16;' +
           'float fr=bw*(1.0+2.0*Cw.w+0.18)-Cw.w-0.09;float cl=1.0-smoothstep(fr-Cw.w,fr,sv);' +
           'float act=step(0.001,bw)*(1.0-smoothstep(0.9,1.0,bw));float wt=max(exp(-pow((sv-fr)/(Cw.w*1.3),2.0)),cl*exp(-max(fr-sv,0.0)/0.16)*0.65)*act;' +
-          'float d=0.0;vec3 kc=vec3(0.0);float kr=0.0,km=0.0;' + DZTYPE[z.type] +
+          'float d=0.0;vec3 kc=vec3(0.0);float kr=0.0,km=0.0;' + (typeof DZTYPE[z.type] === 'function' ? DZTYPE[z.type](z) : DZTYPE[z.type]) +
           'd*=' + gf(z.strength) + '*inb*(1.0-cl);dCol+=kc*d;dAmt+=d;dR+=kr*d;dMt+=km*d;dWet=max(dWet,wt*inb);}}';
       });
       return s + 'if(dAmt>0.0001){vec3 Lr=vd.rgb/max(va,vec3(0.03));base=mix(base,(dCol/dAmt)*Lr*fac,clamp(dAmt,0.0,0.92));}base*=1.0-0.22*dWet;';
