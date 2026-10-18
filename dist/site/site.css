@@ -2092,4 +2092,4 @@ body.hdr-compact .hdr{background:var(--ivory)}
 /* Beschriftungen im Bad: nur ohne Überschneidung mit Text, Stationen und Bedienung und innerhalb der Bühne (Kern setzt .off) */
 .jr-tech span.off,.jr-tech-c.off{opacity:0;visibility:hidden}
 /* Demo-Naht: Während die Hecke das Bild verdeckt, blendet der Stationstext aus; der Wechsel von Station 6 auf 1 geschieht unsichtbar */
-.jr-live.jr-seam .jr-st,.jr-3d.jr-seam .jr-st{opacity:0!important;transition:opacity 450ms var(--ease-out)!important}
+.jr-live.jr-seam .jr-st.on,.jr-3d.jr-seam .jr-st.on{opacity:var(--seam-o,0)!important;transition:none!important}

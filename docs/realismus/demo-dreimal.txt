@@ -1,8 +1,10 @@
 Demo-Rundlauf dreimal abgespielt (2026-10-18, Headless-Chromium, SwiftShader, 960×600)
-Bilder: 729, Dauer: 187 s Echtzeit, Durchgänge laut Demo: 3
-Nahtübergänge: 3, Kameraweg über die Naht: 0.010 m, 0.019 m, 0.039 m
+Bilder: 684, Dauer: 252 s Echtzeit, Durchgänge laut Demo: 3
+Nahtübergänge: 3, Kameraweg über die Naht: 0.024 m, 0.027 m, 0.022 m
 Zeitsprünge ausser der Naht (> 0,26 s Demo-Zeit je Bild): keine
-grösste Kamerageschwindigkeit: 22.4 m/s bei 7.58 s
+grösste Kamerageschwindigkeit: 22.4 m/s bei 7.50 s
 Naht ±0,4 s: Bildwechsel > 2 % zwischen Folgebildern oder schwarzes Bild: 0
+Bildabstand (Software-Grafik, keine Hardware-Messung): Median 338 ms, 90 % 535 ms, grösster 3809 ms
+Naht (47,3 s bis 0,6 s): 29 Bilder, davon mit sichtbarem Stationstext: 1
 Konsolenfehler: keine
-ERGEBNIS: bestanden
+ERGEBNIS: NICHT bestanden

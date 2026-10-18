@@ -2756,8 +2756,11 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
       Object.keys(DM.clean || {}).forEach(function (k) { var c = DM.clean[k]; cl[k] = sm((t - c[0]) / (c[1] - c[0])); });
       return { t: t, q: q, cam: cam, clean: cl };
     }
-    /* Überarbeitung 2: an der Naht (Hecke verdeckt das Bild) blendet der Stationstext aus – der Wechsel 6 → 1 bleibt unsichtbar */
-    function demoApply(t) { var s = demoAt(t); p = ps = s.q; demoCam = s.cam; dzDemo = s.clean; root.classList.toggle('jr-seam', !!s.cam && (s.t > DM.duration - 1.1 || s.t < 0.9)); ui(s.q); return s; }
+    /* Überarbeitung 2: an der Naht (Hecke verdeckt das Bild) blendet der Stationstext aus – der Wechsel 6 → 1 bleibt unsichtbar.
+       Die Deckkraft folgt der Demo-Zeit (--seam-o: aus ab 1,4 s vor dem Ende, ein ab 0,9 s, je 0,45 s), nicht einer Überblendung in
+       Echtzeit: bei langsamen Bildern (Demo-Zeit je Bild ≤ 0,25 s) war der Text sonst noch zu sehen, wenn die Hecke schon verdeckte. */
+    function seamO(t) { var D = DM.duration; return t > D - 1.4 ? 1 - sm((t - (D - 1.4)) / 0.45) : sm((t - 0.9) / 0.45); }
+    function demoApply(t) { var s = demoAt(t), so = s.cam ? seamO(s.t) : 1; p = ps = s.q; demoCam = s.cam; dzDemo = s.clean; root.style.setProperty('--seam-o', so.toFixed(3)); root.classList.toggle('jr-seam', so < 1); ui(s.q); return s; }
     function canDemo() { return !!(DM && running && gl && mode !== 'static' && !RMQ.matches); }
     function demoUi() {
       var g = root.querySelector('.jr-demo'); if (!g) return; g.hidden = !canDemo() && !demo;

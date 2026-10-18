@@ -8,7 +8,7 @@
 //  · Vergleich nur, wo eine Reinigungszone im Bild liegt (WC-Nahansicht ohne Vergleich)
 //  · «Details ansehen»: Maus und Tastatur, Titel/Vergleich/Stationen/«Tour überspringen»/«Offerte anfragen» bleiben bedienbar
 //  · Handy-Bildmodus: Vergleich direkt am Bild, per Antippen und Tastatur
-//  · Demo-Naht: Stationstext blendet aus, solange die Hecke das Bild verdeckt (Wechsel 6 → 1 unsichtbar)
+//  · Demo-Naht: Stationstext blendet aus, solange die Hecke das Bild verdeckt (Wechsel 6 → 1 unsichtbar); Deckkraft aus der Demo-Zeit
 //  · Licht: vorab gerechnet mit Sonnensichtbarkeit und Himmel durch Öffnungen; Leistungspunkt Bad weicht der Stationsleiste aus
 // Weltpunkte aus src/tour/geometry.part.js (Waschtisch: bcx 3,315 / bcz 0,8 / hx 0,235 / hz 0,31, Oberkante 1,36 m; WC: VX 3,222 / cz −0,38).
 // Aufruf: node tests/t29-buehne.js
@@ -164,6 +164,16 @@ const fmt = f => 'Abstand Text ' + f.L + ' · Stationsleiste ' + f.R + ' · Kopf
     ok(!seam[46.4].seam && seam[46.4].op > 0.9 && seam[46.4].i === 5, 'Demo 46,4 s: Text der Station 6 sichtbar');
     ok(seam[47.5].seam && seam[47.5].op < 0.05 && seam[0.3].seam && seam[0.3].op < 0.05, 'Demo-Naht (47,5 s und 0,3 s): kein Stationstext, solange die Hecke verdeckt (Deckkraft ' + seam[47.5].op + ' / ' + seam[0.3].op + ')');
     ok(!seam[1.6].seam && seam[1.6].op > 0.9 && seam[1.6].i === 0, 'Demo 1,6 s: Text der Station 1 sichtbar');
+    /* Deckkraft aus der Demo-Zeit statt Überblendung in Echtzeit: gilt sofort nach dem Bild, auch bei langsamen Bildern */
+    const sq = {};
+    for (const t of [46.83, 47.1, 1.12]) {
+      const f0 = await p.evaluate(() => window.__JR.state().frames);
+      await p.evaluate(t => window.__JR.demoSeek(t), t);
+      await p.waitForFunction(f => window.__JR.state().frames > f, f0, { timeout: 120000 }).catch(() => {});
+      sq[t] = await p.evaluate(() => { const r = document.getElementById('reise'), on = r.querySelector('.jr-st.on'); return { seam: r.classList.contains('jr-seam'), op: on ? +getComputedStyle(on).opacity : 1, so: +r.style.getPropertyValue('--seam-o') }; });
+    }
+    ok(sq[47.1].seam && sq[47.1].op < 0.05 && [46.83, 1.12].every(t => sq[t].seam && sq[t].so > 0.3 && sq[t].so < 0.7 && Math.abs(sq[t].op - sq[t].so) < 0.02),
+      'Demo-Naht: Deckkraft folgt der Demo-Zeit, ohne Wartezeit (46,83 s ' + sq[46.83].op.toFixed(2) + ' · 47,1 s ' + sq[47.1].op.toFixed(2) + ' · 1,12 s ' + sq[1.12].op.toFixed(2) + ')');
     await p.evaluate(() => window.__JR.demoStop());
     ok(!(await p.evaluate(() => document.getElementById('reise').classList.contains('jr-seam'))), 'Demo beendet: Naht-Zustand aufgehoben');
     ok(!p.errs.length, '1280×720 Bedienung: keine Fehler in der Konsole' + (p.errs.length ? ' – ' + p.errs.slice(0, 2).join(' | ') : ''));

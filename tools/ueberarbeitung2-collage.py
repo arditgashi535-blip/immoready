@@ -13,7 +13,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-END = sys.argv[1] if len(sys.argv) > 1 else 'r11'
+END = sys.argv[1] if len(sys.argv) > 1 else 'r12'
 BASE = sys.argv[2] if len(sys.argv) > 2 else 'r7vorher'
 B = os.path.join(ROOT, 'shots/beurteilung')
 OUT = os.path.join(ROOT, 'docs/realismus')
