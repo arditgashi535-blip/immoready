@@ -10,7 +10,8 @@ const RULES = {
     ['kontakt_belegt', 10, l => !!(l.address || l.phone || l.contact_form)],
     ['quelle_offiziell', 10, l => !!l.official_source],
     ['eigene_hauswartung', -15, l => !!l.has_inhouse_facility],
-    ['unverifiziert', -10, l => l.verification !== 'verifiziert']
+    ['website_bestaetigt', 5, l => l.verification === 'verifiziert'],
+    ['unverifiziert', -10, l => !l.verification || l.verification === 'unverifiziert']
   ],
   readystudio: [
     ['branche_ziel', 20, l => ['handwerk', 'reinigung', 'gartenbau', 'hauswartung', 'coiffeur', 'beauty', 'dienstleistung'].includes(l.segment)],

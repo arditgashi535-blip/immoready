@@ -235,7 +235,7 @@ test('Datenschutz: Ereignisprotokoll maskiert E-Mail/Telefon und ist unveränder
 
 test('Scoring und Kanalwahl (UWG): ohne Einwilligung kein E-Mail-Erstkontakt', () => {
   const s = score('immoready', { segment: 'immobilienverwaltung', canton: 'ZH', portfolio_hint: true, address: 'x', official_source: true, verification: 'verifiziert' });
-  assert.equal(s.score, 85); assert.ok(s.detail.length >= 4);
+  assert.equal(s.score, 90); assert.ok(s.detail.length >= 4);
   assert.equal(score('immoready', { segment: 'x', verification: 'unverifiziert' }).score, 0);
   assert.equal(recommendChannel({ hasPostalAddress: true }).channel, 'brief');
   assert.equal(recommendChannel({ hasContactForm: true }).channel, 'kontaktformular');
