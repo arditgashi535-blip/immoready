@@ -1,0 +1,6 @@
+# Lead-, Kunden- und CRM-Daten nie ins (öffentliche) Repository
+data/*
+!data/.gitkeep
+*.sqlite
+*.sqlite-*
+secrets*.json

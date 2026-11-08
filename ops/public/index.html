@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>ReadyOps Freigaben</title>
+<link rel="stylesheet" href="/app.css">
+</head>
+<body>
+<a class="skip" href="#main">Zum Inhalt</a>
+<header class="top">
+  <div class="brand">ReadyOps <span class="muted">Freigaben &amp; CRM</span></div>
+  <div class="top-r" id="topR" hidden>
+    <label class="sr" for="tenant">Mandant</label>
+    <select id="tenant"></select>
+    <span id="who" class="muted"></span>
+    <button type="button" id="logout" class="btn ghost">Abmelden</button>
+  </div>
+</header>
+<nav class="tabs" id="tabs" hidden aria-label="Bereiche">
+  <button type="button" data-tab="drafts" aria-current="page">Freigaben</button>
+  <button type="button" data-tab="leads">Leads</button>
+  <button type="button" data-tab="dash">Auswertung</button>
+  <button type="button" data-tab="inq">Anfragen</button>
+  <button type="button" data-tab="notif">Meldungen</button>
+  <button type="button" data-tab="log">Protokoll</button>
+</nav>
+<main id="main" tabindex="-1">
+  <section id="login" class="card narrow" hidden>
+    <h1>Anmelden</h1>
+    <form id="loginForm">
+      <label>E-Mail<input type="email" name="email" autocomplete="username" required></label>
+      <label>Passwort<input type="password" name="password" autocomplete="current-password" required minlength="12"></label>
+      <button class="btn" type="submit">Anmelden</button>
+      <p class="err" id="loginErr" role="alert"></p>
+    </form>
+  </section>
+  <section id="view"></section>
+</main>
+<div id="toast" role="status" aria-live="polite"></div>
+<script src="/app.js"></script>
+</body>
+</html>
