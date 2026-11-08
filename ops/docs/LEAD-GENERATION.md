@@ -5,7 +5,8 @@
 - **Sterneintrag** im Telefonbuch («wünscht keine Werbung», UWG Art. 3 Abs. 1 lit. u): Diese Firmen werden bei der Recherche **ausgeschlossen**, nicht nur beim Anruf.
 - Jede Nachricht enthält eine einfache Ablehnungsmöglichkeit. Ein Widerspruch → Sperrliste (`suppression`), danach ist kein Entwurf mehr freigebbar.
 - **Nichts erfinden:** keine Referenzen, keine Kundenbeziehungen, keine Zertifikate, keine «GmbH», kein 24/7, keine Garantien. `drafts.checkClaims()` blockiert solche Formulierungen. Bei Ready Studio: keine Aussage, dass eine Website «unsicher» oder «schlecht» sei. Es gibt nur gemessene Befunde mit Beleg.
-- Personendaten: Ansprechpartner nur, wenn öffentlich und geschäftlich relevant. Im Pilot wurden **keine** Personennamen gespeichert; die Anrede lautet «Sehr geehrte Damen und Herren» bzw. «Guten Tag».
+- Personendaten: Ansprechpartner nur, wenn öffentlich und geschäftlich relevant. Im Pilot wurden **keine Ansprechpartner** erfasst; die Anrede lautet «Sehr geehrte Damen und Herren» bzw. «Guten Tag». Ausnahme: **Einzelunternehmen**, die im Verzeichnis unter dem Namen des Inhabers geführt werden (Pilot: 2 Einträge im Format «Nachname, Vorname»). Das ist der öffentliche Geschäftseintrag; vor einer Freigabe bitte besonders prüfen.
+- Gelöschte/anonymisierte Verzeichniseinträge («Gelöscht») werden verworfen (1 Fall im Pilot erkannt, Entwurf abgelehnt, Lead «verloren»).
 
 ## Quellen und Technik
 | Schritt | Werkzeug | Schonung |

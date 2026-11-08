@@ -57,7 +57,7 @@ function readystudio(lead) {
   const body = [
     'Guten Tag',
     '',
-    `Bei einem Besuch der Website von ${cleanText(c.name, 160)} sind mir ein paar Punkte aufgefallen, die sich mit überschaubarem Aufwand verbessern lassen (Prüfung am ${String((f[0] && f[0].measured_at) || new Date().toISOString()).slice(0, 10)}):`,
+    `Bei einem Besuch Ihrer Website (${c.domain || cleanText(c.name, 160)}) am ${new Date((f[0] && f[0].measured_at) || Date.now()).toLocaleDateString('de-CH')} sind mir ein paar Punkte aufgefallen, die sich mit überschaubarem Aufwand verbessern lassen:`,
     '',
     ...obs,
     '',

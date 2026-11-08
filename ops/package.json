@@ -16,6 +16,7 @@
     "research:immo": "NODE_USE_ENV_PROXY=1 node --no-warnings scripts/research-immoready.js",
     "research:studio": "NODE_USE_ENV_PROXY=1 node --no-warnings scripts/research-readystudio.js",
     "handoff": "node --no-warnings scripts/handoff.js",
-    "digest": "node --no-warnings scripts/digest.js"
+    "digest": "node --no-warnings scripts/digest.js",
+    "export": "node --no-warnings scripts/export.js"
   }
 }

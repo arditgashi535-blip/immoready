@@ -10,7 +10,7 @@ function parseSearchCh(html, sourceUrl) {
     const a = p.slice(0, p.indexOf('</article>') > 0 ? p.indexOf('</article>') : undefined);
     const m = (re) => { const x = a.match(re); return x ? dec(x[1]) : null; };
     const name = m(/<h1><a [^>]*>([\s\S]*?)<\/a><\/h1>/);
-    if (!name) continue;
+    if (!name || /^(gelöscht|geloescht|anonym|unbekannt)$/i.test(name)) continue; // gelöschte/anonymisierte Einträge nie verwenden
     const detail = (a.match(/<h1><a href="([^"]+)"/) || [])[1];
     const web = (a.match(/class="tel-result-action sl-icon-website" href="([^"]+)"/) || [])[1] || null;
     const phone = m(/class="value tel-callable"[^>]*>([^<]+)<\/a>/);

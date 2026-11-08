@@ -26,7 +26,7 @@
 - **Datenschutz (revDSG):**
   - Daten liegen nur lokal in `data/` (gitignoriert, Datei-Rechte 600 für Exporte).
   - Personendaten in `events` werden maskiert; Meldungen enthalten keine Kundenkontaktdaten.
-  - Ansprechpartner nur, wenn sie öffentlich und geschäftlich genannt sind. Im Pilot wurden keine Personennamen erfasst.
+  - Ansprechpartner nur, wenn sie öffentlich und geschäftlich genannt sind. Im Pilot wurden keine Ansprechpartner erfasst; 2 Einzelunternehmen tragen den Namen des Inhabers als Firmennamen (öffentlicher Geschäftseintrag).
   - Sperrliste (E-Mail oder Domain) blockiert Freigabe und Ausführung.
   - Sterneinträge («wünscht keine Werbung») werden schon bei der Recherche ausgeschlossen.
 - **Recherche:**

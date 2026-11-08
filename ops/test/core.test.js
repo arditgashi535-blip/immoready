@@ -219,6 +219,11 @@ test('Datenschutz: Sperrliste blockiert Freigabe und Ausführung; Opt-out der Fi
   const d2 = A.createDraft(sampleDraft(id, { recipient: 'neu@muster-verwaltung.example' }));
   assert.equal(d2.suppressed, true);
   assert.throws(() => A.decide(d2.id, { decision: 'freigegeben', version: 1, content_hash: d2.current.content_hash }), /Sperrliste/);
+  // Opt-out auf Firmenebene (z. B. telefonischer Widerspruch ohne E-Mail-Adresse)
+  const o = R.createLead(sampleLead({ company: { name: 'Optout Verwaltung AG', website: 'optout.example' } }));
+  db.prepare('UPDATE companies SET opt_out=1 WHERE id=?').run(R.getLead(o.id).company_id);
+  const d3 = A.createDraft(sampleDraft(o.id, { recipient: 'info@optout.example' }));
+  assert.throws(() => A.decide(d3.id, { decision: 'freigegeben', version: 1, content_hash: d3.current.content_hash }), /widersprochen/);
 });
 
 test('Datenschutz: Ereignisprotokoll maskiert E-Mail/Telefon und ist unveränderlich', () => {

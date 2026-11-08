@@ -22,7 +22,8 @@ test('Verzeichnis-Parser: Felder und Sterneintrag (keine Werbung)', () => {
   const html = '<article class="tel-resultentry"><div class="tel-categories">Liegenschaftsverwaltung</div><h1><a href="/tel/baden/x/muster-ag">Muster AG</a></h1><div class="tel-occupation">Verwaltung</div><div class="tel-address">Weg 1, <span class="tel-zipcity"><span class="postal-code">5400</span> <span class="locality">Baden</span> <span class="region">AG</span></span></div><a href="tel:+41" class="value tel-callable">056 000 00 00</a> <span title="* Wünscht keine Werbung">*</span><a class="tel-result-action sl-icon-website" href="https://muster.example/">Web</a></article>';
   const [e] = parseSearchCh(html);
   assert.equal(e.name, 'Muster AG'); assert.equal(e.zip, '5400'); assert.equal(e.region, 'AG'); assert.equal(e.street, 'Weg 1');
-  assert.equal(e.no_advertising, true); assert.equal(e.website, 'https://muster.example/'); assert.equal(e.source, 'https://search.ch/tel/baden/x/muster-ag');
+  assert.equal(e.no_advertising, true);
+  assert.equal(parseSearchCh(html.replace('Muster AG', 'Gelöscht')).length, 0, 'gelöschte Einträge werden verworfen'); assert.equal(e.website, 'https://muster.example/'); assert.equal(e.source, 'https://search.ch/tel/baden/x/muster-ag');
 });
 
 test('Statische Analyse: belegte Befunde, keine Befunde bei guter Seite', () => {
