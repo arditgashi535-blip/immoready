@@ -1,8 +1,36 @@
-# Veröffentlichung und GmbH-Status
+# Veröffentlichung und Rechtsform
 
-Stand: 15. Oktober 2026 · Branch `v17.1-release-candidate`
+Stand: 8. November 2026 · Branch `live-einzelunternehmen`
 
-## Status
+## Entscheid vom 08.11.2026
+
+Der Inhaber hat entschieden, die neue Website **als Einzelunternehmen** live zu stellen; die GmbH folgt später.
+
+| Punkt | Stand |
+|---|---|
+| Rechtsform | **Einzelunternehmen «ImmoReady Gashi»**, Ostring 6, 8105 Regensdorf, UID CHE-437.026.042, Inhaber Ardit Gashi (Angaben des Inhabers). GmbH weiterhin geplant, öffentlich nicht genannt. |
+| Handelsregister, MWST | offen – erscheinen nicht im Impressum (beim Einzelunternehmen nicht Pflicht; nichts erfunden) |
+| Rechtstexte | Entwürfe aus der Vorschau vom Inhaber freigegeben (`approvals.legalDraftsApproved`); im Release ohne offene Markierungen: Stand-Datum gesetzt, Wix Bookings und Foto-Upload entfernt (auf der neuen Seite nicht im Einsatz), Aufbewahrung «sobald nicht mehr benötigt». Fachliche Prüfung weiterhin empfohlen. |
+| Bilder | 8 KI-Symbolbilder mit Kennzeichnung «Symbolbild (KI)» vom Inhaber freigegeben (`approvals.aiPhotosApproved`); Porträt fehlt (kein Platzhalter öffentlich) |
+| Formular | Wix Forms «Offertanfragen» auf der neuen Wix-Headless-Seite (`rise.json → wix.forms`), ohne Foto-Upload |
+| Hosting | neue Wix-Headless-Seite «ImmoReady» (Site-ID `f486f5d5-a0d6-45e5-80a7-44befc45746e`). Die bisherige Classic-Seite www.immoready.ch (Bookings, Members) bleibt unverändert; den Domainwechsel macht der Inhaber im Wix-Dashboard. |
+| Startprüfung | `python3 tools/rise.py --launch` → «Bereit» |
+
+## Release bauen
+
+```bash
+python3 tools/rise.py --launch     # muss «Bereit» melden
+python3 build.py --release         # → dist-release/site/ (öffentliche Fassung)
+```
+
+`dist-release/` ist nicht im Repository (`.gitignore`), sie wird aus der Quelle erzeugt. `dist/` bleibt die private Vorschau
+(`noindex`, `robots.txt`, Demo-Formular, Prüfhinweise).
+
+---
+
+## Früherer Stand (15.10.2026, GmbH in Gründung)
+
+### Status
 
 | Punkt | Stand |
 |---|---|

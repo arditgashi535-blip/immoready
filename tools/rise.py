@@ -207,46 +207,67 @@ UNSPEC = lambda v: isinstance(v, str) and v.startswith('[UNSPECIFIED')
 COMPANY_FIELDS = [('registeredName', 'Eingetragener Firmenname'), ('seat', 'Sitz'), ('address', 'Geschäftsadresse'),
                   ('uid', 'UID (CHE-…)'), ('commercialRegister', 'Handelsregister (Kanton, Eintrag)'),
                   ('representation', 'Zeichnungsberechtigte Person(en) und Funktion'), ('vat', 'MWST-Nummer oder «nicht MWST-pflichtig»')]
+# Einzelunternehmen: Pflichtangaben im Impressum (Name mit Familienname, Adresse, Inhaber); UID, Handelsregister und MWST nur falls vorhanden
+SOLE_FIELDS = [('registeredName', 'Firmenname (mit Familienname des Inhabers)'), ('address', 'Geschäftsadresse'), ('representation', 'Inhaber')]
+LIVE_STATUS = ('einzelunternehmen', 'eingetragen')
 
 
 def _company_rules(d):
-    """GmbH in Gründung: Die Seite darf die GmbH nicht als bestehend darstellen; nichts erfinden."""
+    """Rechtsform aus rise.json → firm.company. In Gründung: die GmbH nicht als bestehend darstellen; nichts erfinden.
+    Einzelunternehmen (Livegang vor der GmbH): Name, Adresse und Inhaber Pflicht, «GmbH» öffentlich weiter gesperrt."""
     e, c = [], d['firm']['company']
+    public = json.dumps([d['tour'], d['services'], d['pages']], ensure_ascii=False)
     if c['status'] == 'in_gruendung':
         if c['foundingConfirmed'] or c['goLiveApproved']:
             e.append('GmbH in Gründung: foundingConfirmed und goLiveApproved müssen false bleiben, bis die Eintragung bestätigt ist')
-        public = json.dumps([d['tour'], d['services'], d['pages']], ensure_ascii=False)
         if 'GmbH' in public:
             e.append('GmbH in Gründung: «GmbH» darf in öffentlichen Texten (Rundgang, Leistungen, Seiten) noch nicht vorkommen')
+    elif c['status'] == 'einzelunternehmen':
+        if c['foundingConfirmed']:
+            e.append('Einzelunternehmen: foundingConfirmed betrifft die GmbH und muss false bleiben')
+        miss = [n for k, n in SOLE_FIELDS if UNSPEC(c[k])]
+        if miss:
+            e.append('Einzelunternehmen, aber offen: ' + ', '.join(miss))
+        if 'GmbH' in public or 'GmbH' in c['registeredName']:
+            e.append('Einzelunternehmen: «GmbH» darf weder im Namen noch in öffentlichen Texten vorkommen')
+        if d['firm']['contactPerson'].split()[-1] not in c['registeredName']:
+            e.append('Einzelunternehmen: Der Firmenname muss den Familiennamen des Inhabers enthalten (Art. 945 OR)')
     else:
         if not c['foundingConfirmed']:
             e.append('Status «eingetragen» nur mit foundingConfirmed = true (Gründung vom Inhaber bestätigt)')
         miss = [n for k, n in COMPANY_FIELDS if UNSPEC(c[k])]
         if miss:
             e.append('Status «eingetragen», aber offen: ' + ', '.join(miss))
-    if c['goLiveApproved'] and c['status'] != 'eingetragen':
-        e.append('Livegang-Freigabe ohne eingetragene GmbH ist nicht zulässig')
-    if not UNSPEC(c['registeredName']) and 'GmbH' not in c['registeredName']:
-        e.append('Firmenname einer GmbH muss die Rechtsform enthalten (z. B. «… GmbH»)')
+        if not UNSPEC(c['registeredName']) and 'GmbH' not in c['registeredName']:
+            e.append('Firmenname einer GmbH muss die Rechtsform enthalten (z. B. «… GmbH»)')
+    if c['goLiveApproved'] and c['status'] == 'in_gruendung':
+        e.append('Livegang-Freigabe ist erst als Einzelunternehmen oder als eingetragene GmbH zulässig')
     return e
 
 
 def launch_check(d):
-    """Offene Punkte vor der Veröffentlichung (python3 tools/rise.py --launch). Leere Liste = bereit."""
+    """Offene Punkte vor der Veröffentlichung (python3 tools/rise.py --launch). Leere Liste = bereit.
+    Live gehen darf die Seite als Einzelunternehmen oder als eingetragene GmbH."""
     c, o = d['firm']['company'], []
-    if c['status'] != 'eingetragen' or not c['foundingConfirmed']:
-        o.append('Gründung der GmbH nicht bestätigt (firm.company.status / foundingConfirmed)')
-    o += ['Unternehmensangabe fehlt: ' + n for k, n in COMPANY_FIELDS if UNSPEC(c[k])]
+    ap = c.get('approvals', {})
+    if c['status'] == 'einzelunternehmen':
+        o += ['Unternehmensangabe fehlt: ' + n for k, n in SOLE_FIELDS if UNSPEC(c[k])]
+    else:
+        if c['status'] != 'eingetragen' or not c['foundingConfirmed']:
+            o.append('Gründung der GmbH nicht bestätigt (firm.company.status / foundingConfirmed) – oder Livegang als Einzelunternehmen (status «einzelunternehmen»)')
+        o += ['Unternehmensangabe fehlt: ' + n for k, n in COMPANY_FIELDS if UNSPEC(c[k])]
+        if c['status'] != 'eingetragen' or d['firm']['role'] == 'Inhaber':
+            o.append('Funktion von %s in der GmbH bestätigen und als Bezeichnung auf der Website setzen (firm.role, heute «%s»)' % (d['firm']['contactPerson'], d['firm']['role']))
     for k, n in (('imprint', 'Impressum: endgültiger Text'), ('privacy', 'Datenschutzerklärung: endgültiger Text'), ('hosting', 'Hosting/Auftragsbearbeiter')):
         if UNSPEC(d['legal'].get(k, '[UNSPECIFIED]')):
             o.append(n + ' (legal.%s)' % k)
-    if UNSPEC(d['wix'].get('formEndpoint', '[UNSPECIFIED]')):
-        o.append('Formular nicht angeschlossen (wix.formEndpoint) – Demo-Modus')
-    if c['status'] != 'eingetragen' or d['firm']['role'] == 'Inhaber':
-        o.append('Funktion von %s in der GmbH bestätigen und als Bezeichnung auf der Website setzen (firm.role, heute «%s»)' % (d['firm']['contactPerson'], d['firm']['role']))
+    if UNSPEC(d['wix'].get('formEndpoint', '[UNSPECIFIED]')) and not d['wix'].get('forms'):
+        o.append('Formular nicht angeschlossen (wix.forms bzw. wix.formEndpoint) – Demo-Modus')
     for sl in d['assets'].get('photos', {}).get('slots', []):
-        if sl['status'] in ('ki-symbolbild', 'fehlt'):
-            o.append('Foto «%s»: %s (assets.photos)' % (sl['id'], 'KI-Übergangsbild durch eigenes oder lizenziertes Foto ersetzen' if sl['status'] == 'ki-symbolbild' else 'eigenes Foto fehlt'))
+        if sl['status'] == 'ki-symbolbild' and not ap.get('aiPhotosApproved'):
+            o.append('Foto «%s»: KI-Übergangsbild durch eigenes oder lizenziertes Foto ersetzen (assets.photos) – oder Verwendung als gekennzeichnetes Symbolbild freigeben (approvals.aiPhotosApproved)' % sl['id'])
+        elif sl['status'] == 'fehlt' and not ap.get('aiPhotosApproved'):
+            o.append('Foto «%s»: eigenes Foto fehlt (assets.photos)' % sl['id'])
     if not c['goLiveApproved']:
         o.append('Livegang nicht ausdrücklich freigegeben (firm.company.goLiveApproved)')
     return o
@@ -362,6 +383,15 @@ def firm_markup(d):
                                                                  val('uid', 'UID'), val('representation', 'Vertretung'), val('vat', 'MWST'))
         resp = '%s, %s, Schweiz' % (name, addr().replace('<br>', ', '))
         foot = name
+    elif c['status'] == 'einzelunternehmen':
+        name = _e(c['registeredName'])
+        opt = ''.join('<br>%s: %s' % (n, _e(c[key])) for key, n in (('uid', 'UID'), ('commercialRegister', 'Handelsregister'), ('vat', 'MWST'))
+                      if not UNSPEC(c[key]))
+        imprint = ('<h2>Verantwortlich für den Inhalt</h2><p>%s<br>%s: %s<br>%s<br>Schweiz</p>%s<h2>Unternehmensangaben</h2>'
+                   '<p>Rechtsform: Einzelunternehmen<br>Inhaber: %s%s</p>') % (
+            name, _e(f['role']), _e(f['contactPerson']), addr(), reach, _e(f['contactPerson']), opt)
+        resp = '%s, %s, %s, Schweiz' % (name, _e(f['contactPerson']), addr().replace('<br>', ', '))
+        foot = '%s · %s' % (_e(f['brand']), _e(f['contactPerson']))
     else:
         rows = ''.join('<div><dt>%s</dt><dd>%s</dd></div>' % (_e(n), _miss('offen') if UNSPEC(c[key]) else _e(c[key])) for key, n in COMPANY_FIELDS)
         imprint = ('<h2>Verantwortlich für den Inhalt</h2><p>%s<br>%s: %s<br>%s<br>Schweiz</p>%s'
@@ -402,6 +432,7 @@ def tour_config(d):
         'services': [s['key'] for s in d['services']],
         'allowedOrigins': d['wix']['allowedOrigins'],
         'formEndpoint': None if d['wix'].get('formEndpoint', '[UNSPECIFIED]') == '[UNSPECIFIED]' else d['wix']['formEndpoint'],
+        'forms': {k: d['wix']['forms'][k] for k in ('clientId', 'formId')} if d['wix'].get('forms') else None,
     }
 
 

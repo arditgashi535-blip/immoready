@@ -37,29 +37,49 @@ check('Scan-Kante länger als 1400 ms → Fehler', lambda d: d['tour']['introSca
 check('Tür ohne Winkel und ohne Schiebeweg → Fehler', lambda d: d['tour']['doors'][2].pop('slideM'), True)
 check('Ereignis request-contact fehlt → Fehler', lambda d: d['events'].pop('request-contact'), True)
 
-# GmbH in Gründung: nichts als bestehend darstellen, nichts erfinden, Veröffentlichung gesperrt
+# Rechtsform: Einzelunternehmen (Livegang), GmbH in Gründung (Sperre), GmbH eingetragen – nichts erfinden
 co = lambda d: d['firm']['company']
-check('GmbH in Gründung mit Livegang-Freigabe → Fehler', lambda d: co(d).__setitem__('goLiveApproved', True), True)
+U = '[UNSPECIFIED]'
+
+
+def gruendung(d):
+    co(d).update(status='in_gruendung', goLiveApproved=False, registeredName=U, seat=U, address=U, uid=U, representation=U)
+
+
+check('Einzelunternehmen mit Freigabe ist gültig', None, False)
+check('Einzelunternehmen ohne Adresse → Fehler', lambda d: co(d).__setitem__('address', U), True)
+check('Einzelunternehmen: Name ohne Familienname des Inhabers → Fehler', lambda d: co(d).__setitem__('registeredName', 'ImmoReady'), True)
+check('Einzelunternehmen mit «GmbH» im Namen → Fehler', lambda d: co(d).__setitem__('registeredName', 'ImmoReady Gashi GmbH'), True)
+check('«GmbH» in öffentlichem Rundgangtext als Einzelunternehmen → Fehler', lambda d: d['tour']['stations'][0].__setitem__('text', 'ImmoReady GmbH betreut Ihre Liegenschaft.'), True)
+check('GmbH in Gründung ohne Freigabe ist gültig', gruendung, False)
+check('GmbH in Gründung mit Livegang-Freigabe → Fehler', lambda d: (gruendung(d), co(d).__setitem__('goLiveApproved', True)), True)
 check('«eingetragen» ohne bestätigte Gründung → Fehler', lambda d: co(d).__setitem__('status', 'eingetragen'), True)
 check('«eingetragen» mit offenen Registerangaben → Fehler', lambda d: (co(d).__setitem__('status', 'eingetragen'), co(d).__setitem__('foundingConfirmed', True)), True)
-check('Firmenname ohne «GmbH» → Fehler', lambda d: co(d).__setitem__('registeredName', 'ImmoReady'), True)
+check('GmbH: Firmenname ohne «GmbH» → Fehler', lambda d: co(d).update(status='eingetragen', foundingConfirmed=True, commercialRegister='X', vat='X', registeredName='ImmoReady Gashi'), True)
 check('UID im falschen Format → Fehler', lambda d: co(d).__setitem__('uid', 'CHE-12345'), True)
-check('«GmbH» in öffentlichem Rundgangtext während der Gründung → Fehler', lambda d: d['tour']['stations'][0].__setitem__('text', 'ImmoReady GmbH betreut Ihre Liegenschaft.'), True)
-lc = launch_check(base)
-results.append(('PASS ' if lc and any('Gründung' in x for x in lc) and any('Livegang' in x for x in lc) else 'FAIL ') + 'Startsperre: --launch meldet %d offene Punkte (Gründung, Registerangaben, Freigabe)' % len(lc))
+g = json.loads(json.dumps(base)); gruendung(g)
+lc = launch_check(g)
+results.append(('PASS ' if lc and any('Gründung' in x for x in lc) and any('Livegang' in x for x in lc) else 'FAIL ') + 'Startsperre in Gründung: --launch meldet %d offene Punkte (Gründung, Registerangaben, Freigabe)' % len(lc))
+lb = launch_check(base)
+results.append(('PASS ' if not any('Gründung' in x or 'Livegang' in x or 'Foto' in x for x in lb) else 'FAIL ') + 'Einzelunternehmen mit Freigabe: keine Sperre wegen Gründung, Freigabe oder freigegebener Symbolbilder (%s)' % '; '.join(lb))
 fx = json.loads(json.dumps(base))  # reine Testdaten, erscheinen nirgends auf der Seite
 fx['firm']['company'].update(status='eingetragen', foundingConfirmed=True, goLiveApproved=True, registeredName='Testfirma Muster GmbH', seat='Testort',
                              address='Teststrasse 1, 9999 Testort', uid='CHE-000.000.000', commercialRegister='Testregister', representation='Test Person, Geschäftsführung', vat='Test-MWST')
 fx['firm']['role'] = 'Testfunktion'
 fm = firm_markup(fx)
-results.append(('PASS ' if not validate(fx) and 'Testfirma Muster GmbH' in fm['imprint'] and 'CHE-000.000.000' in fm['imprint'] and 'missing' not in fm['imprint'] and 'review-only' not in fm['imprint'] and fm['footer'] == 'Testfirma Muster GmbH' else 'FAIL ') + 'nach Eintragung: Impressum, Datenschutz und Footer vollständig aus firm.company (Testdaten)')
+results.append(('PASS ' if not validate(fx) and 'Testfirma Muster GmbH' in fm['imprint'] and 'CHE-000.000.000' in fm['imprint'] and 'missing' not in fm['imprint'] and 'review-only' not in fm['imprint'] and fm['footer'] == 'Testfirma Muster GmbH' else 'FAIL ') + 'nach Eintragung: Impressum, Datenschutz und Footer vollständig aus firm.company')
+fg = firm_markup(g)
+results.append(('PASS ' if 'GmbH' not in fg['imprint'].split('review-only')[0] and 'GmbH' not in fg['privacy'] and 'GmbH' not in fg['footer'] and 'data-company="in_gruendung"' in fg['imprint'] else 'FAIL ') + 'in Gründung: öffentlicher Teil ohne «GmbH», Entwurf nur als interner Prüfhinweis')
 fb = firm_markup(base)
-results.append(('PASS ' if 'GmbH' not in fb['imprint'].split('review-only')[0] and 'GmbH' not in fb['privacy'] and 'GmbH' not in fb['footer'] and 'data-company="in_gruendung"' in fb['imprint'] else 'FAIL ') + 'in Gründung: öffentlicher Teil ohne «GmbH», Entwurf nur als interner Prüfhinweis')
+results.append(('PASS ' if 'GmbH' not in fb['imprint'] + fb['privacy'] + fb['footer'] and 'Rechtsform: Einzelunternehmen' in fb['imprint'] and 'CHE-437.026.042' in fb['imprint']
+                and 'missing' not in fb['imprint'] and 'Handelsregister' not in fb['imprint'] and 'MWST' not in fb['imprint'] else 'FAIL ') + 'Einzelunternehmen: Impressum vollständig, ohne «GmbH» und ohne erfundene Register-/MWST-Angaben')
 
 # Gebaute Seite enthält genau die Konfiguration aus rise.json
 page = open(os.path.join(ROOT, 'dist/immoready-vorschau.html'), encoding='utf-8').read()
 m = re.search(r'window\.IR_RISE=(\{.*?\});</script>', page)
-same = m is not None and json.loads(m.group(1)) == json.loads(json.dumps(tour_config(base)))
+exp = json.loads(json.dumps(tour_config(base)))
+exp['forms'] = None  # Vorschau: Formular im Demo-Modus, nur die Release-Fassung sendet an Wix Forms
+same = m is not None and json.loads(m.group(1)) == exp
 results.append(('PASS ' if same else 'FAIL ') + 'gebaute Seite verwendet exakt die Tour-Konfiguration aus rise.json')
 comp = open(os.path.join(ROOT, 'dist/component/immoready-tour.js'), encoding='utf-8').read()
 results.append(('PASS ' if ('"hold":%s' % json.dumps(base['tour']['stations'][4]['hold'])) in comp and 'Gartenunterhalt anfragen' in comp else 'FAIL ') + 'Komponente enthält Stationen und Texte aus rise.json')

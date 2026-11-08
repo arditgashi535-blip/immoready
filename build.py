@@ -15,21 +15,23 @@ import base64, json, os, re, shutil, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 os.chdir(HERE)
 sys.path.insert(0, HERE)
-from tools.rise import load, tour_config, tour_markup, firm_markup, launch_check, careers_markup, photo_credits, videos_markup, video_slots  # noqa: E402
+from tools.rise import load, tour_config, tour_markup, firm_markup, launch_check, careers_markup, photo_credits, videos_markup, video_slots, LIVE_STATUS  # noqa: E402
 
 # IR_RISE / IR_DIST nur für Prüfungen (andere Quelldatei, anderer Ausgabeordner); normal: rise.json → dist/
 RISE = load(os.environ.get('IR_RISE'))  # bricht bei Schemafehlern ab
-DIST = os.environ.get('IR_DIST', 'dist').rstrip('/') + '/'
-# Veröffentlichungsstand nur nach bestätigter GmbH-Eintragung und ausdrücklicher Freigabe (docs/VEROEFFENTLICHUNG.md).
+RELEASE = '--release' in sys.argv
+# Release-Build in einen eigenen Ordner (dist-release/), damit dist/ die private Vorschau für die Prüfungen bleibt
+DIST = os.environ.get('IR_DIST', 'dist-release' if RELEASE else 'dist').rstrip('/') + '/'
+# Veröffentlichungsstand nur mit ausdrücklicher Freigabe als Einzelunternehmen oder eingetragene GmbH (docs/VEROEFFENTLICHUNG.md).
 # Ohne --release entsteht immer die private Vorschau (noindex, Prüfhinweise, Demo-Hinweis).
-if '--release' in sys.argv:
+if RELEASE:
     _open = launch_check(RISE)
     if _open:
         print('Release-Build nicht freigegeben – %d offene Punkte:' % len(_open))
         for _o in _open:
             print('  -', _o)
         sys.exit(1)
-    print('Hinweis: Freigabe vorhanden. Vor dem Hochladen Vorschau-Werkzeuge (Demo-Hinweis, Prüfhinweise, Umsetzungsmappe) entfernen – siehe docs/VEROEFFENTLICHUNG.md.')
+    print('Release-Build: Vorschau-Werkzeuge (Demo-Hinweis, Prüfhinweise, Umsetzungsmappe) werden entfernt → %s' % os.environ.get('IR_DIST', 'dist-release'))
 CFG = tour_config(RISE)
 STATIONS = RISE['tour']['stations']
 
@@ -87,6 +89,9 @@ ASSET_JS = '<script>window.IR_TEX=%s;window.IR_BAKE=%s;</script>' % (json.dumps(
 
 # Tour-Kern mit Geometrie zusammensetzen
 CORE = read('src/tour/tour-core.js').replace('/*{{GEOMETRY}}*/', read('src/tour/geometry.part.js'))
+# Das Formular sendet nur in der freigegebenen Release-Fassung an Wix Forms; die Vorschau bleibt im Demo-Modus
+if not (RELEASE and RISE['firm']['company']['goLiveApproved']):
+    CFG['forms'] = None
 CFG_JS = json.dumps(CFG, ensure_ascii=False, separators=(',', ':'))
 
 # ---------------- Seite ----------------
@@ -99,7 +104,7 @@ html = html.replace('/*{{TOUR_CORE}}*/', CORE)
 # Unternehmensangaben (GmbH in Gründung bzw. eingetragen) überall aus rise.json → firm.company
 FIRM = firm_markup(RISE)
 CO = RISE['firm']['company']
-LIVE_OK = CO['goLiveApproved'] and CO['status'] == 'eingetragen'
+LIVE_OK = RELEASE and CO['goLiveApproved'] and CO['status'] in LIVE_STATUS
 # Bis zur Freigabe: Suchmaschinen ausschliessen (ersetzt keinen Zugriffsschutz – siehe docs/VEROEFFENTLICHUNG.md)
 ROBOTS = '' if LIVE_OK else '<meta name="robots" content="noindex,nofollow,noarchive">'
 
@@ -110,6 +115,38 @@ def firm(h):
     h = h.replace('<!--{{FIRM_FOOTER}}-->', FIRM['footer']).replace('{{FIRM_ROLE}}', RISE['firm']['role'])
     h = h.replace('<!--{{CAREERS}}-->', careers_markup(RISE)).replace('<!--{{PHOTO_CREDITS}}-->', photo_credits(RISE))
     h = h.replace('<!--{{TOUR_VIDEOS}}-->', videos_markup(RISE))
+    return release_strip(h) if LIVE_OK else h
+
+
+# ---------------- Release: Vorschau-Werkzeuge entfernen ----------------
+# Öffentliche Fassung: kein Demo-Banner, keine Prüfhinweise (auch nicht im Quelltext), keine Umsetzungsmappe,
+# Datenschutz ohne offene Markierungen (Entwurf vom Inhaber freigegeben, rise.json → firm.company.approvals).
+_D = CO.get('goLiveApprovedOn', '')
+RELEASE_TEXT = [
+    ('<span class="missing">Datum bei Veröffentlichung</span>', '%s.%s.%s' % (_D[8:10], _D[5:7], _D[:4])),
+    (' sowie hochgeladene Fotos (höchstens fünf Bilder, je bis 10 MB)', ''),
+    ('      <li><b>Terminbuchungen:</b> Angaben, die Sie bei der Buchung eines Beratungstermins über Wix Bookings machen.</li>\n', ''),
+    ('Hosting der Website, Speicherung der Offertanfragen und Fotos, Terminbuchung.', 'Hosting der Website und Speicherung der Offertanfragen (Wix Forms).'),
+    (' <span class="missing">Garantien gemäss Wix-Vertrag ergänzen</span>', ''),
+    (' <span class="missing">Alternative: Schrift selbst hosten – vor der Veröffentlichung entscheiden</span>', ''),
+    ('      <li><span class="missing">Weitere Dienste (z. B. eine Automatisierung) nur aufführen, falls sie tatsächlich eingesetzt werden</span></li>\n', ''),
+    ('<span class="missing">Frist festlegen, z. B. nach 12 Monaten</span>', 'sobald sie für die Bearbeitung nicht mehr benötigt werden'),
+    (' <span class="missing">Mit der Cookie-Konfiguration der Wix-Website abgleichen</span>', ''),
+    ("'datenschutz','umsetzung'];", "'datenschutz'];"),
+]
+
+
+def release_strip(h):
+    for a, b in RELEASE_TEXT:
+        if a in h:
+            h = h.replace(a, b)
+    demo = re.search(r'<div class="demo" role="region".*?</div>\s*</div>', h, re.S)
+    if demo:
+        h = h[:demo.start()] + '<input type="checkbox" id="reviewToggle" hidden aria-hidden="true">' + h[demo.end():]
+    h = h.replace('<div data-page="umsetzung" hidden id="umsetzungPage"></div>', '<div hidden id="umsetzungPage"></div>')
+    h = re.sub(r'<p class="review-only[^"]*"[^>]*>.*?</p>', '', h, flags=re.S)
+    h = re.sub(r'<figcaption class="review-only">.*?</figcaption>', '', h, flags=re.S)
+    h = re.sub(r'<section class="sec review-only[^"]*".*?</section>', '', h, flags=re.S)
     return h
 
 

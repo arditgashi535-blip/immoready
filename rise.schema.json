@@ -146,7 +146,7 @@
           "required": ["status", "plannedLegalForm", "registeredName", "seat", "address", "uid", "commercialRegister", "representation", "vat", "foundingConfirmed", "goLiveApproved"],
           "additionalProperties": false,
           "properties": {
-            "status": { "enum": ["in_gruendung", "eingetragen"] },
+            "status": { "enum": ["in_gruendung", "einzelunternehmen", "eingetragen"] },
             "statusNote": { "type": "string" },
             "plannedLegalForm": { "const": "GmbH" },
             "registeredName": { "type": "string", "minLength": 2 },
@@ -157,7 +157,16 @@
             "representation": { "type": "string", "minLength": 2 },
             "vat": { "type": "string", "minLength": 2 },
             "foundingConfirmed": { "type": "boolean" },
-            "goLiveApproved": { "type": "boolean" }
+            "goLiveApproved": { "type": "boolean" },
+            "goLiveApprovedOn": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+            "approvals": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "legalDraftsApproved": { "type": "boolean" },
+                "aiPhotosApproved": { "type": "boolean" }
+              }
+            }
           }
         }
       }
@@ -683,6 +692,16 @@
         "formEndpoint": {
           "type": "string",
           "pattern": "^(\\[UNSPECIFIED\\]|https://[a-z0-9.-]+(/[A-Za-z0-9_./-]*)?)$"
+        },
+        "forms": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["clientId", "formId"],
+          "properties": {
+            "clientId": { "type": "string", "pattern": "^[0-9a-f-]{36}$" },
+            "formId": { "type": "string", "pattern": "^[0-9a-f-]{36}$" },
+            "siteUrl": { "type": "string", "pattern": "^https://[a-z0-9.-]+$" }
+          }
         }
       }
     },

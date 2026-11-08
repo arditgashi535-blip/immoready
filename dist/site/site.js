@@ -616,7 +616,7 @@ function txt(id,type,attrs){return '<input type="'+(type||'text')+'" id="'+id+'"
 var OPT=' <small>(optional)</small>';
 function buildForm(){
   var h='<form id="qf" class="form" novalidate aria-labelledby="qfTitle"><h2 class="sr" id="qfTitle">Offertanfrage</h2>';
-  if(!FORM_EP())h+='<div class="demo-flag" role="note" style="margin-bottom:18px"><b>Vorschau – Formular nicht verbunden</b><span>Eingaben werden geprüft, aber nicht gesendet und nicht gespeichert.</span></div>';
+  if(!FORM_EP()&&!WIXF())h+='<div class="demo-flag" role="note" style="margin-bottom:18px"><b>Vorschau – Formular nicht verbunden</b><span>Eingaben werden geprüft, aber nicht gesendet und nicht gespeichert.</span></div>';
   h+='<div class="failbox" id="failbox" role="alert" hidden><b>Ihre Anfrage konnte nicht gesendet werden.</b><br><span id="failWhy"></span>Ihre Eingaben sind erhalten. Bitte versuchen Sie es erneut oder rufen Sie uns an: 076 340 44 01.</div>';
   h+='<div class="errsum" id="errsum" tabindex="-1" hidden><b>Bitte prüfen Sie folgende Angaben:</b><ul></ul></div>';
   h+='<div class="fgroup"><h3><span>01</span>Ihr Anliegen</h3>';
@@ -625,14 +625,15 @@ function buildForm(){
   h+='<div class="fgroup"><h3><span>02</span>Ihr Objekt</h3><div class="fields">';
   h+=fld('ort','Ort oder Postleitzahl',txt('ort','text','autocomplete="address-level2" placeholder="z. B. Baden oder 5400"'),'');
   h+=fld('beschreibung','Beschreibung','<textarea id="beschreibung" name="beschreibung" aria-describedby="beschreibung_h beschreibung_e"></textarea>','','Worum geht es? Bei Sanitär: Was ist defekt und wo? Verwaltungen können mehrere Objekte auflisten.');
-  h+='<div class="f"><span class="lbl" id="fotoLbl">Fotos'+OPT+'</span><div class="upload" id="drop"><span class="muted" style="font-size:.92rem">Bis zu 5 Bilder (JPG, PNG, HEIC), je max. 10 MB.</span><label class="btn ghost sm" for="fotos" style="cursor:pointer">Fotos auswählen</label><input type="file" id="fotos" name="fotos" accept="image/*" multiple class="sr" aria-labelledby="fotoLbl"><ul class="files" id="fileList"></ul></div><span class="err" id="fotos_e" aria-live="polite"></span></div>';
+  if(WIXF())h+='<div class="f"><span class="lbl">Fotos'+OPT+'</span><p class="hint" style="margin:0">Fotos können Sie nach unserer Antwort per E-Mail an info.immoready@gmail.com senden.</p></div>';
+  else h+='<div class="f"><span class="lbl" id="fotoLbl">Fotos'+OPT+'</span><div class="upload" id="drop"><span class="muted" style="font-size:.92rem">Bis zu 5 Bilder (JPG, PNG, HEIC), je max. 10 MB.</span><label class="btn ghost sm" for="fotos" style="cursor:pointer">Fotos auswählen</label><input type="file" id="fotos" name="fotos" accept="image/*" multiple class="sr" aria-labelledby="fotoLbl"><ul class="files" id="fileList"></ul></div><span class="err" id="fotos_e" aria-live="polite"></span></div>';
   h+='</div></div>';
   h+='<div class="fgroup" style="border-bottom:0;margin-bottom:0"><h3><span>03</span>Ihre Kontaktdaten</h3><div class="fields">';
   h+=fld('name','Name',txt('name','text','autocomplete="name"'),'');
     h+=fld('email','E-Mail',txt('email','email','autocomplete="email" placeholder="name@beispiel.ch"'),'s3');
   h+=fld('tel','Telefon <small id="telReq">(optional)</small>',txt('tel','tel','autocomplete="tel" placeholder="079 123 45 67"'),'s3');
     h+='<div class="f" aria-hidden="true" style="position:absolute;left:-9999px"><label for="website">Website</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>';
-  h+='<p class="privacy">Wir verwenden Ihre Angaben und Fotos nur, um Ihre Anfrage zu bearbeiten und mit Ihnen Kontakt aufzunehmen. Keine Weitergabe zu Werbezwecken, keine Newsletter-Anmeldung. Mehr dazu in der <a href="#datenschutz">Datenschutzerklärung</a>.</p>';
+  h+='<p class="privacy">Wir verwenden Ihre Angaben'+(WIXF()?'':' und Fotos')+' nur, um Ihre Anfrage zu bearbeiten und mit Ihnen Kontakt aufzunehmen. Keine Weitergabe zu Werbezwecken, keine Newsletter-Anmeldung. Mehr dazu in der <a href="#datenschutz">Datenschutzerklärung</a>.</p>';
   h+='</div></div>';
   h+='<div class="fnav"><span class="review-only" style="font-size:.85rem"><label style="display:inline-flex;gap:8px;align-items:center;cursor:pointer"><input type="checkbox" id="simFail"> Demo: Übermittlungsfehler testen</label></span><button type="submit" class="btn inkb" id="next" data-primary>Unverbindliche Offerte anfragen <span class="spin" aria-hidden="true"></span><i class="a" aria-hidden="true"></i></button><span class="sr" id="busyMsg" aria-live="polite"></span></div>';
   h+='</form><div id="result" class="result" hidden tabindex="-1"></div>';
@@ -642,6 +643,19 @@ var files=[];
 /* V17.1: Übermittlung an die Velo-HTTP-Funktionen (wix/backend/http-functions.js). Endpunkt aus rise.json → wix.formEndpoint;
    ohne Endpunkt bleibt der Demo-Modus. Erfolg erst nach bestätigter Annahme (HTTP 200 mit ok und Referenz). */
 function FORM_EP(){var c=window.IR_RISE||{};return typeof c.formEndpoint==='string'&&/^https:\/\//.test(c.formEndpoint)?c.formEndpoint.replace(/\/$/,''):'';}
+/* Livegang: Offertanfragen über Wix Forms (Headless, anonymer Besucher-Token; Formular und öffentliche OAuth-Client-ID aus
+   rise.json → wix.forms). Erfolg erst, wenn Wix die Speicherung mit einer Referenz bestätigt. Keine Fotos (Plan ohne Datei-Upload). */
+function WIXF(){var c=(window.IR_RISE||{}).forms;return c&&/^[0-9a-f-]{36}$/.test(c.clientId||'')&&/^[0-9a-f-]{36}$/.test(c.formId||'')?c:null;}
+var WIXT=null;
+function wixToken(c){if(WIXT&&WIXT.exp>Date.now())return Promise.resolve(WIXT.t);
+  return fetchT('https://www.wixapis.com/oauth2/token',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:c.clientId,grantType:'anonymous'})},15000)
+    .then(function(r){if(!r.ok)throw xerr('server');return r.json();}).then(function(j){if(!j||!j.access_token)throw xerr('server');WIXT={t:j.access_token,exp:Date.now()+((j.expires_in||3600)-60)*1000};return WIXT.t;});}
+function sendWixForm(c){var b=payload(),sub={leistung:b.leistung,ort:b.ort,beschreibung:b.beschreibung,name:b.name,email:b.email};
+  if(b.auftrag)sub.auftrag=b.auftrag;if(b.tel)sub.tel=b.tel;
+  return wixToken(c).then(function(t){return fetchT('https://www.wixapis.com/form-submission-service/v4/submissions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:t},body:JSON.stringify({submission:{formId:c.formId,submissions:sub}})},20000);})
+    .then(function(r){return r.json().catch(function(){return {};}).then(function(j){var s=j&&j.submission;
+      if(r.status===400){var f={};((j&&j.details&&j.details.validationError&&j.details.validationError.fieldViolations)||[]).forEach(function(v){var k=String(v.field||'').split('.').pop();if(k)f[k]='Bitte prüfen Sie diese Angabe.';});if(Object.keys(f).length)throw Object.assign(xerr('invalid'),{fields:f});throw xerr('server');}
+      if(!r.ok||!s||!s.id)throw xerr('server');return {ok:true,id:s.id};});});}
 function xerr(code,msg){var e=new Error(msg||code);e.code=code;return e;}
 function fetchT(url,opt,ms){return new Promise(function(res,rej){var done=false,t=setTimeout(function(){if(!done){done=true;rej(xerr('timeout'));}},ms);
   fetch(url,opt).then(function(r){if(!done){done=true;clearTimeout(t);res(r);}},function(){if(!done){done=true;clearTimeout(t);rej(xerr('network'));}});});}
@@ -680,7 +694,7 @@ function validate(){var errs=[];function add(x){if(x)errs.push(x);}
   errs.forEach(function(x){var el=$(x.id)||$('fs_'+x.id);var box=el&&(el.closest('.f')||el);if(box){box.classList.remove('shake');void box.offsetWidth;box.classList.add('shake');}});
   if(errs.length){es.querySelector('ul').innerHTML=errs.map(function(x){return '<li><a href="#" data-f="'+x.id+'">'+esc(x.msg)+'</a></li>';}).join('');es.hidden=false;/* V17.1: Fokus auf das erste fehlerhafte Feld (Übersicht bleibt sichtbar und verlinkt alle Fehler) */var f0=errs[0],el0=$(f0.id)||document.querySelector('#qf input[name="'+f0.id+'"]');if(el0){el0.focus({preventScroll:true});var bx=el0.closest('.f')||el0.closest('fieldset')||el0;bx.scrollIntoView({block:'center'});}else es.focus();}else es.hidden=true;
   return errs.length===0;}
-function renderFiles(){$('fileList').innerHTML=files.map(function(f,i){return '<li><span>'+esc(f.name)+' · '+(f.size/1048576).toFixed(1)+' MB</span><button type="button" data-rm="'+i+'">Entfernen</button></li>';}).join('');}
+function renderFiles(){if(!$('fileList'))return;$('fileList').innerHTML=files.map(function(f,i){return '<li><span>'+esc(f.name)+' · '+(f.size/1048576).toFixed(1)+' MB</span><button type="button" data-rm="'+i+'">Entfernen</button></li>';}).join('');}
 function addFiles(list){var msgs=[];Array.prototype.forEach.call(list,function(f){
   if(!/^image\//.test(f.type)&&!/\.heic$/i.test(f.name)){msgs.push(f.name+' ist kein Bild.');return;}
   if(f.size>10*1048576){msgs.push(f.name+' ist grösser als 10 MB.');return;}
@@ -695,18 +709,20 @@ function wireForm(){var f=$('qf');
   f.addEventListener('change',function(e){if(e.target.name&&$(e.target.name+'_e'))setErr(e.target.name,'');});
   f.addEventListener('input',function(e){var id=e.target.id;if($(id+'_e')&&$(id+'_e').textContent)setErr(id,'');});
   $('errsum').addEventListener('click',function(e){var a=e.target.closest('a');if(!a)return;e.preventDefault();var id=a.dataset.f;var el=$(id)||f.querySelector('input[name="'+id+'"]');if(el)el.focus();});
+  if($('fotos')){
   $('fotos').addEventListener('change',function(e){addFiles(e.target.files);e.target.value='';});
   $('fileList').addEventListener('click',function(e){var b=e.target.closest('[data-rm]');if(!b)return;files.splice(+b.dataset.rm,1);renderFiles();});
   var drop=$('drop');['dragenter','dragover'].forEach(function(t){drop.addEventListener(t,function(e){e.preventDefault();drop.classList.add('drag');});});
   ['dragleave','drop'].forEach(function(t){drop.addEventListener(t,function(e){e.preventDefault();drop.classList.remove('drag');});});
   drop.addEventListener('drop',function(e){if(e.dataTransfer&&e.dataTransfer.files)addFiles(e.dataTransfer.files);});
+  }
   var busy=false;
   function setBusy(on){busy=on;var b=$('next');if(on){b.setAttribute('aria-busy','true');b.setAttribute('aria-disabled','true');$('busyMsg').textContent='Anfrage wird übermittelt …';}else{b.removeAttribute('aria-busy');b.removeAttribute('aria-disabled');$('busyMsg').textContent='';}}
   f.addEventListener('submit',function(e){e.preventDefault();if(busy)return;$('failbox').hidden=true;
     if(!validate())return;
     if($('website').value)return;
-    var ep=FORM_EP();
-    if(ep){setBusy(true);sendQuote(ep).then(function(j){setBusy(false);var r=$('result');
+    var ep=FORM_EP(),wf=WIXF();
+    if(ep||wf){setBusy(true);(wf?sendWixForm(wf):sendQuote(ep)).then(function(j){setBusy(false);var r=$('result');
         /* Drei Stufen getrennt: 1 übermittelt (Antwort erhalten), 2 gespeichert (Dienst bestätigt mit ok und Referenz),
            3 Benachrichtigung – nur als zugestellt melden, wenn der Dienst es ausdrücklich bestätigt (notified === true). */
         r.innerHTML='<p class="ok">Vielen Dank für Ihre Anfrage.</p><ul class="rstat"><li data-state="sent">Anfrage übermittelt</li><li data-state="stored">Anfrage gespeichert · Referenz '+esc(String(j.id))+'</li>'+(j.notified===true?'<li data-state="notified">Benachrichtigung an ImmoReady zugestellt</li>':'')+'</ul><p>Wir melden uns bei Ihnen, um die nächsten Schritte zu besprechen.</p><div style="display:flex;flex-wrap:wrap;gap:12px"><button type="button" class="btn inkb" id="newReq">Neue Anfrage</button></div>';

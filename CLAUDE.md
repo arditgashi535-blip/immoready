@@ -19,12 +19,15 @@ Inhaber ausdrücklich freigibt.
 - **Nichts erfinden:** keine Bewertungen, Preise, Garantien, Fachbewilligungen, Notdienst- oder
   24/7-Versprechen, Referenzen, Kundenlogos, Teammitglieder oder Firmengeschichte. ImmoReady nicht automatisch
   «GmbH» nennen.
-- **GmbH in Gründung:** Die Website wird für den späteren Auftritt als GmbH vorbereitet, darf die GmbH aber öffentlich nicht
-  als gegründet darstellen. Alle Unternehmensangaben nur in `rise.json → firm.company` (`status`, Firmenname, Sitz, Adresse,
-  UID, Handelsregister, Vertretung, MWST, `foundingConfirmed`, `goLiveApproved`); Impressum, Datenschutz, Kontakt und Footer
-  werden daraus erzeugt (`firm_markup`). Keine Adresse, UID, Registerdaten oder Rollen erfinden. Veröffentlichung erst nach
-  bestätigter Gründung und ausdrücklicher Freigabe: `python3 tools/rise.py --launch` / `build.py --release` sperren bis dahin.
-  Vorschau nur privat (Claude-Artefakt privat; `noindex` + `robots.txt` sind kein Zugriffsschutz). Details: `docs/VEROEFFENTLICHUNG.md`.
+- **Rechtsform (Stand 08.11.2026): Einzelunternehmen «ImmoReady Gashi»**, Ostring 6, 8105 Regensdorf, UID CHE-437.026.042,
+  Inhaber Ardit Gashi (Angaben und Livegang-Freigabe des Inhabers). Die GmbH ist weiterhin geplant und darf öffentlich nicht als
+  gegründet erscheinen («GmbH» in öffentlichen Texten gesperrt). Alle Unternehmensangaben nur in `rise.json → firm.company`
+  (`status` in_gruendung|einzelunternehmen|eingetragen, Firmenname, Sitz, Adresse, UID, Handelsregister, Vertretung, MWST,
+  `foundingConfirmed`, `goLiveApproved`, `approvals`); Impressum, Datenschutz, Kontakt und Footer werden daraus erzeugt
+  (`firm_markup`). Handelsregister und MWST sind offen und erscheinen nicht – nichts erfinden. Freigaben des Inhabers:
+  Rechtstext-Entwürfe und gekennzeichnete KI-Symbolbilder (`approvals`). Startprüfung `python3 tools/rise.py --launch`;
+  `python3 build.py --release` baut die öffentliche Fassung nach `dist-release/` (ohne Demo-Banner, Prüfhinweise, Umsetzungsmappe,
+  mit Wix-Forms-Anbindung); `dist/` bleibt die private Vorschau mit `noindex` und Demo-Formular. Details: `docs/VEROEFFENTLICHUNG.md`.
 - **Familienbetrieb, Qualifikation:** ImmoReady ist ein Familienbetrieb (`firm.businessType`). Bestätigte Qualifikation: nur
   Fachmann Betriebsunterhalt EFZ (WSF wurde auf Wunsch des Inhabers entfernt und darf nicht wieder erscheinen; Schema und Regeln sperren es).
   Funktion von Ardit Gashi in der GmbH erst nach Bestätigung nennen; bis dahin «Ihr Ansprechpartner».
@@ -35,9 +38,10 @@ Inhaber ausdrücklich freigibt.
   KI-Bilder (Canva) und die 3D-Szene sind Illustrationen und werden als solche gekennzeichnet
   («Symbolbild»; Rundgang: «Illustrative Visualisierung · kein Referenzobjekt» aus `rise.json → tour.scene.label`).
   Sie dürfen nie als echte Objekte, Kundenreferenzen, Mitarbeitende oder Vorher-nachher-Ergebnisse erscheinen.
-- **Formular:** Es läuft im Demo-Modus. Eine Erfolgsbestätigung erscheint nur nach echter Übermittlung, sonst
-  bleibt der Demo-Hinweis sichtbar. Sanitär-Detailleistungen sind als «zu bestätigen» markiert und öffentlich
-  ausgeblendet.
+- **Formular:** Vorschau im Demo-Modus. Release: Wix Forms auf der neuen Wix-Headless-Seite «ImmoReady»
+  (`rise.json → wix.forms`: öffentliche OAuth-Client-ID und Formular-ID «Offertanfragen», anonymer Besucher-Token, `sendWixForm` in
+  `p3c`), ohne Foto-Upload (Plan ohne Datei-Upload; Hinweis auf E-Mail). Erfolgsbestätigung nur nach Speicherung mit Referenz.
+  Sanitär-Detailleistungen sind als «zu bestätigen» markiert und öffentlich ausgeblendet.
 - **Leistungen (alle 8 behalten):** Hauswartung (wichtigste) · Sanitär & Unterhalt (direkt sichtbar) ·
   Gartenunterhalt · Reinigung · Räumung & Aufbereitung · Leerstandsmanagement · Vermarktung & Vermittlung ·
   Immobilienpräsentation (Fotografie, Drohne, 360°).
