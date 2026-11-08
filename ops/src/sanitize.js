@@ -5,7 +5,7 @@
 const PATTERNS = [
   [/ignor(e|iere)[^.\n]{0,40}(previous|vorherig|above|obig|all|alle)[^.\n]{0,20}(instruction|anweisung|regel|prompt)/i, 'ignore_instructions'],
   [/(system\s*prompt|developer\s*message|you are (now )?(chatgpt|claude|an? ai)|du bist (jetzt )?(ein|eine) (ki|assistent))/i, 'role_override'],
-  [/(send|sende|schick|forward|leite)[^.\n]{0,60}(e-?mail|mail|nachricht|daten|passwort|password)[^.\n]{0,40}(an|to)\s+\S+@\S+/i, 'exfiltration_request'],
+  [/(send|sende|schick|forward|leite)[^.\n]{0,60}(e-?mail|mail|nachricht|daten|data|passwort|password|kunden|customer)[^.\n]{0,40}(an|to)\s+\S+@\S+/i, 'exfiltration_request'],
   [/(approve|genehmig|freigeb|freigabe erteil)[^.\n]{0,40}(automatisch|sofort|immediately|all|alle)/i, 'approval_bypass'],
   [/<\s*(script|iframe|object|embed)\b/i, 'markup_script'],
   [/\b(BEGIN|END)\s+(INSTRUCTIONS|PROMPT)\b|\[\[?\s*(system|assistant)\s*\]?\]/i, 'prompt_delimiter'],
