@@ -36,7 +36,7 @@ test('Statische Analyse: belegte Befunde, keine Befunde bei guter Seite', () => 
 
 test('Browser-Audit gegen lokale Testseiten (390 px, robots, Fehlerseite)', { timeout: 120000 }, async () => {
   const srv = http.createServer((req, res) => {
-    const f = { '/bad': 'bad.html', '/good': 'good.html', '/robots.txt': 'robots.txt', '/privat/x': 'good.html' }[req.url];
+    const f = { '/bad': 'bad.html', '/good': 'good.html', '/overflow': 'overflow.html', '/robots.txt': 'robots.txt', '/privat/x': 'good.html' }[req.url];
     if (!f) { res.writeHead(404); return res.end('nein'); }
     res.writeHead(200, { 'Content-Type': f.endsWith('.txt') ? 'text/plain' : 'text/html; charset=utf-8' }); res.end(fs.readFileSync(path.join(__dirname, 'fixtures', f)));
   });
@@ -47,7 +47,10 @@ test('Browser-Audit gegen lokale Testseiten (390 px, robots, Fehlerseite)', { ti
   try {
     const bad = await auditSite(browser, base + '/bad');
     assert.equal(bad.reachable, true); assert.equal(bad.mobile_ok, false);
-    assert.ok(bad.findings.some(f => f.code === 'mobile_overflow' && /390 px/.test(f.text)));
+    assert.ok(bad.findings.some(f => f.code === 'no_viewport'));
+    const ov = await auditSite(browser, base + '/overflow');
+    assert.equal(ov.mobile_ok, false);
+    assert.ok(ov.findings.some(f => f.code === 'mobile_overflow' && /390 px/.test(f.text)), JSON.stringify(ov.findings.map(f => f.code)));
     assert.equal(bad.improvements.length, 3); assert.ok(bad.services.length >= 2);
     const good = await auditSite(browser, base + '/good');
     assert.equal(good.mobile_ok, true); assert.equal(good.contact_form, true);

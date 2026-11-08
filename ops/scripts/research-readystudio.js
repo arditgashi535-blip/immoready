@@ -13,7 +13,7 @@ const { domainOf } = require('../src/dedupe');
 
 const OUT = path.join(__dirname, '..', 'data', 'leads');
 const TARGET = Number(process.env.TARGET || 50);
-const PLAN = [
+const PLAN = process.env.PLAN_JSON ? JSON.parse(process.env.PLAN_JSON) : [
   ['coiffeur', 'Coiffeur', 'Baden,Aarau,Winterthur,Uster,Wettingen,Dietikon,Lenzburg,Brugg'],
   ['beauty', 'Nagelstudio', 'Baden,Aarau,Winterthur,Zürich'],
   ['beauty', 'Kosmetik', 'Baden,Aarau,Wohlen AG,Bülach'],
@@ -30,7 +30,16 @@ const MAX_AUDITS = Number(process.env.MAX_AUDITS || 75);
   fs.mkdirSync(OUT, { recursive: true });
   const started = new Date().toISOString();
   const cands = new Map(); const excluded = [];
-  for (const [segment, rub, towns] of PLAN) for (const town of towns.split(',')) {
+  // bereits geprüfte Domains früherer Läufe überspringen
+  const skip = new Set((process.env.SKIP_FILES || '').split(',').filter(Boolean).flatMap(f => JSON.parse(fs.readFileSync(f, 'utf8')).audited_all.map(l => domainOf(l.company.website))));
+  if (process.env.REAUDIT_FILE) {
+    for (const l of JSON.parse(fs.readFileSync(process.env.REAUDIT_FILE, 'utf8')).audited_all) {
+      const m = (l.company.address || '').match(/^(.*), (\d{4}) (.+)$/) || [];
+      cands.set(domainOf(l.company.website), { name: l.company.name, website: l.company.website, phone: l.company.phone, street: m[1] || null, zip: m[2] || null, locality: l.company.locality,
+        region: l.company.canton, segment: l.company.segment, occupation: l.company.industry, rubrik: (l.sources[0].note.match(/\((.+)\)/) || [])[1] || l.company.segment, source: l.sources[0].url });
+    }
+  }
+  for (const [segment, rub, towns] of (process.env.REAUDIT_FILE ? [] : PLAN)) for (const town of towns.split(',')) {
     const url = `https://search.ch/tel/${encodeURIComponent(town)}/${encodeURIComponent(rub)}`;
     const r = await politeGet(url, { delayMs: 4000 }).catch(e => ({ error: e.message }));
     if (!r || r.status !== 200) { console.log('übersprungen', town, rub, r && (r.skipped || r.error || r.status)); continue; }
@@ -42,7 +51,7 @@ const MAX_AUDITS = Number(process.env.MAX_AUDITS || 75);
       if (!['ZH', 'AG'].includes(e.region)) { excluded.push({ name: e.name, reason: 'ausserhalb ZH/AG' }); continue; }
       if (!d) { excluded.push({ name: e.name, reason: 'keine eigene Website im Verzeichnis' }); continue; }
       if (/(facebook|instagram|local\.ch|search\.ch|wix\.com|google)/.test(d)) { excluded.push({ name: e.name, reason: 'keine eigene Domain: ' + d }); continue; }
-      if (cands.has(d)) continue;
+      if (cands.has(d) || skip.has(d)) continue;
       cands.set(d, { ...e, segment, rubrik: rub, website: e.website.replace(/^http:\/\//, 'https://') }); n++;
     }
     console.log(`${town}/${rub}: ${es.length} Einträge, ${n} neu mit Website`);
@@ -72,8 +81,9 @@ const MAX_AUDITS = Number(process.env.MAX_AUDITS || 75);
       process.stdout.write(a.reachable ? '.' : 'x');
     }
   } finally { await browser.close(); }
-  const relevant = leads.filter(l => l.audit.reachable && l.findings.some(f => f.severity === 'hoch' || f.severity === 'mittel')).sort((a, b) => b.score - a.score);
-  const file = path.join(OUT, `readystudio-pilot-${started.slice(0, 10)}.json`);
+  // relevant = mindestens ein hoher oder zwei mittlere belegte Befunde
+  const relevant = leads.filter(l => l.audit.reachable && (l.findings.some(f => f.severity === 'hoch') || l.findings.filter(f => f.severity === 'mittel').length >= 2)).sort((a, b) => b.score - a.score);
+  const file = path.join(OUT, `readystudio-pilot-${started.slice(0, 10)}${process.env.OUT_SUFFIX || ''}.json`);
   fs.writeFileSync(file, JSON.stringify({ started, finished: new Date().toISOString(), plan: PLAN, candidates: cands.size, audited: leads.length, reachable: leads.filter(l => l.audit.reachable).length,
     relevant: relevant.length, excluded_count: excluded.length, excluded_star: excluded.filter(x => /Stern/.test(x.reason)).length, leads: relevant.slice(0, TARGET), audited_all: leads }, null, 1), { mode: 0o600 });
   console.log(`\nGespeichert: ${file}\nGeprüft ${leads.length}, erreichbar ${leads.filter(l => l.audit.reachable).length}, relevant ${relevant.length}, ausgeschlossen ${excluded.length} (Stern ${excluded.filter(x => /Stern/.test(x.reason)).length})`);

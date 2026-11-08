@@ -81,6 +81,7 @@ test('Anschreiben: keine verbotenen Behauptungen, Opt-out enthalten, Befunde nur
   assert.deepEqual(rs.claim_violations, []); assert.match(rs.body, /Kein Kontaktformular gefunden/);
   assert.ok(drafts.checkClaims('Wir garantieren 24/7 Notdienst als GmbH').length >= 3);
   assert.ok(drafts.checkClaims('Ihre Website ist unsicher').length === 1);
+  assert.deepEqual(drafts.compose('immoready', { company: { name: 'Muster Verwaltungen GmbH', canton: 'ZH' }, contacts: [] }).claim_violations, [], 'GmbH im Empfängernamen ist erlaubt');
 });
 
 test('Offerten: Beträge in Rappen, Nummernkreis je Mandant, Offerte → Freigabe → Auftrag', () => {

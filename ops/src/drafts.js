@@ -21,12 +21,12 @@ function immoready(lead) {
   const contact = (lead.contacts || []).find(x => x.is_public_business);
   const anrede = salutation(contact);
   const region = c.locality ? `in ${c.locality} und Umgebung` : 'in den Kantonen Zürich und Aargau';
-  const need = lead.need_text || 'Hauswartung, Reinigung, Gartenpflege und laufendem Liegenschaftsunterhalt';
+  const need = lead.need_text || 'Hauswartung, Reinigung, Gartenpflege und den laufenden Liegenschaftsunterhalt';
   const subject = `Partner für Hauswartung und Liegenschaftsunterhalt ${c.canton === 'AG' ? 'im Aargau' : c.canton === 'ZH' ? 'im Raum Zürich' : 'in Zürich und Aargau'}`;
   const body = [
     anrede ? `Guten Tag ${anrede}` : 'Sehr geehrte Damen und Herren',
     '',
-    `Ich wende mich an ${cleanText(c.name, 160)}, weil Sie Liegenschaften ${region} betreuen. Mein Name ist Ardit Gashi; mit ImmoReady, einem Familienbetrieb, übernehmen wir Arbeiten rund um ${need}.`,
+    `Ich schreibe Ihnen, weil Sie Liegenschaften ${region} betreuen. Mein Name ist Ardit Gashi; mit ImmoReady, einem Familienbetrieb, übernehmen wir Arbeiten rund um ${need}.`,
     '',
     'Was wir für Verwaltungen übernehmen können:',
     '– Hauswartung und technischer Gebäudeunterhalt (Fachmann Betriebsunterhalt EFZ)',
@@ -77,7 +77,9 @@ function readystudio(lead) {
 
 function compose(tenant, lead) {
   const r = tenant === 'immoready' ? immoready(lead) : readystudio(lead);
-  r.claim_violations = checkClaims(r.subject + '\n' + r.body.replace(/Fachmann Betriebsunterhalt EFZ/, ''));
+  // Der Name der Empfängerfirma darf «GmbH» o. ä. enthalten – geprüft werden nur unsere eigenen Aussagen.
+  const own = (r.subject + '\n' + r.body).split(String((lead.company && lead.company.name) || '\u0000')).join('').replace(/Fachmann Betriebsunterhalt EFZ/, '');
+  r.claim_violations = checkClaims(own);
   return r;
 }
 module.exports = { compose, checkClaims, FORBIDDEN };

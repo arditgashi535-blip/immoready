@@ -16,7 +16,7 @@ function analyzeHtml(html, { finalUrl } = {}) {
   const imgNoAlt = imgs.filter(t => !/\salt=/i.test(t)).length;
   const forms = (h.match(/<form\b/gi) || []).length;
   const tel = /href=["']tel:/i.test(h), mailto = /href=["']mailto:/i.test(h);
-  const impressum = /impressum|imprint/i.test(h), privacy = /datenschutz|privacy/i.test(h);
+  const impressum = /impressum|imprint|rechtliche|legal/i.test(h), privacy = /datenschutz|privacy/i.test(h);
   const ldjson = /application\/ld\+json/i.test(h);
   const years = (h.match(/(?:©|&copy;|copyright)\s*(?:\d{4}\s*[-–]\s*)?(20\d{2})/gi) || []).map(s => Number(s.match(/(20\d{2})/)[1]));
   const generator = pick(/<meta[^>]+name=["']generator["'][^>]*content=["']([^"']*)["']/i);
@@ -28,11 +28,11 @@ function analyzeHtml(html, { finalUrl } = {}) {
 function findingsFrom(a, m, at) {
   const f = [];
   const add = (code, severity, text, evidence) => f.push({ code, severity, text, evidence, measured_at: at });
-  if (m && m.overflowPx > 8) add('mobile_overflow', 'hoch', `Auf einem Smartphone (390 px Breite) ist die Seite ${m.overflowPx} px breiter als der Bildschirm; Inhalte lassen sich seitlich verschieben.`, `scrollWidth ${m.scrollWidth} px bei 390 px Ansicht`);
+  if (m && m.overflowPx > 8) add('mobile_overflow', 'hoch', `Auf einem Smartphone (390 px Breite) lässt sich die Seite ${m.overflowPx} px seitlich verschieben; Inhalte ragen über den Bildschirmrand.`, `seitlich scrollbar um ${m.overflowPx} px (scrollWidth − clientWidth, ohne overflow-x:hidden) bei 390 px Ansicht`);
   if (!a.viewport) add('no_viewport', 'hoch', 'Die Seite enthält keine Viewport-Angabe für Mobilgeräte; Smartphones zeigen sie dadurch verkleinert an.', 'kein <meta name="viewport">');
-  if (m && m.loadMs > 4000) add('slow_load', m.loadMs > 7000 ? 'hoch' : 'mittel', `Die Startseite brauchte in unserer Messung ${(m.loadMs / 1000).toFixed(1)} s bis zum vollständigen Laden.`, `load-Ereignis nach ${m.loadMs} ms (einmalige Messung, Rechenzentrum)`);
+  if (m && m.loadMs > 6000) add('slow_load', m.loadMs > 10000 ? 'hoch' : 'mittel', `Die Startseite brauchte in unserer Messung ${(m.loadMs / 1000).toFixed(1)} s bis zum vollständigen Laden.`, `load-Ereignis nach ${m.loadMs} ms (einmalige Messung, Rechenzentrum)`);
   if (m && m.bytes > 5e6) add('heavy_page', 'mittel', `Die Startseite lädt rund ${(m.bytes / 1e6).toFixed(1)} MB Daten.`, `übertragene Datenmenge ${m.bytes} Bytes`);
-  if (!a.forms && !(m && m.formSeen)) add('no_form', 'mittel', 'Auf der Startseite ist kein Kontakt- oder Anfrageformular vorhanden.', 'kein <form>-Element auf der Startseite');
+  if (!a.forms && !(m && m.formSeen)) add('no_form', 'niedrig', 'Auf der Startseite ist kein Kontakt- oder Anfrageformular vorhanden.', 'kein <form>-Element auf der Startseite');
   if (!a.tel && !(m && m.telSeen)) add('no_tel_link', 'mittel', 'Die Telefonnummer ist auf der Startseite nicht als antippbarer Link hinterlegt.', 'kein tel:-Link auf der Startseite');
   if (!a.title) add('no_title', 'hoch', 'Die Seite hat keinen Titel (wird in Google und im Browser-Tab angezeigt).', 'kein <title>');
   else if (a.title.length < 15 || a.title.length > 70) add('title_length', 'niedrig', `Der Seitentitel ist ${a.title.length} Zeichen lang («${a.title.slice(0, 80)}»); empfehlenswert sind etwa 30–60 Zeichen mit Leistung und Ort.`, `<title> mit ${a.title.length} Zeichen`);
@@ -82,8 +82,8 @@ async function measure(browser, url) {
     await page.goto(url, { waitUntil: 'load', timeout: 30000 });
     const loadMs = Date.now() - t0;
     await page.waitForTimeout(800);
-    const d = await page.evaluate(() => ({ scrollWidth: document.documentElement.scrollWidth, formSeen: !!document.querySelector('form, iframe[src*="form"]'), telSeen: !!document.querySelector('a[href^="tel:"]'), h1: document.querySelectorAll('h1').length, html: document.documentElement.outerHTML.slice(0, 2e6) }));
-    return { ok: true, loadMs, bytes, consoleErrors, scrollWidth: d.scrollWidth, overflowPx: Math.max(0, d.scrollWidth - 390), formSeen: d.formSeen, telSeen: d.telSeen, h1: d.h1, renderedHtml: d.html, finalUrl: page.url() };
+    const d = await page.evaluate(() => { const de = document.documentElement, ox = e => getComputedStyle(e).overflowX; const clipped = ['hidden', 'clip'].includes(ox(de)) || ['hidden', 'clip'].includes(ox(document.body)); const sx = clipped ? 0 : Math.max(0, de.scrollWidth - de.clientWidth); return { scrollX: sx, scrollWidth: document.documentElement.scrollWidth, formSeen: !!document.querySelector('form, iframe[src*="form"]'), telSeen: !!document.querySelector('a[href^="tel:"]'), h1: document.querySelectorAll('h1').length, html: document.documentElement.outerHTML.slice(0, 2e6) }; });
+    return { ok: true, loadMs, bytes, consoleErrors, scrollWidth: d.scrollWidth, overflowPx: d.scrollX, formSeen: d.formSeen, telSeen: d.telSeen, h1: d.h1, renderedHtml: d.html, finalUrl: page.url() };
   } catch (e) {
     return { ok: false, error: String(e.message).slice(0, 200) };
   } finally { await ctx.close(); }
