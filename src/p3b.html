@@ -15,7 +15,7 @@ var HY=(function(){var W={'Leerstandsmanagement':'Leer-stands-manage-ment','Immo
  'Benachrichtigungen':'Benach-richtigungen','Terminbuchungen':'Termin-buchungen','Terminbuchung':'Termin-buchung','Anfrageformular':'Anfrage-formular','Veröffentlichung':'Veröffent-lichung',
  'mehrwertsteuerpflichtig':'mehrwertsteuer-pflichtig','Grundreinigung':'Grund-reinigung','Hauswartung':'Haus-wartung','Vermarktung':'Ver-marktung','Vermittlung':'Ver-mittlung',
  'Koordinationsaufwand':'Koordinations-aufwand','Wohnungsabnahme':'Wohnungs-abnahme','Unterhaltsarbeiten':'Unterhalts-arbeiten','Gesamtansicht':'Gesamt-ansicht',
- 'Unterhaltsreinigung':'Unterhalts-reinigung','Treppenhausreinigung':'Treppenhaus-reinigung','Kompletträumung':'Komplett-räumung','Mehrfamilienhäuser':'Mehrfamilien-häuser',
+ 'Unterhaltsreinigung':'Unterhalts-reinigung','Treppenhausreinigung':'Treppen-haus-reinigung','Treppenhaus':'Treppen-haus','Treppenhäuser':'Treppen-häuser','Kompletträumung':'Komplett-räumung','Mehrfamilienhäuser':'Mehrfamilien-häuser',
  'Umzugsreinigung':'Umzugs-reinigung','Kontrollrundgänge':'Kontroll-rundgänge','Gemeinschaftliche':'Gemeinschaft-liche','Zusammenarbeit':'Zusammen-arbeit','Aufbereitung':'Auf-bereitung','Familienbetrieb':'Familien-betrieb','Initiativbewerbung':'Initiativ-bewerbung','Leistungsübersicht':'Leistungs-übersicht','Kontaktdaten':'Kontakt-daten','Offertanfrage':'Offert-anfrage'};
  var re=new RegExp(Object.keys(W).sort(function(a,b){return b.length-a.length;}).join('|'),'g'),SK=/^(SCRIPT|STYLE|TEXTAREA|INPUT|SELECT|OPTION|TITLE|CODE|PRE)$/;
  function txt(n){var t=n.data;if(t.length<11)return;var u=t.replace(re,function(w){return W[w].replace(/-/g,'­');});if(u!==t)n.data=u;}
