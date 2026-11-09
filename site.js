@@ -404,7 +404,7 @@ function renderService(key){
   h+='<section class="sec" id="umfang-'+key+'"><div class="wrap side-l"><div><p class="mono eyebrow">Leistungsumfang</p><h2 class="h2" style="font-size:clamp(1.8rem,3.4vw,2.8rem)">Was wir übernehmen.</h2>';
   if(d.scope.some(function(s){return s[2];}))h+='';
   h+='</div><div class="scope" style="margin-top:0">';
-  d.scope.forEach(function(s){h+='<div'+(s[2]?' class="unconfirmed"':'')+'><b>'+esc(s[0])+(s[2]?'<span class="tbc">zu bestätigen</span>':'')+'</b><p>'+esc(s[1])+'</p></div>';});
+  d.scope.forEach(function(s){h+='<div'+(s[2]?' class="unconfirmed"':'')+'><b>'+esc(s[0])+(s[2]?'':'')+'</b><p>'+esc(s[1])+'</p></div>';});
   h+='</div></div>';
   if(d.note)h+='<div class="wrap" style="margin-top:40px"><p class="note">'+esc(d.note)+'</p></div>';
   h+='</section>';
