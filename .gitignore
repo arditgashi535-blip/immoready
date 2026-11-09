@@ -9,4 +9,5 @@ model/geo.json
 __pycache__/
 *.pyc
 immoready-website-*.zip
-dist-release/
+dist-release/*
+!dist-release/cdn/

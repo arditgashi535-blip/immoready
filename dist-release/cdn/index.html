@@ -1,0 +1,545 @@
+<!doctype html><html lang="de-CH"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>ImmoReady Relaunch</title>
+<link rel="icon" type="image/png" href="https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/fav.png">
+<meta name="description" content="Familienbetrieb für Hauswartung, Sanitär und Unterhalt in Zürich und Aargau – dazu Garten, Reinigung, Räumung und Vermarktung. Persönlich betreut.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,200..900&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/site.css"></head><body>
+
+<a class="skip" href="#main">Zum Inhalt springen</a>
+
+<input type="checkbox" id="reviewToggle" hidden aria-hidden="true">
+
+<header class="hdr">
+  <div class="wrap">
+    <a class="logo" href="#start" aria-label="ImmoReady – zur Startseite"><img data-logo alt="ImmoReady – einfach bereit" width="762" height="578"></a>
+    <nav class="nav" aria-label="Hauptnavigation">
+      <div class="dd">
+        <button type="button" aria-expanded="false" aria-controls="ddLeistungen" id="ddBtn">Leistungen <svg class="chev" viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>
+        <div class="dd-panel" id="ddLeistungen" hidden>
+          <a href="#hauswartung"><span class="mono">01</span><span>Hauswartung</span></a>
+          <a href="#sanitaer"><span class="mono">02</span><span>Sanitär &amp; Unterhalt</span></a>
+          <a href="#gartenunterhalt"><span class="mono">03</span><span>Gartenunterhalt</span></a>
+          <a href="#reinigung"><span class="mono">04</span><span>Reinigung</span></a>
+          <a href="#raeumung"><span class="mono">05</span><span>Räumung &amp; Aufbereitung</span></a>
+          <a href="#leerstand"><span class="mono">06</span><span>Leerstandsmanagement</span></a>
+          <a href="#verkauf"><span class="mono">07</span><span>Vermarktung &amp; Vermittlung</span></a>
+          <a href="#fotografie"><span class="mono">08</span><span>Immobilienpräsentation</span></a>
+          <a href="#leistungen"><span class="mono">→</span><span>Alle Leistungen im Überblick</span></a>
+        </div>
+      </div>
+      <a href="#verwaltungen">Für Verwaltungen</a>
+      <a href="#ueber">Über ImmoReady</a>
+      <a href="#kontakt">Kontakt</a>
+    </nav>
+    <a class="btn sm top" href="#offerte">Offerte anfragen <i class="a" aria-hidden="true"></i></a>
+    <a class="hdr-call" href="tel:+41763404401" aria-label="Anrufen: 076 340 44 01"><i data-icon="phone"></i></a>
+    <button class="burger" type="button" aria-expanded="false" aria-controls="mnav" id="burger" aria-label="Menü öffnen">
+      <svg width="22" height="14" viewBox="0 0 22 14" aria-hidden="true"><path d="M0 1h22M0 7h22M0 13h22" stroke="currentColor" stroke-width="1.6"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="mnav" id="mnav" data-open="false" role="dialog" aria-modal="true" aria-label="Menü">
+  <div class="mtop">
+    <a href="#start" aria-label="ImmoReady – zur Startseite"><img data-logo alt="ImmoReady – einfach bereit" width="762" height="578"></a>
+    <button class="burger" type="button" id="mclose" aria-label="Menü schliessen" style="display:inline-flex">
+      <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M1 1l16 16M17 1L1 17" stroke="currentColor" stroke-width="1.6"/></svg>
+    </button>
+  </div>
+  <ul>
+    <li><a href="#leistungen">Leistungen <span>→</span></a></li>
+    <li class="sub"><a href="#hauswartung">Hauswartung</a></li>
+    <li class="sub"><a href="#sanitaer">Sanitär &amp; Unterhalt</a></li>
+    <li class="sub"><a href="#gartenunterhalt">Gartenunterhalt</a></li>
+    <li class="sub"><a href="#reinigung">Reinigung</a></li>
+    <li class="sub"><a href="#raeumung">Räumung &amp; Aufbereitung</a></li>
+    <li class="sub"><a href="#leerstand">Leerstandsmanagement</a></li>
+    <li class="sub"><a href="#verkauf">Vermarktung &amp; Vermittlung</a></li>
+    <li class="sub"><a href="#fotografie">Immobilienpräsentation</a></li>
+    <li><a href="#verwaltungen">Für Verwaltungen <span>→</span></a></li>
+    <li><a href="#ueber">Über ImmoReady <span>→</span></a></li>
+    <li><a href="#kontakt">Kontakt <span>→</span></a></li>
+  </ul>
+  <div class="mcontact">
+    <a class="btn" href="#offerte" style="justify-content:space-between">Offerte anfragen <i class="a" aria-hidden="true"></i></a>
+    <a class="btn ghost" href="tel:+41763404401" style="justify-content:space-between">076 340 44 01 <span class="mono">Anrufen</span></a>
+  </div>
+</div>
+
+<main id="main" tabindex="-1">
+
+<!-- =================== STARTSEITE =================== -->
+<div data-page="start">
+
+  <!-- 1 Einstieg: Foto und klare Aussage (Bildfläche «hero» aus rise.json → assets.photos) -->
+  <section class="hero3" id="einstieg" aria-labelledby="h-start">
+    <figure class="hero3-media"><div class="illu" data-illu="house"></div></figure>
+    <div class="wrap hero3-copy">
+      <p class="mono hero3-kicker">ImmoReady · Immobilienservice</p>
+      <h1 id="h-start" class="hero3-title">Ihre Liegenschaft.<br><b>Unsere Verantwortung.</b></h1>
+      <p class="hero3-sub">Ihr Familienbetrieb für Hauswartung, Sanitär und Unterhalt in Zürich und Aargau.</p>
+      <div class="hero3-ctas">
+        <a class="btn sand" href="#offerte">Offerte anfragen <i class="a" aria-hidden="true"></i></a>
+        <a class="btn ghost" href="#reise">Gebäude entdecken <i class="a" aria-hidden="true"></i></a>
+      </div>
+      <ul class="hero3-facts" aria-label="Kurz zusammengefasst">
+        <li>Persönlicher Ansprechpartner</li><li>Einzelaufträge und regelmässige Betreuung</li><li>Kantone Zürich und Aargau</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 2 Leistungsübersicht -->
+  <section class="sec sx" id="leistungswelt" aria-labelledby="h-sx">
+    <div class="wrap">
+      <div class="sx-top">
+        <p class="num reveal"><span>01</span>Leistungen</p>
+        <h2 class="display reveal" id="h-sx">Acht Leistungen. <b>Ein Ansprechpartner.</b></h2>
+      </div>
+      <div class="sx-grid" id="svcx"></div>
+    </div>
+  </section>
+
+  <!-- 3 Hauswartung als Schwerpunkt -->
+  <section class="sec hw" id="leistungen-start" aria-labelledby="h-hw">
+    <div class="wrap hw-grid">
+      <div class="hw-head">
+        <p class="num reveal"><span>02</span>Hauswartung</p>
+        <h2 class="display reveal" id="h-hw">Damit Ihre Liegenschaft <b>im Alltag funktioniert.</b></h2>
+      </div>
+      <figure class="hw-media mask"><div class="mask-in"><div class="illu" data-illu="stair2"></div></div></figure>
+      <div class="hw-body">
+        <p class="lead reveal">Für Eigentümerinnen und Eigentümer, Stockwerkeigentümergemeinschaften und Verwaltungen kleinerer und mittlerer Wohnliegenschaften. Wir legen mit Ihnen fest, was regelmässig zu tun ist – und Sie wissen, wer sich darum kümmert.</p>
+        <ol class="hw-list reveal">
+          <li><span>01</span><b>Vereinbarte Kontrollrundgänge</b><em>Treppenhaus, Keller, Waschküche, Technikräume und Umgebung im vereinbarten Rhythmus</em></li>
+          <li><span>02</span><b>Gemeinschaftliche Bereiche</b><em>Eingang, Treppenhaus und Nebenräume betreuen</em></li>
+          <li><span>03</span><b>Reinigung und Umgebungspflege</b><em>nach Auftrag – von der Treppenhausreinigung bis zum Rasenschnitt</em></li>
+          <li><span>04</span><b>Kleinere Unterhaltsarbeiten</b><em>wie vereinbart; Grösseres besprechen wir vorher mit Ihnen</em></li>
+          <li><span>05</span><b>Rückmeldung bei Mängeln</b><em>Was uns auffällt, melden wir nachvollziehbar, bei Bedarf mit Foto</em></li>
+        </ol>
+        <div class="row-ctas reveal">
+          <a class="btn" href="#offerte" data-pre="hauswartung" data-mode="laufend">Hauswartung anfragen <i class="a" aria-hidden="true"></i></a>
+          <a class="tlink" href="#hauswartung">Leistungsumfang <i class="a" aria-hidden="true"></i></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 Sanitär und Unterhalt -->
+  <section class="sani2" id="sanitaer-start" aria-labelledby="h-sani">
+    <div class="sani2-grid">
+      <figure class="sani2-media mask"><div class="mask-in"><div class="illu" data-illu="faucet2"></div></div></figure>
+      <div class="sani2-copy">
+        <p class="num reveal"><span>03</span>Sanitär &amp; Unterhalt</p>
+        <h2 class="display reveal" id="h-sani">Kleine Mängel <b>sorgfältig angehen.</b></h2>
+        <p class="lead reveal">Eine tropfende Armatur, ein undichter Siphon oder ein Problem am Spülkasten? Schildern Sie uns Ihr Anliegen, gerne mit Foto. Wir klären, welche Arbeiten wir übernehmen können und welcher Leistungsumfang sinnvoll ist.</p>
+        <div class="row-ctas reveal">
+          <a class="btn sand" href="#offerte" data-pre="sanitaer" data-mode="einzel">Sanitäranfrage stellen <i class="a" aria-hidden="true"></i></a>
+          <a class="tlink light" href="#sanitaer">Mehr zu Sanitär <i class="a" aria-hidden="true"></i></a>
+        </div>
+        <p class="fine reveal">Kein Notdienst: Bei einem akuten Wasserschaden wenden Sie sich bitte an einen Sanitär-Notdienst oder an Ihre Verwaltung.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 Familienbetrieb und Ansprechpartner -->
+  <section class="sec paper" id="familienbetrieb" aria-labelledby="h-person">
+    <div class="wrap person">
+      <aside class="vcard reveal" aria-label="Kontakt Ardit Gashi">
+        <span class="mono muted">Ihr Ansprechpartner</span>
+        <b class="vn">Ardit Gashi</b>
+        <span class="muted">ImmoReady · Zürich &amp; Aargau</span>
+        <ul class="vq"><li><i data-icon="check"></i>Fachmann Betriebsunterhalt EFZ</li></ul>
+        <div class="vc"><a href="tel:+41763404401"><i data-icon="phone"></i>076 340 44 01</a><a href="mailto:info.immoready@gmail.com"><i data-icon="mail"></i>info.immoready<wbr>@gmail.com</a></div>
+        
+      </aside>
+      <div>
+        <p class="num reveal"><span>04</span>Familienbetrieb</p>
+        <h2 class="display reveal" id="h-person">Ein Familienbetrieb. <b>Persönlich für Sie da.</b></h2>
+        <div class="prose reveal" style="margin-top:28px">
+          <p>ImmoReady unterstützt Eigentümer und Verwaltungen bei der Betreuung ihrer Immobilien in Zürich und Aargau. Als Familienbetrieb legen wir Wert auf persönliche Absprachen, sorgfältige Arbeit und einen klar vereinbarten Leistungsumfang. Ob regelmässige Betreuung oder einzelner Auftrag – wir besprechen mit Ihnen, welche Unterstützung Sie benötigen.</p>
+          <p>Ihr Ansprechpartner ist Ardit Gashi, Fachmann Betriebsunterhalt EFZ. Sie sprechen mit ihm direkt – von der ersten Anfrage über die Offerte bis zur Ausführung.</p>
+        </div>
+        <div class="row-ctas reveal" style="margin-top:32px">
+          <a class="tlink" href="#ueber">Mehr über uns <i class="a" aria-hidden="true"></i></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 Optionaler Gebäuderundgang (illustrativ) -->
+  
+  <section class="jr" id="reise" aria-labelledby="h-hero" data-st="0">
+<script>(function(r){try{var s=matchMedia("(max-width:700px)").matches,m=matchMedia("(prefers-reduced-motion: reduce)").matches;if(s||(m&&!window.IR_EMBED))r.classList.add("jr-static");else{r.classList.add("jr-live");if(window.IR_EMBED)r.classList.add("jr-button");}}catch(e){}})(document.currentScript.parentNode);</script>
+<div class="jr-sticky">
+<div class="jr-stage">
+<picture class="jr-pic"><source media="(max-width:700px)" srcset="https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tour/station-01-aussen-hoch.webp"><img class="jr-still on" data-n="station-01-aussen" src="https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tour/station-01-aussen.webp" alt="Illustrative Visualisierung: Wohnblock in der blauen Stunde mit Garten – kein Referenzobjekt" width="1440" height="900" decoding="async"></picture>
+<picture class="jr-pic"><source media="(max-width:700px)" srcset="https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tour/station-02-garten-hoch.webp"><img class="jr-still" data-n="station-02-garten" src="https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tour/station-02-garten.webp" alt="Illustrative Visualisierung: Gartenweg mit Beeten, Wegleuchten und Hecken – kein Referenzobjekt" width="1440" height="900" decoding="async"></picture>
+<picture class="jr-pic"><source media="(max-width:700px)" srcset="https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tour/station-03-eingang-hoch.webp"><img class="jr-still" data-n="station-03-eingang" src="https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tour/station-03-eingang.webp" alt="Illustrative Visualisierung: Eingangshalle mit Treppe und Briefkästen – kein Referenzobjekt" width="1440" height="900" decoding="async"></picture>
+<picture class="jr-pic"><source media="(max-width:700px)" srcset="https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tour/station-04-wohnung-hoch.webp"><img class="jr-still" data-n="station-04-wohnung" src="https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tour/station-04-wohnung.webp" alt="Illustrative Visualisierung: Wohnraum mit Küche, Sideboard und Leuchten am Abend – kein Referenzobjekt" width="1440" height="900" decoding="async"></picture>
+<picture class="jr-pic"><source media="(max-width:700px)" srcset="https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tour/station-05-bad-hoch.webp"><img class="jr-still" data-n="station-05-bad" src="https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tour/station-05-bad.webp" alt="Illustrative Visualisierung: Badezimmer mit wandhängendem WC an der Vorwand und Waschtisch auf wandhängendem Unterschrank – kein Referenzobjekt" width="1440" height="900" decoding="async"></picture>
+<picture class="jr-pic"><source media="(max-width:700px)" srcset="https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tour/station-06-zurueck-hoch.webp"><img class="jr-still" data-n="station-06-zurueck" src="https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tour/station-06-zurueck.webp" alt="Illustrative Visualisierung: Wohnblock in der Gesamtansicht am Abend – kein Referenzobjekt" width="1440" height="900" decoding="async"></picture>
+<picture class="jr-pic"><source media="(max-width:700px)" srcset="https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tour/station-05-bad-waschtisch-hoch.webp"><img class="jr-still jr-still-det" data-det-still="0" data-n="station-05-bad-waschtisch" src="https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tour/station-05-bad-waschtisch.webp" alt="Illustrative Visualisierung: Waschtisch mit Armatur, Ablaufventil und Überlauf auf wandhängendem Unterschrank (Siphon und Eckventile verdeckt) – kein Referenzobjekt" width="1440" height="900" decoding="async" loading="lazy"></picture>
+<picture class="jr-pic"><source media="(max-width:700px)" srcset="https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tour/station-05-bad-wc-hoch.webp"><img class="jr-still jr-still-det" data-det-still="1" data-n="station-05-bad-wc" src="https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tour/station-05-bad-wc.webp" alt="Illustrative Visualisierung: Wandhängendes WC mit Brille, geöffnetem Deckel, zwei Scharnieren und Betätigungsplatte mit zwei Tasten – kein Referenzobjekt" width="1440" height="900" decoding="async" loading="lazy"></picture>
+<picture class="jr-pic"><source media="(max-width:700px)" srcset="https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tour/station-02-garten-vorher-hoch.webp"><img class="jr-still jr-still-v" data-v="station-02-garten" src="https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tour/station-02-garten-vorher.webp" alt="Illustrative Visualisierung: Gartenweg mit Beeten, Wegleuchten und Hecken, Zustand vorher – kein Referenzobjekt" width="1440" height="900" decoding="async" loading="lazy"></picture>
+<picture class="jr-pic"><source media="(max-width:700px)" srcset="https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tour/station-03-eingang-vorher-hoch.webp"><img class="jr-still jr-still-v" data-v="station-03-eingang" src="https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tour/station-03-eingang-vorher.webp" alt="Illustrative Visualisierung: Eingangshalle mit Treppe und Briefkästen, Zustand vorher – kein Referenzobjekt" width="1440" height="900" decoding="async" loading="lazy"></picture>
+<picture class="jr-pic"><source media="(max-width:700px)" srcset="https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tour/station-04-wohnung-vorher-hoch.webp"><img class="jr-still jr-still-v" data-v="station-04-wohnung" src="https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tour/station-04-wohnung-vorher.webp" alt="Illustrative Visualisierung: Wohnraum mit Küche, Sideboard und Leuchten am Abend, Zustand vorher – kein Referenzobjekt" width="1440" height="900" decoding="async" loading="lazy"></picture>
+<picture class="jr-pic"><source media="(max-width:700px)" srcset="https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tour/station-05-bad-waschtisch-vorher-hoch.webp"><img class="jr-still jr-still-v" data-v="station-05-bad-waschtisch" src="https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tour/station-05-bad-waschtisch-vorher.webp" alt="Illustrative Visualisierung: Waschtisch mit Armatur, Ablaufventil und Überlauf auf wandhängendem Unterschrank (Siphon und Eckventile verdeckt), Zustand vorher – kein Referenzobjekt" width="1440" height="900" decoding="async" loading="lazy"></picture>
+<canvas class="jr-canvas" aria-hidden="true"></canvas>
+<div class="jr-tech" aria-hidden="true"><span data-w="3.17,1.53,0.8" data-l="Armatur"></span><span data-w="3.345,1.235,0.8" data-l="Ablaufventil"></span><span data-w="3.515,1.06,0.8" data-l="Siphon und Eckventile im Unterschrank"></span><em class="jr-tech-c" data-l="Schematische Kennzeichnung"></em></div>
+<a class="jr-hot" href="#offerte" data-pre="gartenunterhalt" data-hot="-1.2,0.6,8.6" data-st="1" aria-label="Gartenunterhalt – Offerte anfragen"><span class="jr-hot-d" aria-hidden="true"></span><span class="jr-hot-l">Gartenunterhalt</span></a>
+<a class="jr-hot" href="#offerte" data-pre="hauswartung" data-hot="1.7,1.55,1.6" data-st="2" aria-label="Hauswartung – Offerte anfragen"><span class="jr-hot-d" aria-hidden="true"></span><span class="jr-hot-l">Hauswartung</span></a>
+<a class="jr-hot" href="#offerte" data-pre="reinigung" data-hot="7.9,0.8,0.6" data-st="3" aria-label="Reinigung – Offerte anfragen"><span class="jr-hot-d" aria-hidden="true"></span><span class="jr-hot-l">Reinigung</span></a>
+<a class="jr-hot" href="#offerte" data-pre="sanitaer" data-hot="3.23,1.5,-0.38" data-st="4" aria-label="Sanitär – Offerte anfragen"><span class="jr-hot-d" aria-hidden="true"></span><span class="jr-hot-l">Sanitär</span></a>
+<div class="jr-cmpo" role="group" aria-label="Vorher und Nachher am Bild" hidden><button type="button" class="jr-cmpob" data-cmp="0" aria-pressed="false">Vorher</button><button type="button" class="jr-cmpob" data-cmp="1" aria-pressed="false">Nachher</button><span class="jr-cmpon">Illustration · kein Kundenergebnis</span></div>
+<span class="jr-tag">Illustrative Visualisierung · kein Referenzobjekt</span></div>
+<div class="jr-ui wrap">
+<div class="jr-st jr-st0 hx-copy on" data-k="aussen"><p class="mono hx-kicker">Station 1 · Gesamtansicht · Illustration</p>
+<h2 id="h-hero" class="hx-title"><span class="ln"><span style="--d:.1s">Leistungen am Gebäude entdecken.</span></span></h2>
+<p class="hx-sub">Ein illustratives Mehrfamilienhaus zeigt, wo wir unterstützen: vom Garten über Eingang und Treppenhaus bis in die Wohnung und ins Bad. Wählen Sie eine Station oder überspringen Sie den Rundgang.</p>
+<div class="hx-ctas hx-in"><a class="btn ghost" href="#reise" data-go="1">Rundgang starten <i class="a" aria-hidden="true"></i></a></div></div>
+<div class="jr-st" data-k="garten"><p class="jr-k mono">Station 2 · Garten</p><h2 class="jr-t">Ein gepflegter erster Eindruck.</h2><p class="jr-d">Gartenunterhalt für ein ordentliches und einladendes Umfeld.</p>
+<div class="jr-cmp" role="group" aria-label="Reinigung vergleichen: Laub und Moos auf dem Weg"><button type="button" class="jr-cmpb" data-cmp="0" aria-pressed="false">Vorher</button><button type="button" class="jr-cmpb" data-cmp="1" aria-pressed="false">Nachher</button><label class="jr-cmpr"><span>Reinigungsfortschritt</span><input type="range" min="0" max="100" step="5" value="100" data-cmpr></label><p class="jr-cmpn">Illustration eines Arbeitsablaufs, kein Kundenergebnis.</p></div>
+<div class="jr-acts"><a class="btn sm" href="#offerte" data-pre="gartenunterhalt">Gartenunterhalt anfragen <i class="a" aria-hidden="true"></i></a><a class="tlink light" href="#gartenunterhalt">Details <i class="a" aria-hidden="true"></i></a></div></div>
+<div class="jr-st" data-k="eingang"><p class="jr-k mono">Station 3 · Eingang &amp; Treppenhaus</p><h2 class="jr-t">Hauswartung, die den Überblick behält.</h2><p class="jr-d">Hauswartung und Reinigung für Eingang, Treppenhaus und allgemeine Flächen, abgestimmt auf Ihre Liegenschaft.</p>
+<div class="jr-cmp" role="group" aria-label="Reinigung vergleichen: Schuhspuren und Staub in der Eingangshalle, Fingerabdrücke und Schlieren an der Lifttür"><button type="button" class="jr-cmpb" data-cmp="0" aria-pressed="false">Vorher</button><button type="button" class="jr-cmpb" data-cmp="1" aria-pressed="false">Nachher</button><label class="jr-cmpr"><span>Reinigungsfortschritt</span><input type="range" min="0" max="100" step="5" value="100" data-cmpr></label><p class="jr-cmpn">Illustration eines Arbeitsablaufs, kein Kundenergebnis.</p></div>
+<div class="jr-acts"><a class="btn sm" href="#offerte" data-pre="hauswartung" data-mode="laufend">Hauswartung anfragen <i class="a" aria-hidden="true"></i></a><a class="btn sm ghost" href="#offerte" data-pre="reinigung">Reinigung anfragen <i class="a" aria-hidden="true"></i></a><a class="tlink light" href="#hauswartung">Details <i class="a" aria-hidden="true"></i></a></div></div>
+<div class="jr-st" data-k="wohnung"><p class="jr-k mono">Station 4 · Wohnung</p><h2 class="jr-t">Bereit für den nächsten Schritt.</h2><p class="jr-d">Wählen Sie, wobei wir Sie unterstützen können:</p>
+<div class="jr-cmp" role="group" aria-label="Reinigung vergleichen: Staub und Spuren auf Parkett, Tisch und Sitzflächen"><button type="button" class="jr-cmpb" data-cmp="0" aria-pressed="false">Vorher</button><button type="button" class="jr-cmpb" data-cmp="1" aria-pressed="false">Nachher</button><label class="jr-cmpr"><span>Reinigungsfortschritt</span><input type="range" min="0" max="100" step="5" value="100" data-cmpr></label><p class="jr-cmpn">Illustration eines Arbeitsablaufs, kein Kundenergebnis.</p></div>
+<div class="jr-choice"><div class="jr-choice-opts" role="radiogroup" aria-label="Leistung in der Wohnung wählen"><button type="button" role="radio" aria-checked="true" tabindex="0" data-choice="reinigung" data-cta="Reinigung anfragen"><span class="jr-rd" aria-hidden="true"></span><span>Reinigung</span></button><button type="button" role="radio" aria-checked="false" tabindex="-1" data-choice="raeumung" data-cta="Räumung anfragen"><span class="jr-rd" aria-hidden="true"></span><span>Räumung &amp; Aufbereitung</span></button><button type="button" role="radio" aria-checked="false" tabindex="-1" data-choice="leerstand" data-cta="Leerstandsbetreuung anfragen"><span class="jr-rd" aria-hidden="true"></span><span>Leerstandsmanagement</span></button></div><div class="jr-choice-tx" aria-live="polite"><p class="jr-choice-t" data-choice-text="reinigung">Wohnungen vor oder nach einem Umzug, Treppenhäuser und Gemeinschaftsflächen – regelmässig oder einmalig.</p><p class="jr-choice-t" data-choice-text="raeumung" hidden>Wir räumen, entsorgen und bereiten die Räume nach vereinbartem Umfang für die Vermietung oder den Verkauf vor.</p><p class="jr-choice-t" data-choice-text="leerstand" hidden>Vereinbarte Kontrollgänge und Zustandsmeldungen, solange eine Wohnung leer steht.</p></div><div class="jr-acts"><a class="btn sm" href="#offerte" data-pre="reinigung" data-choice-cta><span class="jr-cl">Reinigung anfragen</span> <i class="a" aria-hidden="true"></i></a></div></div></div>
+<div class="jr-st" data-k="bad"><p class="jr-k mono">Station 5 · Badezimmer</p><h2 class="jr-t">Sanitär und Unterhalt. <span>Sorgfältig bis ins Detail.</span></h2><p class="jr-d">Beschreiben Sie uns Ihr Anliegen. Wir klären den passenden Leistungsumfang mit Ihnen.</p>
+<div class="jr-cmp" role="group" aria-label="Reinigung vergleichen: Kalk an Armaturenfuss und Strahlregler, Wasserränder am Ablauf, Spritzer an Armatur und Seifenspender, Tropfspuren aussen"><button type="button" class="jr-cmpb" data-cmp="0" aria-pressed="false">Vorher</button><button type="button" class="jr-cmpb" data-cmp="1" aria-pressed="false">Nachher</button><label class="jr-cmpr"><span>Reinigungsfortschritt</span><input type="range" min="0" max="100" step="5" value="100" data-cmpr></label><p class="jr-cmpn">Illustration eines Arbeitsablaufs, kein Kundenergebnis.</p></div>
+<div class="jr-det" role="group" aria-label="Ansicht wählen"><button type="button" class="jr-detb" data-det="0.73" data-det-i="-1" aria-pressed="true">Übersicht</button><button type="button" class="jr-detb" data-det="0.752" data-det-i="0" aria-pressed="false">Waschtisch</button><button type="button" class="jr-detb" data-det="0.772" data-det-i="1" aria-pressed="false">WC</button></div>
+<div class="jr-acts"><a class="btn sm" href="#offerte" data-pre="sanitaer">Sanitäranfrage stellen <i class="a" aria-hidden="true"></i></a><a class="tlink light" href="#sanitaer">Details <i class="a" aria-hidden="true"></i></a></div></div>
+<div class="jr-st jr-st5" data-k="zurueck"><p class="jr-k mono">Station 6 · Gesamtansicht</p>
+<h2 class="jr-big">Eine Immobilie. Viele Aufgaben. <b>Ein Ansprechpartner.</b></h2><p class="jr-q">Erzählen Sie uns von Ihrem Objekt oder Ihrem Auftrag. Wir besprechen mit Ihnen die passende Unterstützung.</p>
+<div class="jr-acts"><a class="btn" href="#offerte" data-primary>Offerte anfragen <i class="a" aria-hidden="true"></i></a><a class="btn ghost" href="#kontakt" data-contact>Kontakt aufnehmen <i class="a" aria-hidden="true"></i></a><a class="btn ghost" href="#reise" data-go="0">Tour erneut starten <i class="a" aria-hidden="true"></i></a></div></div>
+<nav class="jr-nav" aria-label="Stationen des Rundgangs"><ol><li><button type="button" data-go="0" class="on" aria-current="step"><span class="jr-dot" aria-hidden="true"></span><span class="jr-l">Gebäude</span></button></li><li><button type="button" data-go="1"><span class="jr-dot" aria-hidden="true"></span><span class="jr-l">Garten</span></button></li><li><button type="button" data-go="2"><span class="jr-dot" aria-hidden="true"></span><span class="jr-l">Eingang</span></button></li><li><button type="button" data-go="3"><span class="jr-dot" aria-hidden="true"></span><span class="jr-l">Wohnung</span></button></li><li><button type="button" data-go="4"><span class="jr-dot" aria-hidden="true"></span><span class="jr-l">Sanitär</span></button></li><li><button type="button" data-go="5"><span class="jr-dot" aria-hidden="true"></span><span class="jr-l">Offerte</span></button></li></ol><div class="jr-bar" aria-hidden="true"><i></i></div></nav>
+<p class="jr-3d-note" role="status" hidden></p>
+<div class="jr-skip"><div class="jr-demo" role="group" aria-label="Demo-Rundlauf"><button type="button" class="jr-db" data-demo="toggle" aria-pressed="false"><span>Demo-Rundlauf starten</span></button><button type="button" class="jr-db" data-demo="stop" hidden>Beenden</button></div><button type="button" class="jr-viewb" data-view aria-pressed="false">Details ansehen</button><div class="jr-light" role="group" aria-label="Licht der Visualisierung"><button type="button" class="jr-lb" data-light="tag" aria-pressed="true">Tageslicht</button><button type="button" class="jr-lb" data-light="nacht" aria-pressed="false">Dämmerung</button></div><button type="button" class="jr-3d-btn" data-3d hidden aria-pressed="false"><span>3D-Ansicht starten</span></button><a href="#ablauf" class="jr-skip-a">Tour überspringen <i class="a" aria-hidden="true"></i></a><a href="#offerte" class="jr-skip-o">Offerte anfragen</a></div>
+<div class="jr-steps" role="group" aria-label="Rundgang steuern"><button type="button" class="jr-stepb" data-step="-1" aria-label="Vorherige Station">← Zurück</button><button type="button" class="jr-stepb" data-step="1" aria-label="Nächste Station">Weiter →</button></div>
+</div></div></section>
+<script>(function(){var r=document.getElementById('reise');if(r&&window.matchMedia&&matchMedia('(max-width:700px)').matches)r.classList.add('jr-static');})();</script>
+
+  <!-- 7 Ablauf -->
+  <section class="sec" id="ablauf" aria-labelledby="h-steps">
+    <div class="wrap">
+      <p class="num reveal"><span>05</span>Zusammenarbeit</p>
+      <h2 class="display reveal" id="h-steps" style="max-width:16ch">So läuft eine <b>Zusammenarbeit.</b></h2>
+      <ol class="steps reveal">
+        <li><span class="n">1</span><b>Anliegen schildern</b><span class="muted">Per Formular, Telefon oder E-Mail – Fotos helfen bei der Einschätzung.</span></li>
+        <li><span class="n">2</span><b>Umfang gemeinsam klären</b><span class="muted">Wir besprechen die Details und schauen uns das Objekt an, wenn es nötig ist.</span></li>
+        <li><span class="n">3</span><b>Offerte erhalten</b><span class="muted">Mit dem vereinbarten Leistungsumfang, damit Sie wissen, was enthalten ist.</span></li>
+        <li><span class="n">4</span><b>Ausführen oder starten</b><span class="muted">Wir führen den Auftrag aus oder beginnen mit der regelmässigen Betreuung.</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 8 Karriere (Initiativbewerbung per E-Mail, keine Stellen erfunden) -->
+  <section class="sec career" id="karriere" aria-labelledby="h-career"><div class="wrap career-grid"><figure class="career-media mask"><div class="mask-in"><div class="illu" data-illu="career"></div></div></figure><div class="career-copy"><p class="num reveal"><span>06</span>Arbeiten bei ImmoReady</p><h2 class="display reveal" id="h-career">Gemeinsam anpacken.</h2><p class="lead reveal">Sie arbeiten sorgfältig, sind zuverlässig und haben Freude an gepflegten Liegenschaften? Wir freuen uns, Sie kennenzulernen. Erzählen Sie uns kurz von Ihrer Erfahrung und dem Bereich, in dem Sie mitarbeiten möchten.</p><div class="row-ctas reveal"><a class="btn sand" href="mailto:info.immoready@gmail.com?subject=Initiativbewerbung%20ImmoReady" data-career>Initiativ bewerben <i class="a" aria-hidden="true"></i></a></div><p class="fine reveal" id="career-hint">Der Knopf öffnet Ihr E-Mail-Programm mit dem Betreff «Initiativbewerbung ImmoReady». Sie erreichen uns auch direkt unter <a href="mailto:info.immoready@gmail.com?subject=Initiativbewerbung%20ImmoReady">info.immoready<wbr>@gmail.com</a>. Lebenslauf und Zeugnisse können Sie als Anhang mitsenden.</p></div></div></section>
+
+  <!-- 9 Häufige Fragen -->
+  <section class="sec paper" aria-labelledby="h-faq">
+    <div class="wrap faqwrap">
+      <div>
+        <p class="num reveal"><span>07</span>Häufige Fragen</p>
+        <h2 class="display reveal" id="h-faq">Kurz <b>beantwortet.</b></h2>
+      </div>
+      <div class="faq reveal">
+        <details><summary>Übernehmen Sie einmalige Aufträge oder nur regelmässige Betreuung? <span class="pm"></span></summary><p>Beides. Sie können einen einzelnen Auftrag anfragen, etwa eine Reparatur, eine Räumung oder einen Heckenschnitt, oder eine Liegenschaft regelmässig betreuen lassen.</p></details>
+        <details><summary>Welche Angaben brauchen Sie für eine Offerte? <span class="pm"></span></summary><p>Die gewünschte Leistung, den Ort und eine kurze Beschreibung. Hilfreich sind die Objektart, die ungefähre Grösse oder Fläche und ein paar Fotos.</p></details>
+        <details><summary>Kommen Sie für eine Besichtigung vorbei? <span class="pm"></span></summary><p>Wenn sich der Umfang aus Beschreibung und Fotos nicht zuverlässig einschätzen lässt, vereinbaren wir eine Besichtigung vor Ort. Bei einer regelmässigen Betreuung gehört sie in der Regel dazu.</p></details>
+        <details><summary>In welchem Gebiet sind Sie tätig? <span class="pm"></span></summary><p>In den Kantonen Zürich und Aargau. Ob Ihr Objekt in unserem Gebiet liegt, klären wir gern bei Ihrer Anfrage.</p></details>
+        <details><summary>Kann ich Fotos mitschicken? <span class="pm"></span></summary><p>Ja. Im Anfrageformular können Sie bis zu fünf Fotos hochladen oder sie später per E-Mail nachreichen.</p></details>
+        <details><summary>Nehmen Sie Anfragen von Verwaltungen für mehrere Objekte an? <span class="pm"></span></summary><p>Ja. Nennen Sie die Objekte kurz in der Beschreibung. Wir melden uns, um die Anforderungen gemeinsam durchzugehen.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 Kontakt und Offertanfrage -->
+  <section class="sec finale" aria-labelledby="h-close" id="anfrage">
+    <div class="wrap">
+      <h2 id="h-close" class="finale-title"><span class="ln"><span>Was braucht</span></span><span class="ln"><span><b>Ihre Immobilie?</b></span></span></h2>
+      <p class="finale-lead reveal">Erzählen Sie uns von Ihrem Objekt oder Ihrem Auftrag. Wir besprechen mit Ihnen die passende Unterstützung.</p>
+      <div class="fchips reveal" role="group" aria-label="Leistung wählen und Anfrage beginnen">
+        <span class="fchips-l">Womit dürfen wir beginnen?</span>
+        <a class="fchip" href="#offerte" data-pre="hauswartung" aria-pressed="false" style="--i:0">Hauswartung</a>
+        <a class="fchip" href="#offerte" data-pre="sanitaer" aria-pressed="false" style="--i:1">Sanitär &amp; Unterhalt</a>
+        <a class="fchip" href="#offerte" data-pre="gartenunterhalt" aria-pressed="false" style="--i:2">Gartenunterhalt</a>
+        <a class="fchip" href="#offerte" data-pre="reinigung" aria-pressed="false" style="--i:3">Reinigung</a>
+        <a class="fchip" href="#offerte" data-pre="raeumung" aria-pressed="false" style="--i:4">Räumung &amp; Aufbereitung</a>
+        <a class="fchip" href="#offerte" data-pre="leerstand" aria-pressed="false" style="--i:5">Leerstand</a>
+        <a class="fchip" href="#offerte" data-pre="verkauf" aria-pressed="false" style="--i:6">Vermarktung &amp; Vermittlung</a>
+        <a class="fchip" href="#offerte" data-pre="fotografie" aria-pressed="false" style="--i:7">Fotografie &amp; Drohne</a>
+      </div>
+      <div class="finale-bar reveal">
+        <a class="btn sand big fcta" href="#offerte" data-toform data-primary>Offerte anfragen <span class="fcta-c" aria-hidden="true"><i class="a" aria-hidden="true"></i></span></a>
+        <a class="finale-tel" href="tel:+41763404401">076 340 44 01</a>
+        <a class="finale-mail" href="mailto:info.immoready@gmail.com">info.immoready<wbr>@gmail.com</a>
+      </div>
+      <div class="cgrid">
+        <div class="reveal" style="display:grid;gap:18px;align-content:start">
+          <p style="color:var(--stone-d);font-size:.95rem">ImmoReady · Ardit Gashi<br>Einsatzgebiet Zürich und Aargau</p>
+          <p style="color:var(--stone-d);font-size:.95rem">Lieber im Gespräch? <a href="https://www.immoready.ch/book-online" target="_blank" rel="noopener" style="color:#fff">Termin buchen ↗</a></p>
+        </div>
+        <div id="formSlotHome"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- =================== LEISTUNGSSEITE (wird per Script gefüllt) =================== -->
+<div data-page="leistung" hidden id="leistungPage"></div>
+
+<!-- =================== ÜBERSICHT LEISTUNGEN =================== -->
+<div data-page="leistungen" hidden>
+  <section class="phead">
+    <div class="wrap" style="grid-template-columns:1fr">
+      <div>
+        <p class="crumbs mono"><a href="#start">Start</a><span>/</span><span>Leistungen</span></p>
+        <h1>Leistungen rund um <b>Ihre Liegenschaft.</b></h1>
+        <p class="lead" style="color:#DAD8D0">Acht Leistungen rund um Ihre Liegenschaft. Wählen Sie direkt, was Sie brauchen – oder kombinieren Sie mehrere Leistungen.</p>
+      </div>
+    </div>
+  </section>
+  <section class="sec" style="padding-top:clamp(40px,6vw,72px)"><div class="wrap" id="overviewList"></div></section>
+</div>
+
+<!-- =================== FÜR VERWALTUNGEN =================== -->
+<div data-page="verwaltungen" hidden>
+  <section class="phead">
+    <div class="wrap">
+      <div>
+        <p class="crumbs mono"><a href="#start">Start</a><span>/</span><span>Für Verwaltungen</span></p>
+        <h1>Ein Ansprechpartner. <b>Weniger Koordi&shy;nations&shy;aufwand.</b></h1>
+        <p class="lead" style="color:#DAD8D0">Für Immobilienverwaltungen, Eigentümerschaften und Stockwerkeigentümer&shy;gemeinschaften mit kleinen und mittleren Wohnliegenschaften in Zürich und Aargau.</p>
+        <div style="margin-top:30px;display:flex;flex-wrap:wrap;gap:12px">
+          <a class="btn" href="#offerte" data-pre="hauswartung" data-mode="laufend" data-kunde="verwaltung">Liegenschaftsbetreuung besprechen <i class="a" aria-hidden="true"></i></a>
+        </div>
+      </div>
+      <figure class="fig"><div class="illu" data-illu="facade2"></div></figure>
+    </div>
+  </section>
+  <section class="sec">
+    <div class="wrap side-l">
+      <div><p class="mono eyebrow">Was Sie erwarten können</p><h2 class="h2" style="font-size:clamp(1.8rem,3.4vw,2.8rem)">Abgestimmt auf Ihr Portfolio.</h2></div>
+      <div class="scope" style="margin-top:0">
+        <div><b>Kleine und mittlere Wohnliegenschaften</b><p>Mehrfamilienhäuser und Stockwerkeigentum, bei denen ein persönlicher Dienstleister mehr bringt als eine grosse Organisation.</p></div>
+        <div><b>Abgestimmter Leistungsumfang</b><p>Für jedes Objekt halten wir fest, was in welchen Abständen erledigt wird. Änderungen besprechen wir direkt.</p></div>
+        <div><b>Persönlicher Kontakt</b><p>Sie erreichen Ardit Gashi direkt per Telefon oder E-Mail – ohne Ticketsystem und ohne wechselnde Ansprechpartner.</p></div>
+        <div><b>Mehrere Leistungen kombiniert</b><p>Hauswartung, Garten, Reinigung und kleinerer Unterhalt aus einer Hand. Das spart Ihnen Abstimmung zwischen mehreren Firmen.</p></div>
+        <div><b>Rückmeldung zu Auffälligkeiten</b><p>Was wir beim Rundgang feststellen, melden wir nachvollziehbar und bei Bedarf mit Foto. Sie entscheiden über das weitere Vorgehen.</p></div>
+        <div><b>Koordination mit Fachfirmen</b><p>Nach Vereinbarung organisieren wir Zugang und Termine für Fachfirmen und sind vor Ort Ansprechpartner.</p></div>
+      </div>
+    </div>
+  </section>
+  <section class="sec paper">
+    <div class="wrap side-l">
+      <div><p class="mono eyebrow">Mehrere Objekte</p><h2 class="h2" style="font-size:clamp(1.8rem,3.4vw,2.8rem)">Mehrere Liegen&shy;schaften in einer Anfrage.</h2></div>
+      <div class="prose">
+        <p>Im Anfrageformular wählen Sie «Verwaltung» und geben die Anzahl Liegenschaften an. Listen Sie die Objekte mit Adresse und ungefährer Anzahl Wohnungen kurz auf. Eine Objektliste können Sie auch als Foto oder später per E-Mail senden.</p>
+        <p>Wir melden uns, um die Anforderungen durchzugehen, und besichtigen die Objekte vor der Offerte.</p>
+        <div style="margin-top:28px"><a class="btn inkb" href="#offerte" data-pre="hauswartung" data-mode="laufend" data-kunde="verwaltung">Liegenschaftsbetreuung besprechen <i class="a" aria-hidden="true"></i></a></div>
+      </div>
+    </div>
+  </section>
+  <section class="sec">
+    <div class="wrap faqwrap">
+      <div><p class="mono eyebrow">Fragen von Verwaltungen</p><h2 class="h2" style="font-size:clamp(1.8rem,3.4vw,2.8rem)">Gut zu wissen.</h2></div>
+      <div class="faq">
+        <details><summary>Wie wird der Leistungsumfang festgelegt? <span class="pm"></span></summary><p>Nach einer Besichtigung erstellen wir eine Offerte mit den vereinbarten Arbeiten und Intervallen pro Objekt. Bestehende Pflichtenhefte nehmen wir gern als Grundlage.</p></details>
+        <details><summary>Wie erhalten wir Rückmeldungen? <span class="pm"></span></summary><p>Festgestellte Mängel und Auffälligkeiten melden wir per E-Mail, bei Bedarf mit Fotos. Die Form der Rückmeldung stimmen wir mit Ihnen ab.</p></details>
+        <details><summary>Arbeiten Sie mit unseren bestehenden Fachfirmen zusammen? <span class="pm"></span></summary><p>Ja. Nach Vereinbarung koordinieren wir Termine und Zugang mit den Fachfirmen, mit denen Sie bereits zusammenarbeiten.</p></details>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- =================== ÜBER IMMOREADY =================== -->
+<div data-page="ueber" hidden>
+  <section class="phead">
+    <div class="wrap" style="grid-template-columns:1fr">
+      <div>
+        <p class="crumbs mono"><a href="#start">Start</a><span>/</span><span>Über ImmoReady</span></p>
+        <h1 style="max-width:16ch">Ein Familienbetrieb. Persönlich geführt.</h1>
+        <p class="lead" style="color:#DAD8D0;max-width:52ch">ImmoReady betreut und unterhält Immobilien in Zürich und Aargau. Als Familienbetrieb setzen wir auf persönliche Absprachen und einen klar vereinbarten Leistungsumfang – mit Ardit Gashi als direktem Ansprechpartner.</p>
+      </div>
+    </div>
+  </section>
+  <section class="sec">
+    <div class="wrap person" style="color:var(--ink)">
+      <aside class="vcard" aria-label="Kontakt Ardit Gashi">
+        <span class="mono muted">Ihr Ansprechpartner</span>
+        <b class="vn">Ardit Gashi</b>
+        <span class="muted">ImmoReady · Zürich &amp; Aargau</span>
+        <ul class="vq"><li><i data-icon="check"></i>Fachmann Betriebsunterhalt EFZ</li></ul>
+        <div class="vc"><a href="tel:+41763404401"><i data-icon="phone"></i>076 340 44 01</a><a href="mailto:info.immoready@gmail.com"><i data-icon="mail"></i>info.immoready<wbr>@gmail.com</a></div>
+        
+      </aside>
+      <div>
+        <p class="mono eyebrow">Ardit Gashi · Ihr Ansprechpartner</p>
+        <h2 class="h2" style="font-size:clamp(1.8rem,3.4vw,2.8rem)">Wer Liegenschaften betreut, muss Technik, Menschen und Abläufe verstehen.</h2>
+        <div class="prose" style="margin-top:24px">
+          <p>Ardit Gashi hat seine Grundbildung als Fachmann Betriebsunterhalt EFZ abgeschlossen. Als Familienbetrieb nehmen wir uns Zeit für Ihre Anliegen und sagen offen, was wir übernehmen können und was nicht.</p>
+          <p>In früheren Anstellungen hat er Wohnliegenschaften operativ betreut, technischen Unterhalt ausgeführt und Arbeiten von Fachfirmen koordiniert. Diese Erfahrung bringt er heute in ImmoReady ein.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="sec dark">
+    <div class="wrap">
+      <p class="mono eyebrow" style="color:var(--lime)">So arbeiten wir</p>
+      <h2 class="h2" style="max-width:18ch">Vier Grundsätze, die Sie im Alltag merken.</h2>
+      <ol class="steps" style="border-color:var(--line-d)">
+        <li style="border-color:var(--line-d)"><span class="n" style="color:var(--stone-d)">1</span><b>Klarer Umfang</b><span class="muted">Was wir übernehmen, steht in der Offerte. So wissen beide Seiten, was vereinbart ist.</span></li>
+        <li style="border-color:var(--line-d)"><span class="n" style="color:var(--stone-d)">2</span><b>Direkter Draht</b><span class="muted">Sie sprechen mit der Person, die Ihr Objekt kennt – nicht mit einer Zentrale.</span></li>
+        <li style="border-color:var(--line-d)"><span class="n" style="color:var(--stone-d)">3</span><b>Melden statt übersehen</b><span class="muted">Auffälligkeiten teilen wir Ihnen mit, damit Sie früh entscheiden können.</span></li>
+        <li style="border-color:var(--line-d)"><span class="n" style="color:var(--stone-d)">4</span><b>Sauberer Abschluss</b><span class="muted">Nach jedem Einsatz hinterlassen wir den Arbeitsort aufgeräumt.</span></li>
+      </ol>
+    </div>
+  </section>
+  <section class="sec"><div class="wrap cta-band"><h2>Lernen wir uns kennen.</h2><div class="acts"><a class="btn inkb" href="#offerte">Offerte anfragen <i class="a" aria-hidden="true"></i></a><a class="btn ghost" href="https://www.immoready.ch/booking-calendar/kostenloses-beratungsgespräch-2" target="_blank" rel="noopener">Beratungsgespräch buchen ↗</a></div></div></section>
+</div>
+
+<!-- =================== KONTAKT / OFFERTE =================== -->
+<div data-page="offerte" hidden>
+  <section class="phead">
+    <div class="wrap" style="grid-template-columns:1fr;padding-bottom:clamp(32px,4vw,56px)">
+      <div>
+        <p class="crumbs mono"><a href="#start">Start</a><span>/</span><span>Offerte anfragen</span></p>
+        <h1>Offerte <b>anfragen</b></h1>
+        <p class="lead" style="color:#DAD8D0;max-width:50ch">Beschreiben Sie uns Ihr Anliegen. Wir besprechen mit Ihnen den passenden Leistungsumfang. Ihre Anfrage ist unverbindlich und kostenlos.<span class="tbc">«kostenlos» bestätigen</span></p>
+      </div>
+    </div>
+  </section>
+  <section class="sec" style="padding-top:clamp(36px,5vw,64px)">
+    <div class="wrap formwrap">
+      <aside class="aside-contact" aria-label="Kontaktangaben">
+        <div>
+          <p class="mono muted" style="margin-bottom:8px">Lieber direkt?</p>
+          <div class="copy-row"><a href="tel:+41763404401" style="font-size:1.3rem;font-weight:650;text-decoration:none">076 340 44 01</a><button class="copy-btn" type="button" data-copy="+41 76 340 44 01">Kopieren</button></div>
+          <div class="copy-row" style="margin-top:6px"><a href="mailto:info.immoready@gmail.com" style="font-weight:600">info.immoready<wbr>@gmail.com</a><button class="copy-btn" type="button" data-copy="info.immoready@gmail.com">Kopieren</button></div>
+        </div>
+        <hr class="rule">
+        <div>
+          <p class="mono muted" style="margin-bottom:8px">Beratung lieber im Gespräch?</p>
+          <p style="margin-bottom:12px">Buchen Sie einen Termin für ein Beratungsgespräch oder eine Offertbesprechung.</p>
+          <a class="lnk" href="https://www.immoready.ch/book-online" target="_blank" rel="noopener">Termin buchen ↗</a>
+        </div>
+        <hr class="rule">
+        <p class="muted" style="font-size:.9rem">Bitte nicht für Notfälle verwenden. Bei einem akuten Wasserschaden wenden Sie sich an einen Sanitär-Notdienst oder Ihre Verwaltung.</p>
+      </aside>
+      <div id="formSlotPage"><div id="formRoot"></div></div>
+    </div>
+  </section>
+</div>
+
+<!-- =================== KONTAKT (Info-Seite) =================== -->
+<div data-page="kontakt" hidden>
+  <section class="phead">
+    <div class="wrap" style="grid-template-columns:1fr">
+      <div>
+        <p class="crumbs mono"><a href="#start">Start</a><span>/</span><span>Kontakt</span></p>
+        <h1>Kontakt</h1>
+        <p class="lead" style="color:#DAD8D0">Rufen Sie an, schreiben Sie eine E-Mail oder stellen Sie Ihre Anfrage über das Formular.</p>
+      </div>
+    </div>
+  </section>
+  <section class="sec">
+    <div class="wrap">
+      <div class="related">
+        <a href="tel:+41763404401"><span class="mono muted">Telefon</span><b style="font-size:1.4rem">076 340 44 01</b><span class="muted">+41 76 340 44 01</span></a>
+        <a href="mailto:info.immoready@gmail.com"><span class="mono muted">E-Mail</span><b style="font-size:1.2rem">info.immoready<wbr>@gmail.com</b><span class="muted">Für Anfragen und Unterlagen</span></a>
+        <a href="#offerte"><span class="mono muted">Formular</span><b style="font-size:1.4rem">Offerte anfragen →</b><span class="muted">Mit Foto-Upload, rund zwei Minuten</span></a>
+      </div>
+      <div class="grid12" style="margin-top:64px">
+        <div class="prose k-l">
+          <p class="mono eyebrow">Einsatzgebiet</p>
+          <p>Kantone Zürich und Aargau.</p>
+          
+        </div>
+        <div class="prose k-r">
+          <p class="mono eyebrow">Termin vereinbaren</p>
+          <p>Für ein Beratungsgespräch oder eine Offertbesprechung können Sie direkt online einen Termin wählen.</p>
+          <p style="margin-top:14px"><a class="lnk" href="https://www.immoready.ch/book-online" target="_blank" rel="noopener">Zur Terminbuchung ↗</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- =================== IMPRESSUM =================== -->
+<div data-page="impressum" hidden>
+  <section class="sec doc"><div class="wrap">
+    <p class="crumbs mono" style="color:var(--stone)"><a href="#start">Start</a><span>/</span><span>Impressum</span></p>
+    <h1 class="h2" style="margin:12px 0 10px">Impressum</h1>
+    
+    <h2>Verantwortlich für den Inhalt</h2><p>ImmoReady Gashi<br>Inhaber: Ardit Gashi<br>Ostring 6<br>8105 Regensdorf<br>Schweiz</p><p>Telefon: <a href="tel:+41763404401">+41 76 340 44 01</a><br>E-Mail: <a href="mailto:info.immoready@gmail.com">info.immoready<wbr>@gmail.com</a></p><h2>Unternehmensangaben</h2><p>Rechtsform: Einzelunternehmen<br>Inhaber: Ardit Gashi<br>UID: CHE-437.026.042</p>
+    <h2>Haftung für Inhalte und Links</h2>
+    <p>Die Inhalte dieser Website werden mit Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität übernehmen wir keine Gewähr. Für Inhalte externer Websites, auf die wir verlinken, sind die jeweiligen Betreiber verantwortlich.</p>
+    <h2>Bildnachweis</h2>
+    <p>Logo: ImmoReady. Symbolbilder: mit Canva erstellt (KI-generiert) – sie zeigen keine realen Objekte, Kundenliegenschaften oder Mitarbeitenden. 3D-Rundgang: illustrative Visualisierung, eigene Erstellung, kein Referenzobjekt.</p>
+  </div></section>
+</div>
+
+<!-- =================== DATENSCHUTZ =================== -->
+<div data-page="datenschutz" hidden>
+  <section class="sec doc"><div class="wrap">
+    <p class="crumbs mono" style="color:var(--stone)"><a href="#start">Start</a><span>/</span><span>Datenschutz</span></p>
+    <h1 class="h2" style="margin:12px 0 10px">Datenschutzerklärung</h1>
+    
+    <p class="muted">Stand: 08.11.2026</p>
+    <h2>1. Verantwortliche Stelle</h2>
+    <p>ImmoReady Gashi, Ardit Gashi, Ostring 6, 8105 Regensdorf, Schweiz · <a href="mailto:info.immoready@gmail.com">info.immoready<wbr>@gmail.com</a> · +41 76 340 44 01</p>
+    <h2>2. Welche Daten wir bearbeiten</h2>
+    <ul>
+      <li><b>Offertanfragen über das Formular:</b> gewünschte Leistung, einmaliger Auftrag oder regelmässige Betreuung, Ort oder Postleitzahl, Ihre Beschreibung, Name, E-Mail-Adresse, Telefonnummer (freiwillig).</li>
+      <li><b>Bewerbungen:</b> Initiativbewerbungen nehmen wir per E-Mail an info.immoready@gmail.com entgegen – mit den Angaben und Unterlagen, die Sie uns senden. Bewerbungen werden nicht über das Offertformular verarbeitet.</li>
+      <li><b>Kontakt per E-Mail oder Telefon:</b> die Angaben, die Sie uns dabei mitteilen.</li>
+      <li><b>Technische Daten:</b> Beim Aufruf der Website verarbeitet der Hosting-Anbieter technisch notwendige Daten wie IP-Adresse, Datum, Uhrzeit und Browserinformationen.</li>
+    </ul>
+    <h2>3. Zweck</h2>
+    <p>Wir verwenden Ihre Angaben, um Ihre Anfrage zu prüfen, mit Ihnen Kontakt aufzunehmen, eine Offerte zu erstellen und vereinbarte Leistungen zu erbringen. Bewerbungsunterlagen verwenden wir nur für das Bewerbungsverfahren. Wir verwenden Ihre Angaben nicht für Werbung ohne Ihre Einwilligung.</p>
+    <h2>4. Dienstleister und Speicherort</h2>
+    <ul>
+      <li><b>Wix.com</b> – Hosting der Website und Speicherung der Offertanfragen (Wix Forms). Daten können in Länder ausserhalb der Schweiz, insbesondere in die USA und nach Israel, übermittelt werden.</li>
+      <li><b>Google Fonts</b> – die Schrift Archivo wird beim Seitenaufruf von Servern der Google LLC geladen; dabei wird Ihre IP-Adresse an Google übermittelt.</li>
+      <li><b>Google</b> – E-Mail-Postfach info.immoready@gmail.com (Anfragen, Bewerbungen, Benachrichtigungen).</li>
+    </ul>
+    <h2>5. Aufbewahrung</h2>
+    <p>Anfragen, aus denen kein Auftrag entsteht, löschen wir sobald sie für die Bearbeitung nicht mehr benötigt werden. Bewerbungsunterlagen löschen wir nach Abschluss des Verfahrens, sofern Sie nicht in eine längere Aufbewahrung einwilligen. Auftragsbezogene Unterlagen bewahren wir gemäss den gesetzlichen Aufbewahrungspflichten auf.</p>
+    <h2>6. Cookies und Statistik</h2>
+    <p>Diese Website setzt selbst keine Statistik- oder Marketing-Cookies. Der Gebäuderundgang läuft vollständig in Ihrem Browser und überträgt keine Daten. Der Hosting-Anbieter kann technisch notwendige Cookies setzen.</p>
+    <h2>7. Ihre Rechte</h2>
+    <p>Sie können Auskunft über Ihre Daten verlangen sowie deren Berichtigung oder Löschung beantragen. Wenden Sie sich dazu an info.immoready@gmail.com. Sie haben zudem das Recht, sich an den Eidgenössischen Datenschutz- und Öffentlichkeitsbeauftragten (EDÖB) zu wenden.</p>
+  </div></section>
+</div>
+
+<!-- =================== UMSETZUNGSMAPPE =================== -->
+<div hidden id="umsetzungPage"></div>
+
+</main>
+
+<footer class="ftr">
+  <div class="wrap">
+    <div class="cols">
+      <div style="display:grid;gap:14px;align-content:start">
+        <a href="#start" aria-label="ImmoReady – zur Startseite" style="justify-self:start"><img class="flogo" data-logo alt="ImmoReady – einfach bereit" width="762" height="578"></a>
+        <p style="max-width:34ch">Familienbetrieb für Hauswartung, Unterhalt und Immobilienservice in Zürich und Aargau.</p>
+        <p><a href="tel:+41763404401">076 340 44 01</a><br><a href="mailto:info.immoready@gmail.com">info.immoready<wbr>@gmail.com</a></p>
+      </div>
+      <div><h4>Leistungen</h4><ul><li><a href="#hauswartung">Hauswartung</a></li><li><a href="#sanitaer">Sanitär &amp; Unterhalt</a></li><li><a href="#gartenunterhalt">Gartenunterhalt</a></li><li><a href="#reinigung">Reinigung</a></li><li><a href="#raeumung">Räumung &amp; Aufbereitung</a></li><li><a href="#leerstand">Leerstandsmanagement</a></li><li><a href="#verkauf">Vermarktung &amp; Vermittlung</a></li><li><a href="#fotografie">Immobilienpräsentation</a></li></ul></div>
+      <div><h4>ImmoReady</h4><ul><li><a href="#verwaltungen">Für Verwaltungen</a></li><li><a href="#ueber">Über ImmoReady</a></li><li><a href="#kontakt">Kontakt</a></li><li><a href="#karriere">Karriere</a></li><li><a href="#offerte">Offerte anfragen</a></li><li><a href="https://www.immoready.ch/book-online" target="_blank" rel="noopener">Termin buchen ↗</a></li></ul></div>
+      <div><h4>Rechtliches</h4><ul><li><a href="#impressum">Impressum</a></li><li><a href="#datenschutz">Datenschutz</a></li></ul>
+        </div>
+    </div>
+    <div class="base"><span>© <span id="yr">2026</span> ImmoReady · Ardit Gashi</span><span>Zürich · Aargau</span></div>
+  </div>
+</footer>
+
+<div class="mbar" aria-label="Schnellkontakt">
+  <a class="btn ghost on-dark" href="tel:+41763404401" style="color:var(--ivory)">Anrufen</a>
+  <a class="btn" href="#offerte">Offerte</a>
+</div>
+<script>window.IR_RISE={"version":"17","eventsVersion":1,"stations":[{"k":"aussen","a":0,"b":0.15,"hold":0.03,"nav":"Gebäude","ps":[-0.36,0.14],"det":[]},{"k":"garten","a":0.15,"b":0.3,"hold":0.235,"nav":"Garten","ps":[-0.06,0.12],"det":[]},{"k":"eingang","a":0.3,"b":0.47,"hold":0.44,"nav":"Eingang","ps":[-0.22,0.12],"det":[]},{"k":"wohnung","a":0.47,"b":0.63,"hold":0.59,"nav":"Wohnung","ps":[0.0,0.12],"det":[]},{"k":"bad","a":0.63,"b":0.8,"hold":0.73,"nav":"Sanitär","ps":[-0.34,0.16],"det":[0.752,0.772]},{"k":"zurueck","a":0.8,"b":1.0,"hold":1.0,"nav":"Offerte","ps":[-0.36,0.14],"det":[]}],"keyframes":[[0.0,[38,18,50],[-10,4.5,5.5],0.55],[0.1,[24,11,35],[-8,4,5],0.64],[0.18,[-6,4.5,30],[-2,1,12],0.68],[0.235,[1.2,1.95,20.5],[-1.4,0.9,10],0.74],[0.3,[0,1.75,13.5],[0,1.9,5.5],0.78],[0.355,[0,1.95,7.6],[0,2.0,4],0.84],[0.39,[0,2.1,4.7],[-0.75,2.2,2.4],0.88],[0.405,[-0.05,2.1,4.72],[-1.9,2.6,2.3],0.9],[0.44,[-0.35,2.1,4.75],[1.6,1.5,1.6],0.9],[0.46,[0.4,2.1,4.3],[2.8,1.8,2.0],0.9],[0.48,[1.5,2.1,3.75],[4.0,2.0,2.9],0.9],[0.5,[2.4,2.1,3.3],[5,2.05,3.3],0.9],[0.535,[4.5,2.1,3.3],[7,2.05,3.3],0.9],[0.59,[5.85,2.0,3.6],[8.0,1.55,0.7],0.9],[0.618,[6.45,2.05,2.75],[5.85,1.7,-0.2],0.9],[0.645,[6.9,2.1,1.9],[5.0,1.8,0.9],0.9],[0.7,[6.0,1.95,1.1],[3.3,1.3,0.85],0.88],[0.715,[5.35,1.75,1.05],[3.3,1.2,0.55],0.9],[0.73,[4.9,1.66,1.7],[2.88,1.0,0.8],1.04,1],[0.752,[4.4,1.98,1.72],[3.3,1.25,1.08],0.66,1],[0.772,[4.45,1.5,0.95],[3.3,0.99,-0.09],0.82,1],[0.79,[4.3,1.7,1.15],[3.3,1.25,0.7],0.82],[0.81,[5.15,1.85,1.05],[3.4,1.35,0.8],0.84],[0.83,[6.55,1.95,0.9],[4.11,1.55,0.01],0.88],[0.855,[7.0,2.0,2.0],[5.6,1.7,0.3],0.9],[0.88,[6.8,2.0,4.3],[6.2,1.5,0.6],0.9],[0.893,[6.82,2.04,5.3],[6.6,1.6,1.0],0.88],[0.905,[6.84,2.12,6.4],[6.5,1.6,1.0],0.88],[0.922,[8.6,3.4,11.0],[4.5,2.3,2.0],0.8],[0.94,[12,5.5,17],[3,2.5,2],0.74],[0.97,[26,11,35],[-6,4,5],0.64],[1.0,[38,18,50],[-10,4.5,5.5],0.55]],"doors":{"haustuer":{"open":[0.31,0.35],"close":[0.8,0.84],"angle":1.75},"wohnungstuer":{"open":[0.455,0.485],"close":[0.8,0.84],"angle":-1.6},"terrassentuer":{"open":[0.845,0.875],"close":[0.93,0.955],"slide":1.0}},"highlights":{"sanitaer":{"in":[0.68,0.725],"out":[0.785,0.815]}},"smoothing":{"tauMs":110,"jumpTauMs":420,"stepsTauMs":520},"light":"tag","demo":{"_note":"Ausdrücklich gestarteter Demo-Rundlauf (≈ 48 s, Gestaltungsdauer, kein Messwert). Abschnitte: Zeit [s] → Fortschritt p (gleichmässig nach Weg und Drehung, weich an- und abfahrend) bzw. Naht an der strassenseitigen Hecke: «out» von der Hecke über via zur Gesamtansicht, «in» vom Ende der Fahrt über viaIn hinter die Hecke. clean: Station → Zeitfenster der sichtbaren Reinigung. Vor dem Fenster schmutzig, danach sauber; der Rücksprung auf schmutzig geschieht nur hinter der Hecke (Bild vollständig verdeckt).","duration":48,"seam":{"e":[10.8,0.92,19.72],"t":[10.8,0.86,18.6],"f":0.9,"via":[[10.8,1.8,24.0],[24.0,10.0,40.0]],"viaIn":[[11.6,3.2,21.0]]},"segments":[{"t":[0,6],"seam":"out"},{"t":[6,10.5],"p":[0.0,0.235]},{"t":[10.5,14],"p":[0.235,0.235]},{"t":[14,19],"p":[0.235,0.405]},{"t":[19,22],"p":[0.405,0.44]},{"t":[22,25.5],"p":[0.44,0.59]},{"t":[25.5,29.5],"p":[0.59,0.59]},{"t":[29.5,33.5],"p":[0.59,0.752]},{"t":[33.5,39],"p":[0.752,0.752]},{"t":[39,44.5],"p":[0.752,0.94]},{"t":[44.5,48],"seam":"in"}],"clean":{"garten":[10.8,13.7],"eingang":[18.6,21.8],"wohnung":[25.8,29.2],"bad":[33.8,38.6]}},"cleaning":{"zones":[{"id":"garten-weg","st":"garten","type":"laub","label":"Laub und Moos auf dem Weg","box":[[-0.9,-0.12,7.6],[0.9,0.09,19.3]],"dir":[0,0,-1],"edge":0.05,"mat":[21,6],"strength":1.0,"seed":2.2,"p":[0.2,0.232]},{"id":"eingang-boden","st":"eingang","type":"staub","label":"Schuhspuren und Staub in der Eingangshalle","box":[[-2.95,0.46,1.55],[2.95,0.52,5.1]],"dir":[0,0,-1],"edge":0.06,"mat":[9,-1],"strength":1.0,"seed":6.6,"p":[0.372,0.428],"walk":[[0.0,5.05,2.95,3.3],[-0.2,5.05,-1.75,2.1]],"entry":[0.0,5.1]},{"id":"eingang-lift","st":"eingang","type":"schlieren","label":"Fingerabdrücke und Schlieren an der Lifttür","box":[[1.24,0.5,1.545],[2.16,2.6,1.6]],"dir":[0,-1,0],"edge":0.07,"mat":[24,-1],"strength":1.0,"seed":4.4,"p":[0.385,0.43]},{"id":"wohnung-boden","st":"wohnung","type":"staub","label":"Staub und Spuren auf Parkett, Tisch und Sitzflächen","box":[[5.46,0.46,-0.94],[8.6,1.32,5.1]],"dir":[1,0,0],"edge":0.05,"mat":[7,-1],"strength":1.0,"seed":9.4,"p":[0.545,0.585]},{"id":"bad-armatur","st":"bad","type":"kalk","label":"Kalk an Armaturenfuss und Strahlregler","box":[[3.085,1.352,0.752],[3.338,1.566,0.848]],"dir":[0,-1,0],"edge":0.07,"mat":[22,12],"strength":1.0,"seed":3.7,"p":[0.7,0.724],"focus":[[3.3,1.462,0.8,0.014,1.0]]},{"id":"bad-waschtisch","st":"bad","type":"wasser","label":"Wasserränder am Ablauf, Spritzer an Armatur und Seifenspender, Tropfspuren aussen","box":[[3.08,1.205,0.485],[3.56,1.368,1.115]],"dir":[0,0,-1],"edge":0.07,"mat":[1,22],"strength":1.0,"seed":8.1,"p":[0.702,0.726],"focus":[[3.345,1.225,0.8,0.11,1.0],[3.17,1.362,0.8,0.07,0.75],[3.13,1.362,1.035,0.035,0.6],[3.55,1.34,0.8,0.13,0.4]],"wipeTo":[3.345,1.225,0.8]}]},"routeClearance":0.12,"wind":{"idleMs":15000,"maxFps":30},"label":"Illustrative Visualisierung · kein Referenzobjekt","services":["hauswartung","sanitaer","gartenunterhalt","reinigung","raeumung","leerstand","verkauf","fotografie"],"allowedOrigins":["https://www.immoready.ch","https://immoready.ch"],"formEndpoint":null,"forms":{"clientId":"94332899-a496-47aa-9f41-d5dd65c44f6a","formId":"9671b663-fabd-48c6-b63e-53b20f09ca7e"}};</script><script src="https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/site.js"></script>
+<script>window.IR_TEX={"t1": ["https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tex/t1-putz.webp", "https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tex/t1-stein.webp", "https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tex/t1-rasen.webp", "https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tex/t1-hecke.webp"], "t2": ["https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tex/t2-holz.webp", "https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tex/t2-wandplatten.webp", "https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tex/t2-bodenplatten.webp", "https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tex/t2-metall.webp"], "laub": "https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/tex/laub.webp"};window.IR_BAKE="https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@site-2026-11-09/dist-release/cdn/assets/bake/licht.json";</script></body></html>
