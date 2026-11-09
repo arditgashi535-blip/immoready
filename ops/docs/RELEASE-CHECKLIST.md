@@ -41,3 +41,10 @@ Die Relaunch-Vorschau im Repository (`dist/`) ist **nicht** live. Die Verbindung
 - [ ] Datenschutzerklärungen um CRM, Formular-Speicherung und Auftragsbearbeiter ergänzen
 - [ ] Netzwerk der Arbeitsumgebung nach den Piloten wieder einschränken
 - [ ] Tests grün: `cd ops && npm run test:all`; Website: `npm test` im Repository-Wurzelverzeichnis
+
+## E. Website-Vorschau im Repository (nicht live) – Testbefunde 08.11.2026
+- [ ] t19: Eckpunkt-Grenze (+25 % ggü. V16) an die aktuelle Szene anpassen oder Geometrie reduzieren
+- [ ] t20: Vergleichsordner `shots/v17-ausgang` bereitstellen oder den Test ohne ihn überspringen
+- [ ] t22: Silbentrennung «Treppenhaus…» bei 390 px auf der Seite Reinigung
+- [ ] t24: WSF-Prüfung soll data-URIs ausnehmen (heute Fehlalarm durch Base64)
+- [ ] t25: «Gebäude entdecken» – Scroll-Ziel unter dem Kopf prüfen
