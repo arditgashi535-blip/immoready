@@ -26,14 +26,18 @@ Der Inhaber hat entschieden, die neue Website **als Einzelunternehmen** live zu 
   der Hauptzweig ist grösser. Alle Adressen sind an feste Commits gebunden. Der frühere Lade-Aufbau (Startdatei holt die Seite per
   Skript) liegt als Rückfall in `docs/rollback/wix-index-2026-11-09.html`.
 - **Aktualisieren** (Zweig `fertigstellung-2026-11`, Worktree `cdn-site` daneben):
-  1. `python3 tools/rise.py --launch` und `python3 build.py --release`
+  1. `python3 tools/rise.py --launch` und `python3 build.py --release` (erzeugt WebP-Fotos, Handy-Startbild und schreibt die Fotos der
+     Startseite per `tools/prerender-illus.js` ins HTML)
   2. Nur wenn Bilder/Texturen/Lichtdaten geändert: `dist-release/site/assets` in den Zweig `cdn-site` kopieren, committen, pushen → Commit **A**
   3. `python3 tools/cdn-release.py A` → `site.js`/`site.css` aus `dist-release/cdn/` in `cdn-site` kopieren, committen, pushen → Commit **Y**
   4. `python3 tools/cdn-release.py A Y` → `dist-release/cdn/index.html`
   5. Alle jsDelivr-Adressen auf HTTP 200 prüfen; `IR_LIVE_URL=http://127.0.0.1:<port>/ node tests/t30-live.js` gegen eine lokale Kopie
   6. `index.html` über die Wix-MCP (`UploadHeadlessWebsiteFiles`, Site `f486f5d5-…`) hochladen; danach Datei zurücklesen und vergleichen
      (einziger erwarteter Unterschied: das von Wix eingefügte `<script id="wix-site-script">`), `node tests/t30-live.js` gegen die Live-Adresse.
-  Aktuell: A = `02ae72d2a023ad6cfe7587f6cc0c212e1332e00f`, Y = `2ce98f4a07672abf2713ebc889f1b3b3e507e5c0`.
+  Aktuell (live, 09.11.2026): A = `d80a318f7445f5e20af3c1fc60b24382abaddc32`, Y = `5efa908bd9ef57381644c8770816df4ea086bd1b`.
+  Kleine Änderungen an `index.html` lassen sich statt Neu-Hochladen gezielt über `ExecuteWixAPI` + `wix.headless.files.patch`
+  einspielen: Live-Datei lesen, `wix-site-script` entfernen, Prüfsumme des alten Stands vergleichen, ersetzen, nur bei passender
+  Prüfsumme des Ziels schreiben (so am 09.11.2026 für WebP-Fotos, Startbild-Vorladen und Stilkorrektur).
 - **Formular:** Wix Forms «Offertanfragen». Spam-Schutz `ADVANCED`: Testanfragen mit `test@example.com` oder aus Rechenzentren landen im
   Spam-Ordner (Dashboard → Formulare → Spam).
 

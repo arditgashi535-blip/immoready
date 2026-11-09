@@ -388,7 +388,10 @@ def seo_head(d):
     if street:
         plz, ort = (place.split(' ', 1) + [''])[:2]
         ld['address'] = {'@type': 'PostalAddress', 'streetAddress': street, 'postalCode': plz, 'addressLocality': ort, 'addressCountry': 'CH'}
-    tags = ['<link rel="canonical" href="%s">' % _e(url), '<link rel="preload" as="image" href="%s" fetchpriority="high">' % _e(img),
+    tags = ['<link rel="canonical" href="%s">' % _e(url),
+            # Startbild früh laden: Verbindung zum Auslieferungsnetz vorab öffnen, Bild mit Handy-Variante vorladen
+            '<link rel="preconnect" href="https://cdn.jsdelivr.net">',
+            '<link rel="preload" as="image" href="assets/img/hero.webp" imagesrcset="assets/img/hero-800.webp 800w, assets/img/hero.webp 1200w" imagesizes="100vw" fetchpriority="high">', 
             '<meta property="og:type" content="website">', '<meta property="og:locale" content="de_CH">',
             '<meta property="og:site_name" content="ImmoReady">',
             '<meta property="og:title" content="%s">' % _e(title), '<meta property="og:description" content="%s">' % _e(desc),

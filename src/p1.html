@@ -2099,4 +2099,7 @@ body.hdr-compact .hdr{background:var(--ivory)}
 .jr-tech span.off,.jr-tech-c.off{opacity:0;visibility:hidden}
 /* Demo-Naht: Während die Hecke das Bild verdeckt, blendet der Stationstext aus; der Wechsel von Station 6 auf 1 geschieht unsichtbar */
 .jr-live.jr-seam .jr-st.on,.jr-3d.jr-seam .jr-st.on{opacity:var(--seam-o,0)!important;transition:none!important}
+/* Wix-Headless-Hinweis («Built on Wix Headless», kostenloser Plan) über die mobile Kontaktleiste schieben, damit «Offerte» bedienbar bleibt.
+   Der Hinweis bleibt sichtbar; er wird nicht ausgeblendet. */
+@media (max-width:760px){body.has-mbar #wixheadless-banner-container{bottom:calc(66px + env(safe-area-inset-bottom,0px))!important}}
 </style>

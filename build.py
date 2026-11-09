@@ -315,6 +315,19 @@ def build_site():
         with open(out + 'assets/img/%s.%s' % (k, ext), 'wb') as f:
             f.write(base64.b64decode(data))
         ph[k] = 'assets/img/%s.%s' % (k, ext)
+        if LIVE_OK and ext == 'jpg':
+            # öffentliche Fassung: Fotos als WebP (etwa halb so gross); das JPG bleibt für die Social-Media-Vorschau (og:image)
+            try:
+                from PIL import Image
+                Image.open(out + 'assets/img/%s.jpg' % k).save(out + 'assets/img/%s.webp' % k, 'WEBP', quality=80, method=6)
+                ph[k] = 'assets/img/%s.webp' % k
+                if k == 'hero':  # kleinere Variante für Handys (srcset im vorgerenderten Startbild)
+                    im = Image.open(out + 'assets/img/hero.jpg')
+                    im.resize((800, round(im.height * 800 / im.width)), Image.LANCZOS).save(out + 'assets/img/hero-800.webp', 'WEBP', quality=78, method=6)
+                if k != 'hero':
+                    os.remove(out + 'assets/img/%s.jpg' % k)
+            except ImportError:
+                pass
     h = h[:i] + 'var PH=' + json.dumps(ph) + h[j + 1:]
     a = h.index('<style>')
     b = h.index('</style>', a)
@@ -351,3 +364,10 @@ def build_site():
 
 
 build_site()
+if LIVE_OK:
+    # Fotos der Startseite direkt ins HTML (früher sichtbar, ohne JavaScript lesbar): tools/prerender-illus.js
+    import subprocess
+    r = subprocess.run(['node', 'tools/prerender-illus.js', DIST + 'site/index.html'], capture_output=True, text=True)
+    print((r.stdout or r.stderr).strip().splitlines()[-1] if (r.stdout or r.stderr).strip() else 'prerender: keine Ausgabe')
+    if r.returncode:
+        sys.exit('prerender-illus fehlgeschlagen')
