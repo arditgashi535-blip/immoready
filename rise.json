@@ -58,8 +58,17 @@
     "tone": "formell, Sie-Anrede",
     "orthography": "Schweizer Hochdeutsch, ss statt ß",
     "booking": "https://www.immoready.ch/book-online",
+    "bookingSite": "https://www.immoready.ch",
+    "bookingSiteNote": "Adresse der bisherigen Wix-Seite mit Wix Bookings. Nach dem Domainwechsel auf deren freie Wix-Adresse setzen (docs/DOMAINWECHSEL.md); alle Terminlinks folgen beim Build.",
     "social": "[UNSPECIFIED]",
     "whatsapp": "[UNSPECIFIED]"
+  },
+  "seo": {
+    "canonical": "https://headless-nvjfhfnkngv-infoimmoready-140d.wix-site-host.com/",
+    "canonicalAfterDomainSwitch": "https://www.immoready.ch/",
+    "ogImage": "assets/img/hero.jpg",
+    "areaServed": ["Kanton Zürich", "Kanton Aargau"],
+    "note": "canonical beim Domainwechsel auf canonicalAfterDomainSwitch setzen (docs/DOMAINWECHSEL.md)"
   },
   "legal": {
     "imprint": "Entwurf aus der Vorschau, vom Inhaber am 08.11.2026 freigegeben",

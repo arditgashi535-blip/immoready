@@ -367,6 +367,37 @@ def careers_markup(d):
                                          href, _e(c['email']).replace('@', '<wbr>@'))
 
 
+def seo_head(d):
+    """Kopf-Angaben der öffentlichen Fassung aus rise.json: canonical, Open Graph, JSON-LD (nur belegte Angaben)."""
+    import json as _j
+    seo, c, k, f = d.get('seo', {}), d['firm']['company'], d['contact'], d['firm']
+    url = seo.get('canonical')
+    if not url:
+        return ''
+    title = 'ImmoReady – Hauswartung & Immobilienservice | Regensdorf, Zürich, Aargau'
+    desc = ('Familienbetrieb aus Regensdorf: Hauswartung, Sanitär-Unterhalt, Gartenpflege, Treppenhaus- und Umzugsreinigung, '
+            'Räumung und Leerstand in Zürich und Aargau.')
+    img = seo.get('ogImage', 'assets/img/hero.jpg')
+    street, place = [x.strip() for x in c['address'].split(',', 1)] if not UNSPEC(c['address']) else ('', '')
+    ld = {'@context': 'https://schema.org', '@type': 'HomeAndConstructionBusiness', 'name': f['brand'], 'url': url,
+          'telephone': k['phone'].replace(' ', ''), 'email': k['email'], 'image': img, 'logo': 'assets/logo_orig.png',
+          'areaServed': [{'@type': 'AdministrativeArea', 'name': a} for a in seo.get('areaServed', [])],
+          'knowsAbout': [s['label'] for s in d['services']]}
+    if not UNSPEC(c['registeredName']):
+        ld['legalName'] = c['registeredName']
+    if street:
+        plz, ort = (place.split(' ', 1) + [''])[:2]
+        ld['address'] = {'@type': 'PostalAddress', 'streetAddress': street, 'postalCode': plz, 'addressLocality': ort, 'addressCountry': 'CH'}
+    tags = ['<link rel="canonical" href="%s">' % _e(url), '<link rel="preload" as="image" href="%s" fetchpriority="high">' % _e(img),
+            '<meta property="og:type" content="website">', '<meta property="og:locale" content="de_CH">',
+            '<meta property="og:site_name" content="ImmoReady">',
+            '<meta property="og:title" content="%s">' % _e(title), '<meta property="og:description" content="%s">' % _e(desc),
+            '<meta property="og:url" content="%s">' % _e(url), '<meta property="og:image" content="%s">' % _e(img),
+            '<meta name="twitter:card" content="summary_large_image">',
+            '<script type="application/ld+json">%s</script>' % _j.dumps(ld, ensure_ascii=False, separators=(',', ':'))]
+    return '\n'.join(tags)
+
+
 def firm_markup(d):
     """Unternehmensangaben für Impressum, Datenschutz, Kontakt und Footer – überall aus derselben Quelle.
     In Gründung: öffentlich nur die Marke ohne Rechtsform; der GmbH-Entwurf erscheint nur mit «Prüfhinweise anzeigen»."""

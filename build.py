@@ -15,7 +15,7 @@ import base64, json, os, re, shutil, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 os.chdir(HERE)
 sys.path.insert(0, HERE)
-from tools.rise import load, tour_config, tour_markup, firm_markup, launch_check, careers_markup, photo_credits, videos_markup, video_slots, LIVE_STATUS  # noqa: E402
+from tools.rise import load, tour_config, tour_markup, firm_markup, launch_check, careers_markup, photo_credits, videos_markup, video_slots, LIVE_STATUS, seo_head  # noqa: E402
 
 # IR_RISE / IR_DIST nur für Prüfungen (andere Quelldatei, anderer Ausgabeordner); normal: rise.json → dist/
 RISE = load(os.environ.get('IR_RISE'))  # bricht bei Schemafehlern ab
@@ -115,6 +115,11 @@ def firm(h):
     h = h.replace('<!--{{FIRM_FOOTER}}-->', FIRM['footer']).replace('{{FIRM_ROLE}}', RISE['firm']['role'])
     h = h.replace('<!--{{CAREERS}}-->', careers_markup(RISE)).replace('<!--{{PHOTO_CREDITS}}-->', photo_credits(RISE))
     h = h.replace('<!--{{TOUR_VIDEOS}}-->', videos_markup(RISE))
+    # Terminbuchung bleibt auf der bisherigen Wix-Seite (Wix Bookings); Adresse aus rise.json → contact.bookingSite
+    bs = RISE['contact'].get('bookingSite', 'https://www.immoready.ch').rstrip('/')
+    h = h.replace('https://www.immoready.ch/book-online', bs + '/book-online').replace('https://www.immoready.ch/booking-calendar', bs + '/booking-calendar')
+    if LIVE_OK and '</title>' in h:
+        h = h.replace('</title>', '</title>\n' + seo_head(RISE), 1)
     return release_strip(h) if LIVE_OK else h
 
 
@@ -126,11 +131,13 @@ RELEASE_TEXT = [
     ('<span class="missing">Datum bei Veröffentlichung</span>', '%s.%s.%s' % (_D[8:10], _D[5:7], _D[:4])),
     (' sowie hochgeladene Fotos (höchstens fünf Bilder, je bis 10 MB)', ''),
     ('      <li><b>Terminbuchungen:</b> Angaben, die Sie bei der Buchung eines Beratungstermins über Wix Bookings machen.</li>\n', ''),
-    ('Hosting der Website, Speicherung der Offertanfragen und Fotos, Terminbuchung.', 'Hosting der Website und Speicherung der Offertanfragen (Wix Forms).'),
+    ('Hosting der Website, Speicherung der Offertanfragen und Fotos, Terminbuchung.', 'Hosting der Website und Speicherung der Offertanfragen (Wix Forms). Wix prüft eingehende Anfragen automatisch auf Spam (auch mit automatisierter Textprüfung) und legt zu einer Anfrage einen Kontakt mit Ihrer E-Mail-Adresse an. Die Terminbuchung läuft über Wix Bookings auf unserer bisherigen Wix-Seite.'),
+    (' <span class="missing">Alternative: Schrift selbst hosten – vor der Veröffentlichung entscheiden</span></li>', '</li>\n      <li><b>jsDelivr und GitHub</b> – Gestaltung, Programmcode und Bilder dieser Website werden über das Auslieferungsnetz jsDelivr aus unserem GitHub-Verzeichnis geladen; dabei wird Ihre IP-Adresse an diese Anbieter übermittelt (unter anderem in die USA). Es werden keine Cookies gesetzt.</li>'),
     (' <span class="missing">Garantien gemäss Wix-Vertrag ergänzen</span>', ''),
-    (' <span class="missing">Alternative: Schrift selbst hosten – vor der Veröffentlichung entscheiden</span>', ''),
     ('      <li><span class="missing">Weitere Dienste (z. B. eine Automatisierung) nur aufführen, falls sie tatsächlich eingesetzt werden</span></li>\n', ''),
-    ('<span class="missing">Frist festlegen, z. B. nach 12 Monaten</span>', 'sobald sie für die Bearbeitung nicht mehr benötigt werden'),
+    ('löschen wir <span class="missing">Frist festlegen, z. B. nach 12 Monaten</span>', 'löschen wir, sobald sie für die Bearbeitung nicht mehr benötigt werden'),
+    (' Der Hosting-Anbieter kann technisch notwendige Cookies setzen. <span class="missing">Mit der Cookie-Konfiguration der Wix-Website abgleichen</span>',
+     ' Der Hosting-Anbieter Wix setzt technisch notwendige Cookies für den Betrieb der Seite (Sitzungskennungen wie «bSession», «client-session-bind», «server-session-bind») und erfasst dabei technische Nutzungsdaten. Ihr Browser speichert ausserdem eine Anzeige-Einstellung ohne Personenbezug.'),
     (' <span class="missing">Mit der Cookie-Konfiguration der Wix-Website abgleichen</span>', ''),
     ("'datenschutz','umsetzung'];", "'datenschutz'];"),
 ]
