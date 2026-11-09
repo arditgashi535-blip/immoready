@@ -16,6 +16,20 @@ Der Inhaber hat entschieden, die neue Website **als Einzelunternehmen** live zu 
 | Hosting | neue Wix-Headless-Seite «ImmoReady» (Site-ID `f486f5d5-a0d6-45e5-80a7-44befc45746e`). Die bisherige Classic-Seite www.immoready.ch (Bookings, Members) bleibt unverändert; den Domainwechsel macht der Inhaber im Wix-Dashboard. |
 | Startprüfung | `python3 tools/rise.py --launch` → «Bereit» |
 
+## Live seit 09.11.2026
+
+- Live-Adresse: https://headless-nvjfhfnkngv-infoimmoready-140d.wix-site-host.com (Wix-Headless-Seite `f486f5d5-a0d6-45e5-80a7-44befc45746e`,
+  Dashboard https://manage.wix.com/dashboard/f486f5d5-a0d6-45e5-80a7-44befc45746e). Domain www.immoready.ch zeigt noch auf die alte Classic-Seite.
+- **Aufbau:** Wix hostet nur die Startdatei `dist-release/cdn/wix-index.html` (als `index.html`). Sie lädt die vollständige Seite
+  `dist-release/cdn/index.html` über jsDelivr aus diesem Repository; Stil, Skript, Bilder, Texturen und Lichtdaten ebenso – alle Adressen an
+  feste Commits gebunden (`tools/cdn-release.py <assets-commit> <code-commit> <page-commit>`). Grund: Der direkte Datei-Upload zu Wix war aus
+  der Arbeitsumgebung nicht möglich (Wix 403 bzw. gesperrt durch die Rechteprüfung). Die Seite hängt damit von GitHub und jsDelivr ab.
+- **Aktualisieren:** `python3 build.py --release` → `python3 tools/cdn-release.py <A>` → Commit/Push (A = Commit mit den Assets; `*.png`
+  mit `git add -f`) → `tools/cdn-release.py <A> <Y>` → Commit/Push → `tools/cdn-release.py <A> <Y> <Z>` → `wix-index.html` als `index.html`
+  hochladen (Wix-MCP `UploadHeadlessWebsiteFiles`). Danach alle CDN-Adressen auf HTTP 200 prüfen.
+- **Formular:** Wix Forms «Offertanfragen». Spam-Schutz `ADVANCED`: Testanfragen mit `test@example.com` oder aus Rechenzentren landen im
+  Spam-Ordner (Dashboard → Formulare → Spam).
+
 ## Release bauen
 
 ```bash
