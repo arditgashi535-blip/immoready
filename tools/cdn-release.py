@@ -25,6 +25,7 @@ def absolutize(text, base, code_base):
 
 def main():
     refs_in = sys.argv[1:]
+    refs_in = refs_in[:2]
     if len(refs_in) not in (1, 2) or not all(re.fullmatch(r'[0-9a-f]{40}', r) for r in refs_in):
         sys.exit('Aufruf: python3 tools/cdn-release.py <assets-commit> [<code-commit>]  (volle 40-stellige Commit-IDs)')
     url = lambda c: 'https://cdn.jsdelivr.net/gh/%s@%s/dist-release/cdn/' % (REPO, c)
@@ -49,6 +50,30 @@ def main():
     missing = [r for r in refs if not os.path.exists(os.path.join(OUT, r))]
     assert not missing, 'Verweise ohne Datei: %s' % missing[:5]
     print('CDN-Fassung: %s (%d Verweise, Basis %s)' % (os.path.relpath(OUT, HERE), len(refs), base))
+    # Startdatei für Wix: lädt die vollständige index.html vom CDN und ersetzt das Dokument damit (Hash-Adressen bleiben).
+    # Ab der dritten Stufe (<page-commit> enthält index.html) wird sie mit erzeugt.
+    if len(sys.argv) == 4:
+        page = url(sys.argv[3]) + 'index.html'
+        with open(os.path.join(OUT, 'wix-index.html'), 'w', encoding='utf-8') as f:
+            f.write(LOADER.replace('{{PAGE}}', page).replace('{{FAV}}', base + 'assets/fav.png'))
+        print('Startdatei für Wix: dist-release/cdn/wix-index.html → %s' % page)
+
+
+LOADER = '''<!doctype html><html lang="de-CH"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ImmoReady – Hauswartung, Sanitär &amp; Immobilienservice in Zürich und Aargau</title>
+<meta name="description" content="Familienbetrieb für Hauswartung, Sanitär und Unterhalt in Zürich und Aargau – dazu Garten, Reinigung, Räumung und Vermarktung. Persönlich betreut.">
+<link rel="icon" type="image/png" href="{{FAV}}">
+<style>body{margin:0;background:#FCF8F5;color:#3B3A39;font:16px/1.5 system-ui,sans-serif}.ld{padding:48px 16px;text-align:center}.ld a{color:#7E6343}</style>
+</head><body><p class="ld" id="ld">ImmoReady wird geladen …</p>
+<noscript><p class="ld">ImmoReady · Hauswartung, Sanitär und Unterhalt in Zürich und Aargau · <a href="tel:+41763404401">076 340 44 01</a> · <a href="mailto:info.immoready@gmail.com">info.immoready@gmail.com</a></p></noscript>
+<script>
+(function () {
+  fetch('{{PAGE}}').then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
+    .then(function (t) { document.open(); document.write(t); document.close(); })
+    .catch(function () { document.getElementById('ld').innerHTML = 'Die Seite konnte nicht geladen werden. Kontakt: <a href="tel:+41763404401">076 340 44 01</a> · <a href="mailto:info.immoready@gmail.com">info.immoready@gmail.com</a>'; });
+})();
+</script></body></html>
+'''
 
 
 if __name__ == '__main__':
