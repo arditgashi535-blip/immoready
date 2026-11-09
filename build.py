@@ -161,6 +161,7 @@ def release_strip(h):
         h = h[:m.start()] + 'function renderUmsetzung(){}' + h[m.end():]
     h = re.sub(r'<p class="review-only[^"]*"[^>]*>.*?</p>', '', h, flags=re.S)
     h = re.sub(r'<figcaption class="review-only">.*?</figcaption>', '', h, flags=re.S)
+    h = re.sub(r'<span class="tbc">[^<]*</span>', '', h)
     h = re.sub(r'<section class="sec review-only[^"]*".*?</section>', '', h, flags=re.S)
     return h
 
