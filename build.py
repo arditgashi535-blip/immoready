@@ -140,6 +140,10 @@ RELEASE_TEXT = [
      ' Der Hosting-Anbieter Wix setzt technisch notwendige Cookies für den Betrieb der Seite (Sitzungskennungen wie «bSession», «client-session-bind», «server-session-bind») und erfasst dabei technische Nutzungsdaten. Ihr Browser speichert ausserdem eine Anzeige-Einstellung ohne Personenbezug.'),
     (' <span class="missing">Mit der Cookie-Konfiguration der Wix-Website abgleichen</span>', ''),
     ("'datenschutz','umsetzung'];", "'datenschutz'];"),
+    # Release ohne Foto-Upload (Wix-Gratisplan): Texte, die den Upload versprechen, anpassen
+    ('Ja. Im Anfrageformular können Sie bis zu fünf Fotos hochladen oder sie später per E-Mail nachreichen.', 'Ja, gerne – senden Sie Fotos nach Ihrer Anfrage per E-Mail an info.immoready@gmail.com. Sie helfen uns bei der Einschätzung.'),
+    ('Ja. Im Formular können Sie bis zu fünf Fotos hochladen. Ein Foto', 'Ja, gerne per E-Mail an info.immoready@gmail.com nach Ihrer Anfrage. Ein Foto'),
+    ('Mit Foto-Upload, rund zwei Minuten', 'Kurzes Formular, rund zwei Minuten'),
 ]
 
 
@@ -151,6 +155,10 @@ def release_strip(h):
     if demo:
         h = h[:demo.start()] + '<input type="checkbox" id="reviewToggle" hidden aria-hidden="true">' + h[demo.end():]
     h = h.replace('<div data-page="umsetzung" hidden id="umsetzungPage"></div>', '<div hidden id="umsetzungPage"></div>')
+    # interne Umsetzungsmappe nicht mit ausliefern (nur Vorschau)
+    m = re.search(r'function renderUmsetzung\(\)\{.*?var el=document\.getElementById\(\'umsetzungPage\'\);el\.innerHTML=h;\n\}', h, re.S)
+    if m:
+        h = h[:m.start()] + 'function renderUmsetzung(){}' + h[m.end():]
     h = re.sub(r'<p class="review-only[^"]*"[^>]*>.*?</p>', '', h, flags=re.S)
     h = re.sub(r'<figcaption class="review-only">.*?</figcaption>', '', h, flags=re.S)
     h = re.sub(r'<section class="sec review-only[^"]*".*?</section>', '', h, flags=re.S)
