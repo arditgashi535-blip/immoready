@@ -1,0 +1,12 @@
+{
+  "_hinweis": "INTERNE Preisindikation für die Freigabeoberfläche. confirmed=false: Werte sind Arbeitsannahmen und erscheinen NIE in Kundentexten, bis der Inhaber sie bestätigt (confirmed=true). Bitte prüfen und anpassen.",
+  "confirmed": false,
+  "currency": "CHF",
+  "packages": {
+    "onepager_relaunch": { "label": "Onepager / kleine Website neu (bis 5 Seiten, mobil, Kontaktformular, SEO-Grundlagen)", "from": null, "to": null },
+    "website_relaunch": { "label": "Website-Relaunch (6–15 Seiten, CMS, SEO-Grundlagen)", "from": null, "to": null },
+    "fix_sprint": { "label": "Korrekturpaket (mobile Darstellung, Formular, Meta-Daten, Barrierefreiheit-Basis)", "from": null, "to": null },
+    "seo_basis": { "label": "SEO-Grundpaket (Titel/Beschreibungen, Struktur, Google-Unternehmensprofil-Check)", "from": null, "to": null },
+    "booking": { "label": "Online-Terminbuchung / Anfrageformular mit CRM-Anbindung", "from": null, "to": null }
+  }
+}
