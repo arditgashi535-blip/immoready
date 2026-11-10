@@ -1244,7 +1244,7 @@ body.in-finale .mbar{transform:translateY(calc(100% + 2px))}
 .fchip{display:inline-flex;align-items:center;min-height:44px;padding:10px 18px;border:1px solid rgba(252,248,245,.3);border-radius:999px;color:var(--ivory);text-decoration:none;font-weight:550;font-size:.98rem;transition:background 180ms var(--e-out),border-color 180ms var(--e-out),color 180ms var(--e-out),transform 180ms var(--e-out)}
 @media (hover:hover) and (pointer:fine){.fchip:hover{background:rgba(252,248,245,.08);border-color:rgba(252,248,245,.7)}}
 .fchip:active{transform:scale(.96);transition-duration:80ms}
-.fchip[aria-pressed="true"]{background:var(--lime);border-color:var(--lime);color:var(--ink)}
+.fchip[aria-current="true"]{background:var(--lime);border-color:var(--lime);color:var(--ink)}
 .js .fchips.pre .fchip{opacity:0;transform:translateY(10px)}
 @keyframes chipIn{from{opacity:0;transform:translateY(10px)}}
 .js .fchips:not(.pre) .fchip{animation:chipIn 520ms var(--e-out) both;animation-delay:calc(var(--i) * 35ms + 60ms)}
@@ -2093,3 +2093,6 @@ body.hdr-compact .hdr{background:var(--ivory)}
 .jr-tech span.off,.jr-tech-c.off{opacity:0;visibility:hidden}
 /* Demo-Naht: Während die Hecke das Bild verdeckt, blendet der Stationstext aus; der Wechsel von Station 6 auf 1 geschieht unsichtbar */
 .jr-live.jr-seam .jr-st.on,.jr-3d.jr-seam .jr-st.on{opacity:var(--seam-o,0)!important;transition:none!important}
+/* Wix-Headless-Hinweis («Built on Wix Headless», kostenloser Plan) über die mobile Kontaktleiste schieben, damit «Offerte» bedienbar bleibt.
+   Der Hinweis bleibt sichtbar; er wird nicht ausgeblendet. */
+@media (max-width:760px){body.has-mbar #wixheadless-banner-container{bottom:calc(66px + env(safe-area-inset-bottom,0px))!important}}

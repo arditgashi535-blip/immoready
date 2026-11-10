@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://immoready.ch/schemas/readyos-event-1.json",
+  "title": "ReadyOS-Ereignis aus der ImmoReady-Website (Version 1)",
+  "type": "object",
+  "required": ["version", "type", "idempotencyKey", "source", "occurredAt", "requiresApproval", "kunde"],
+  "properties": {
+    "version": { "const": 1 },
+    "type": { "type": "string", "pattern": "^(offertanfrage\\.eingegangen|buchung\\.[a-z_]+)$" },
+    "idempotencyKey": { "type": "string", "pattern": "^wix-(forms|bookings):" },
+    "source": {
+      "type": "object",
+      "required": ["system"],
+      "properties": {
+        "system": { "enum": ["wix-forms", "wix-bookings"] },
+        "formId": { "type": ["string", "null"] },
+        "submissionId": { "type": "string" },
+        "bookingId": { "type": "string" },
+        "status": { "type": ["string", "null"] }
+      }
+    },
+    "occurredAt": { "type": "string", "format": "date-time" },
+    "requiresApproval": { "const": true, "description": "ReadyOS darf aus dem Ereignis nur Entwürfe und Aufgaben erstellen; jede verbindliche Aktion braucht die Freigabe des Inhabers." },
+    "kunde": {
+      "type": "object",
+      "required": ["email"],
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "telefon": { "type": ["string", "null"] },
+        "wixContactId": { "type": ["string", "null"] }
+      }
+    },
+    "anfrage": {
+      "type": "object",
+      "properties": {
+        "leistung": { "enum": ["hauswartung", "sanitaer", "gartenunterhalt", "reinigung", "raeumung", "leerstand", "verkauf", "fotografie", "mehrere"] },
+        "auftragsart": { "enum": ["einzel", "laufend", null] },
+        "ort": { "type": "string" },
+        "beschreibung": { "type": "string" }
+      }
+    },
+    "buchung": {
+      "type": "object",
+      "properties": {
+        "service": { "type": ["string", "null"] },
+        "start": { "type": ["string", "null"] },
+        "ende": { "type": ["string", "null"] },
+        "status": { "type": "string" }
+      }
+    },
+    "vorschlag": {
+      "type": "object",
+      "properties": {
+        "status": { "enum": ["neu", "in_pruefung", "offerte_entwurf", "freigegeben", "abgelehnt", "erledigt"] },
+        "naechsterSchritt": { "type": "string" }
+      }
+    }
+  }
+}

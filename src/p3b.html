@@ -15,7 +15,7 @@ var HY=(function(){var W={'Leerstandsmanagement':'Leer-stands-manage-ment','Immo
  'Benachrichtigungen':'Benach-richtigungen','Terminbuchungen':'Termin-buchungen','Terminbuchung':'Termin-buchung','Anfrageformular':'Anfrage-formular','Veröffentlichung':'Veröffent-lichung',
  'mehrwertsteuerpflichtig':'mehrwertsteuer-pflichtig','Grundreinigung':'Grund-reinigung','Hauswartung':'Haus-wartung','Vermarktung':'Ver-marktung','Vermittlung':'Ver-mittlung',
  'Koordinationsaufwand':'Koordinations-aufwand','Wohnungsabnahme':'Wohnungs-abnahme','Unterhaltsarbeiten':'Unterhalts-arbeiten','Gesamtansicht':'Gesamt-ansicht',
- 'Unterhaltsreinigung':'Unterhalts-reinigung','Treppenhausreinigung':'Treppenhaus-reinigung','Kompletträumung':'Komplett-räumung','Mehrfamilienhäuser':'Mehrfamilien-häuser',
+ 'Unterhaltsreinigung':'Unterhalts-reinigung','Treppenhausreinigung':'Treppen-haus-reinigung','Treppenhaus':'Treppen-haus','Treppenhäuser':'Treppen-häuser','Kompletträumung':'Komplett-räumung','Mehrfamilienhäuser':'Mehrfamilien-häuser',
  'Umzugsreinigung':'Umzugs-reinigung','Kontrollrundgänge':'Kontroll-rundgänge','Gemeinschaftliche':'Gemeinschaft-liche','Zusammenarbeit':'Zusammen-arbeit','Aufbereitung':'Auf-bereitung','Familienbetrieb':'Familien-betrieb','Initiativbewerbung':'Initiativ-bewerbung','Leistungsübersicht':'Leistungs-übersicht','Kontaktdaten':'Kontakt-daten','Offertanfrage':'Offert-anfrage'};
  var re=new RegExp(Object.keys(W).sort(function(a,b){return b.length-a.length;}).join('|'),'g'),SK=/^(SCRIPT|STYLE|TEXTAREA|INPUT|SELECT|OPTION|TITLE|CODE|PRE)$/;
  function txt(n){var t=n.data;if(t.length<11)return;var u=t.replace(re,function(w){return W[w].replace(/-/g,'­');});if(u!==t)n.data=u;}
@@ -92,11 +92,19 @@ function fixOverview(){document.querySelectorAll('#overviewList a').forEach(func
 
 /* ---------------- Seitentitel ---------------- */
 var META={
- start:['ImmoReady – Hauswartung, Sanitär & Immobilienservice in Zürich und Aargau','Familienbetrieb für Hauswartung, Sanitär und Unterhalt in Zürich und Aargau – dazu Garten, Reinigung, Räumung und Vermarktung. Persönlich betreut. Offerte anfragen.'],
+ start:['ImmoReady – Hauswartung & Immobilienservice | Regensdorf, Zürich, Aargau','Familienbetrieb aus Regensdorf: Hauswartung, Sanitär-Unterhalt, Gartenpflege, Treppenhaus- und Umzugsreinigung, Räumung und Leerstand in Zürich und Aargau.'],
+ hauswartung:['Hauswartung in Zürich und Aargau | ImmoReady','Hauswartung für Wohnliegenschaften: Kontrollrundgänge, Treppenhaus, Umgebung und kleinere Unterhaltsarbeiten – persönlich betreut aus Regensdorf.'],
+ sanitaer:['Sanitär & Unterhalt | ImmoReady','Tropfende Armatur, undichter Siphon, Spülkasten: Wir klären kleinere Sanitär- und Unterhaltsarbeiten in Zürich und Aargau. Kein Notdienst.'],
+ gartenunterhalt:['Gartenunterhalt und Gartenpflege | ImmoReady','Gartenpflege für Wohnliegenschaften in Zürich und Aargau: Rasen, Hecken, Beete und Umgebung – regelmässig oder einmalig.'],
+ reinigung:['Reinigung: Treppenhaus, Unterhalt, Umzug | ImmoReady','Treppenhaus- und Unterhaltsreinigung, Grundreinigung sowie Umzugs- und Endreinigung bei der Wohnungsübergabe in Zürich und Aargau.'],
+ raeumung:['Räumung & Aufbereitung | ImmoReady','Wohnungen, Keller und Estrich räumen, entsorgen und für Vermietung oder Verkauf aufbereiten – in Zürich und Aargau.'],
+ leerstand:['Leerstandsmanagement | ImmoReady','Leere Wohnungen und Liegenschaften betreuen, kontrollieren und für die Wiedervermietung aufbereiten – in Zürich und Aargau.'],
+ verkauf:['Vermarktung & Vermittlung | ImmoReady','Unterstützung bei Vermarktung und Vermittlung von Wohnungen und Liegenschaften in Zürich und Aargau.'],
+ fotografie:['Immobilienpräsentation: Fotos, Drohne, 360° | ImmoReady','Immobilienfotos, Drohnenaufnahmen und 360°-Rundgänge für Inserate in Zürich und Aargau.'],
  leistungen:['Leistungen rund um Ihre Liegenschaft | ImmoReady','Hauswartung, Sanitär & Unterhalt, Gartenunterhalt, Reinigung, Räumung, Leerstandsmanagement und Vermarktung in Zürich und Aargau.'],
  verwaltungen:['Liegenschaftsbetreuung für Verwaltungen | ImmoReady','Hauswartung, Garten, Reinigung und Unterhalt für kleine und mittlere Wohnliegenschaften – ein Ansprechpartner für Verwaltungen in Zürich und Aargau.'],
  ueber:['Über ImmoReady – Ardit Gashi | ImmoReady','ImmoReady ist ein Familienbetrieb für Hauswartung, Sanitär und Unterhalt in Zürich und Aargau. Ansprechpartner: Ardit Gashi, Fachmann Betriebsunterhalt EFZ.'],
- offerte:['Offerte anfragen | ImmoReady','Unverbindliche Offerte für Hauswartung, Sanitär, Garten, Reinigung, Räumung oder Vermarktung anfragen – in drei kurzen Schritten, mit Foto-Upload.'],
+ offerte:['Offerte anfragen | ImmoReady','Unverbindliche Offerte für Hauswartung, Sanitär, Garten, Reinigung, Räumung oder Vermarktung anfragen – mit einem kurzen Formular, unverbindlich und kostenlos.'],
  kontakt:['Kontakt | ImmoReady','ImmoReady erreichen: Telefon 076 340 44 01, E-Mail info.immoready@gmail.com. Einsatzgebiet Zürich und Aargau.'],
  impressum:['Impressum | ImmoReady','Impressum von ImmoReady.'],
  datenschutz:['Datenschutz | ImmoReady','Datenschutzerklärung von ImmoReady.'],
@@ -235,7 +243,7 @@ window.addEventListener('scroll',chk,{passive:true});window.addEventListener('ha
 
 /* V8: Leistungs-Chips im Abschluss wählen die Leistung im Formular vor */
 document.addEventListener('click',function(e){var c=e.target.closest('.fchip,[data-toform]');if(!c||!document.querySelector('#formSlotHome #qf'))return;e.preventDefault();preset=null;
-  if(c.classList.contains('fchip'))document.querySelectorAll('.fchip').forEach(function(x){x.setAttribute('aria-pressed',String(x===c));});
+  if(c.classList.contains('fchip'))document.querySelectorAll('.fchip').forEach(function(x){if(x===c)x.setAttribute('aria-current','true');else x.removeAttribute('aria-current');});
   var r=c.dataset.pre&&document.querySelector('#qf input[name="leistung"][value="'+c.dataset.pre+'"]');
   if(r){r.checked=true;r.dispatchEvent(new Event('change',{bubbles:true}));var lab=r.closest('label');if(lab){lab.classList.remove('pulse');void lab.offsetWidth;lab.classList.add('pulse');}}
   var form=document.getElementById('qf');if(form){var rm=window.matchMedia('(prefers-reduced-motion: reduce)').matches;form.scrollIntoView({behavior:rm?'auto':'smooth',block:'start'});setTimeout(function(){var o=document.getElementById('ort');if(o)o.focus({preventScroll:true});},rm?0:450);}

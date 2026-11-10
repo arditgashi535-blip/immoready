@@ -3,7 +3,7 @@
 "use strict";
 document.documentElement.classList.add('js');document.documentElement.lang='de';
 document.body.classList.add('review','has-mbar');
-var LOGO_SRC='https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@aa719dff96a8b9419bdb732f0b44c0255ead3984/dist-release/cdn/assets/logo_orig.png';
+var LOGO_SRC='https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@d80a318f7445f5e20af3c1fc60b24382abaddc32/assets/logo_orig.png';
 document.querySelectorAll('img[data-logo]').forEach(function(i){i.src=LOGO_SRC;i.decoding='sync';});
 var ICONS={
  house:'<path d="M3.5 11 12 4l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5.5h4V20"/>',
@@ -149,7 +149,7 @@ var S={
    ['Koordination weitergehender Facharbeiten','Arbeiten, die eine spezialisierte Fachfirma erfordern, koordinieren wir nach Absprache.']],
   aud:['Private Haus- und Wohnungseigentümer','Verwaltungen und Eigentümerschaften','Mieterinnen und Mieter (in Absprache mit der Verwaltung)'],
   steps:[['Anliegen beschreiben','Was ist defekt, wo befindet es sich? Ein Foto hilft.'],['Einschätzen','Wir melden uns mit Rückfragen oder vereinbaren eine Besichtigung.'],['Offerte oder Termin','Sie erhalten eine Offerte bzw. einen Terminvorschlag.'],['Ausführen','Wir erledigen die Arbeit und hinterlassen den Ort sauber.']],
-  faq:[['Kann ich ein Foto mitsenden?','Ja. Im Formular können Sie bis zu fünf Fotos hochladen. Ein Foto der Armatur oder des Spülkastens hilft uns bei der Einschätzung.'],
+  faq:[['Kann ich ein Foto mitsenden?','Ja, gerne per E-Mail an info.immoready@gmail.com nach Ihrer Anfrage. Ein Foto der Armatur oder des Spülkastens hilft uns bei der Einschätzung.'],
    ['Was kostet eine Reparatur?','Das hängt vom Problem ab. Nach Ihrer Beschreibung melden wir uns mit einer Einschätzung oder einer Offerte.'],
    ['Übernehmen Sie auch grössere Installationen?','Arbeiten, die über kleinere Sanitärarbeiten hinausgehen, koordinieren wir nach Absprache mit einer Fachfirma.']],
   note:'Das Anfrageformular ist nicht für Notfälle gedacht. Bei einem akuten Wasserschaden wenden Sie sich bitte direkt an einen Sanitär-Notdienst oder an Ihre Verwaltung.',
@@ -344,7 +344,7 @@ ILLU.keys2=function(){var w=U('w');
 ILLU.sale=function(){var s=ILLU.house();return s.replace('Illustration einer gepflegten Wohnliegenschaft','Wohnliegenschaft für Verkauf und Vermittlung');};
 
 /* ---- V6: Bildserie, mit Canva KI generiert (Symbolbilder) ---- */
-var PH={"hero": "https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@aa719dff96a8b9419bdb732f0b44c0255ead3984/dist-release/cdn/assets/img/hero.jpg", "treppe": "https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@aa719dff96a8b9419bdb732f0b44c0255ead3984/dist-release/cdn/assets/img/treppe.jpg", "sanitaer": "https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@aa719dff96a8b9419bdb732f0b44c0255ead3984/dist-release/cdn/assets/img/sanitaer.jpg", "garten": "https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@aa719dff96a8b9419bdb732f0b44c0255ead3984/dist-release/cdn/assets/img/garten.jpg", "raum": "https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@aa719dff96a8b9419bdb732f0b44c0255ead3984/dist-release/cdn/assets/img/raum.jpg", "eingang": "https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@aa719dff96a8b9419bdb732f0b44c0255ead3984/dist-release/cdn/assets/img/eingang.jpg", "luft": "https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@aa719dff96a8b9419bdb732f0b44c0255ead3984/dist-release/cdn/assets/img/luft.jpg", "hauswartung": "https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@aa719dff96a8b9419bdb732f0b44c0255ead3984/dist-release/cdn/assets/img/hauswartung.jpg", "reinigung": "https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@aa719dff96a8b9419bdb732f0b44c0255ead3984/dist-release/cdn/assets/img/reinigung.jpg", "karriere": "https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@aa719dff96a8b9419bdb732f0b44c0255ead3984/dist-release/cdn/assets/img/karriere.jpg"};var PHSLOT={"alt": {}, "pos": {}, "tag": {"hero": "Symbolbild (KI)", "hauswartung": "Symbolbild (KI)", "sanitaer": "Symbolbild (KI)", "garten": "Symbolbild (KI)", "reinigung": "Symbolbild (KI)", "eingang": "Symbolbild (KI)", "luft": "Symbolbild (KI)", "karriere": "Symbolbild (KI)"}, "src": {"hero": "hero", "hauswartung": "treppe", "sanitaer": "sanitaer", "garten": "garten", "reinigung": "raum", "eingang": "eingang", "luft": "luft", "karriere": "treppe"}};
+var PH={"hero": "https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@d80a318f7445f5e20af3c1fc60b24382abaddc32/assets/img/hero.webp", "treppe": "https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@d80a318f7445f5e20af3c1fc60b24382abaddc32/assets/img/treppe.webp", "sanitaer": "https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@d80a318f7445f5e20af3c1fc60b24382abaddc32/assets/img/sanitaer.webp", "garten": "https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@d80a318f7445f5e20af3c1fc60b24382abaddc32/assets/img/garten.webp", "raum": "https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@d80a318f7445f5e20af3c1fc60b24382abaddc32/assets/img/raum.webp", "eingang": "https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@d80a318f7445f5e20af3c1fc60b24382abaddc32/assets/img/eingang.webp", "luft": "https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@d80a318f7445f5e20af3c1fc60b24382abaddc32/assets/img/luft.webp", "hauswartung": "https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@d80a318f7445f5e20af3c1fc60b24382abaddc32/assets/img/hauswartung.webp", "reinigung": "https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@d80a318f7445f5e20af3c1fc60b24382abaddc32/assets/img/reinigung.webp", "karriere": "https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@d80a318f7445f5e20af3c1fc60b24382abaddc32/assets/img/karriere.webp"};var PHSLOT={"alt": {}, "pos": {}, "tag": {"hero": "Symbolbild (KI)", "hauswartung": "Symbolbild (KI)", "sanitaer": "Symbolbild (KI)", "garten": "Symbolbild (KI)", "reinigung": "Symbolbild (KI)", "eingang": "Symbolbild (KI)", "luft": "Symbolbild (KI)", "karriere": "Symbolbild (KI)"}, "src": {"hero": "hero", "hauswartung": "treppe", "sanitaer": "sanitaer", "garten": "garten", "reinigung": "raum", "eingang": "eingang", "luft": "luft", "karriere": "treppe"}};
 var PHALT={"hero": "Moderne Wohnliegenschaft mit gepflegter Aussenanlage im Abendlicht", "treppe": "Helles, sauberes Treppenhaus mit Stahlgeländer", "sanitaer": "Moderne Waschtischarmatur aus gebürstetem Stahl", "garten": "Präzise geschnittene Hecke, Rasen und Lavendelbeet", "raum": "Heller, leerer und gereinigter Wohnraum mit Parkett", "eingang": "Gepflegter Hauseingang mit Vordach und Olivenbäumen", "luft": "Luftaufnahme einer Wohnüberbauung im Abendlicht"};
 var PHPOS={"hero": "50% 50%", "treppe": "40% 50%", "sanitaer": "38% 50%", "garten": "40% 55%", "raum": "50% 55%", "eingang": "50% 45%", "luft": "55% 50%"};
 /* Bildflächen aus rise.json → assets.photos (build.py setzt PHSLOT): echtes Foto oder gekennzeichnetes Übergangsbild */
@@ -369,7 +369,7 @@ var HY=(function(){var W={'Leerstandsmanagement':'Leer-stands-manage-ment','Immo
  'Benachrichtigungen':'Benach-richtigungen','Terminbuchungen':'Termin-buchungen','Terminbuchung':'Termin-buchung','Anfrageformular':'Anfrage-formular','Veröffentlichung':'Veröffent-lichung',
  'mehrwertsteuerpflichtig':'mehrwertsteuer-pflichtig','Grundreinigung':'Grund-reinigung','Hauswartung':'Haus-wartung','Vermarktung':'Ver-marktung','Vermittlung':'Ver-mittlung',
  'Koordinationsaufwand':'Koordinations-aufwand','Wohnungsabnahme':'Wohnungs-abnahme','Unterhaltsarbeiten':'Unterhalts-arbeiten','Gesamtansicht':'Gesamt-ansicht',
- 'Unterhaltsreinigung':'Unterhalts-reinigung','Treppenhausreinigung':'Treppenhaus-reinigung','Kompletträumung':'Komplett-räumung','Mehrfamilienhäuser':'Mehrfamilien-häuser',
+ 'Unterhaltsreinigung':'Unterhalts-reinigung','Treppenhausreinigung':'Treppen-haus-reinigung','Treppenhaus':'Treppen-haus','Treppenhäuser':'Treppen-häuser','Kompletträumung':'Komplett-räumung','Mehrfamilienhäuser':'Mehrfamilien-häuser',
  'Umzugsreinigung':'Umzugs-reinigung','Kontrollrundgänge':'Kontroll-rundgänge','Gemeinschaftliche':'Gemeinschaft-liche','Zusammenarbeit':'Zusammen-arbeit','Aufbereitung':'Auf-bereitung','Familienbetrieb':'Familien-betrieb','Initiativbewerbung':'Initiativ-bewerbung','Leistungsübersicht':'Leistungs-übersicht','Kontaktdaten':'Kontakt-daten','Offertanfrage':'Offert-anfrage'};
  var re=new RegExp(Object.keys(W).sort(function(a,b){return b.length-a.length;}).join('|'),'g'),SK=/^(SCRIPT|STYLE|TEXTAREA|INPUT|SELECT|OPTION|TITLE|CODE|PRE)$/;
  function txt(n){var t=n.data;if(t.length<11)return;var u=t.replace(re,function(w){return W[w].replace(/-/g,'­');});if(u!==t)n.data=u;}
@@ -404,7 +404,7 @@ function renderService(key){
   h+='<section class="sec" id="umfang-'+key+'"><div class="wrap side-l"><div><p class="mono eyebrow">Leistungsumfang</p><h2 class="h2" style="font-size:clamp(1.8rem,3.4vw,2.8rem)">Was wir übernehmen.</h2>';
   if(d.scope.some(function(s){return s[2];}))h+='';
   h+='</div><div class="scope" style="margin-top:0">';
-  d.scope.forEach(function(s){h+='<div'+(s[2]?' class="unconfirmed"':'')+'><b>'+esc(s[0])+(s[2]?'<span class="tbc">zu bestätigen</span>':'')+'</b><p>'+esc(s[1])+'</p></div>';});
+  d.scope.forEach(function(s){h+='<div'+(s[2]?' class="unconfirmed"':'')+'><b>'+esc(s[0])+(s[2]?'':'')+'</b><p>'+esc(s[1])+'</p></div>';});
   h+='</div></div>';
   if(d.note)h+='<div class="wrap" style="margin-top:40px"><p class="note">'+esc(d.note)+'</p></div>';
   h+='</section>';
@@ -446,11 +446,19 @@ function fixOverview(){document.querySelectorAll('#overviewList a').forEach(func
 
 /* ---------------- Seitentitel ---------------- */
 var META={
- start:['ImmoReady – Hauswartung, Sanitär & Immobilienservice in Zürich und Aargau','Familienbetrieb für Hauswartung, Sanitär und Unterhalt in Zürich und Aargau – dazu Garten, Reinigung, Räumung und Vermarktung. Persönlich betreut. Offerte anfragen.'],
+ start:['ImmoReady – Hauswartung & Immobilienservice | Regensdorf, Zürich, Aargau','Familienbetrieb aus Regensdorf: Hauswartung, Sanitär-Unterhalt, Gartenpflege, Treppenhaus- und Umzugsreinigung, Räumung und Leerstand in Zürich und Aargau.'],
+ hauswartung:['Hauswartung in Zürich und Aargau | ImmoReady','Hauswartung für Wohnliegenschaften: Kontrollrundgänge, Treppenhaus, Umgebung und kleinere Unterhaltsarbeiten – persönlich betreut aus Regensdorf.'],
+ sanitaer:['Sanitär & Unterhalt | ImmoReady','Tropfende Armatur, undichter Siphon, Spülkasten: Wir klären kleinere Sanitär- und Unterhaltsarbeiten in Zürich und Aargau. Kein Notdienst.'],
+ gartenunterhalt:['Gartenunterhalt und Gartenpflege | ImmoReady','Gartenpflege für Wohnliegenschaften in Zürich und Aargau: Rasen, Hecken, Beete und Umgebung – regelmässig oder einmalig.'],
+ reinigung:['Reinigung: Treppenhaus, Unterhalt, Umzug | ImmoReady','Treppenhaus- und Unterhaltsreinigung, Grundreinigung sowie Umzugs- und Endreinigung bei der Wohnungsübergabe in Zürich und Aargau.'],
+ raeumung:['Räumung & Aufbereitung | ImmoReady','Wohnungen, Keller und Estrich räumen, entsorgen und für Vermietung oder Verkauf aufbereiten – in Zürich und Aargau.'],
+ leerstand:['Leerstandsmanagement | ImmoReady','Leere Wohnungen und Liegenschaften betreuen, kontrollieren und für die Wiedervermietung aufbereiten – in Zürich und Aargau.'],
+ verkauf:['Vermarktung & Vermittlung | ImmoReady','Unterstützung bei Vermarktung und Vermittlung von Wohnungen und Liegenschaften in Zürich und Aargau.'],
+ fotografie:['Immobilienpräsentation: Fotos, Drohne, 360° | ImmoReady','Immobilienfotos, Drohnenaufnahmen und 360°-Rundgänge für Inserate in Zürich und Aargau.'],
  leistungen:['Leistungen rund um Ihre Liegenschaft | ImmoReady','Hauswartung, Sanitär & Unterhalt, Gartenunterhalt, Reinigung, Räumung, Leerstandsmanagement und Vermarktung in Zürich und Aargau.'],
  verwaltungen:['Liegenschaftsbetreuung für Verwaltungen | ImmoReady','Hauswartung, Garten, Reinigung und Unterhalt für kleine und mittlere Wohnliegenschaften – ein Ansprechpartner für Verwaltungen in Zürich und Aargau.'],
  ueber:['Über ImmoReady – Ardit Gashi | ImmoReady','ImmoReady ist ein Familienbetrieb für Hauswartung, Sanitär und Unterhalt in Zürich und Aargau. Ansprechpartner: Ardit Gashi, Fachmann Betriebsunterhalt EFZ.'],
- offerte:['Offerte anfragen | ImmoReady','Unverbindliche Offerte für Hauswartung, Sanitär, Garten, Reinigung, Räumung oder Vermarktung anfragen – in drei kurzen Schritten, mit Foto-Upload.'],
+ offerte:['Offerte anfragen | ImmoReady','Unverbindliche Offerte für Hauswartung, Sanitär, Garten, Reinigung, Räumung oder Vermarktung anfragen – mit einem kurzen Formular, unverbindlich und kostenlos.'],
  kontakt:['Kontakt | ImmoReady','ImmoReady erreichen: Telefon 076 340 44 01, E-Mail info.immoready@gmail.com. Einsatzgebiet Zürich und Aargau.'],
  impressum:['Impressum | ImmoReady','Impressum von ImmoReady.'],
  datenschutz:['Datenschutz | ImmoReady','Datenschutzerklärung von ImmoReady.'],
@@ -589,7 +597,7 @@ window.addEventListener('scroll',chk,{passive:true});window.addEventListener('ha
 
 /* V8: Leistungs-Chips im Abschluss wählen die Leistung im Formular vor */
 document.addEventListener('click',function(e){var c=e.target.closest('.fchip,[data-toform]');if(!c||!document.querySelector('#formSlotHome #qf'))return;e.preventDefault();preset=null;
-  if(c.classList.contains('fchip'))document.querySelectorAll('.fchip').forEach(function(x){x.setAttribute('aria-pressed',String(x===c));});
+  if(c.classList.contains('fchip'))document.querySelectorAll('.fchip').forEach(function(x){if(x===c)x.setAttribute('aria-current','true');else x.removeAttribute('aria-current');});
   var r=c.dataset.pre&&document.querySelector('#qf input[name="leistung"][value="'+c.dataset.pre+'"]');
   if(r){r.checked=true;r.dispatchEvent(new Event('change',{bubbles:true}));var lab=r.closest('label');if(lab){lab.classList.remove('pulse');void lab.offsetWidth;lab.classList.add('pulse');}}
   var form=document.getElementById('qf');if(form){var rm=window.matchMedia('(prefers-reduced-motion: reduce)').matches;form.scrollIntoView({behavior:rm?'auto':'smooth',block:'start'});setTimeout(function(){var o=document.getElementById('ort');if(o)o.focus({preventScroll:true});},rm?0:450);}
@@ -3351,166 +3359,7 @@ function checkLazy(){if(!lazyQ.length)return;lazyQ=lazyQ.filter(function(el){if(
 function tbl(head,rows){return '<div class="tbl"><table><thead><tr>'+head.map(function(x){return '<th>'+x+'</th>';}).join('')+'</tr></thead><tbody>'+rows.map(function(r){return '<tr>'+r.map(function(c){return '<td>'+c+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table></div>';}
 var OK='<span class="status st-ok">erledigt</span>', OPEN='<span class="status st-open">offen</span>', NO='<span class="status st-no">Problem</span>';
 var umsDone=false;
-function renderUmsetzung(){ if(umsDone)return; umsDone=true;
-var h='<section class="phead"><div class="wrap" style="grid-template-columns:1fr"><div><p class="crumbs mono">Intern · nicht Teil der öffentlichen Website</p><h1>Umsetzungsmappe</h1><p class="lead" style="color:#DAD8D0;max-width:60ch">Analyse, Seitenstruktur, Texte für SEO, Anleitung für Wix, E-Mail-Texte, offene Punkte und Testprotokoll zum Relaunch von immoready.ch. Stand 6. Oktober 2026 · Version 6 · Canva-Bildserie und Effekte.</p>';
-h+='<nav class="toc" aria-label="Inhalt"><a href="#u-status">Status</a><a href="#u-analyse">Analyse</a><a href="#u-urls">URLs &amp; Weiterleitungen</a><a href="#u-seo">SEO</a><a href="#u-wix">Wix-Anleitung</a><a href="#u-form">Formular</a><a href="#u-mails">E-Mail-Texte</a><a href="#u-bilder">Bilder</a><a href="#u-fragen">Offene Punkte</a><a href="#u-test">Tests</a></nav></div></div></section>';
-h+='<section class="sec doc" style="padding-top:24px"><div class="wrap">';
-
-h+='<h2 id="u-status">1. Status auf einen Blick</h2>';
-h+=tbl(['Bereich','Stand','Bemerkung'],[
- ['Design, Texte, Seitenstruktur',OK,'In dieser Vorschau vollständig umgesetzt (Startseite, 7 Leistungsseiten, Verwaltungen, Über, Kontakt, Offerte, Impressum- und Datenschutz-Entwurf).'],
- ['Vorschau',OK,'Läuft ausserhalb von Wix. Formular im Demo-Modus, sendet nichts.'],
- ['Live-Website immoready.ch',OK,'Unverändert. In Wix wurde nichts bearbeitet, nichts installiert, nichts veröffentlicht.'],
- ['Wix-Zugriff','<span class="status st-ok">vorhanden</span>','Lesend geprüft: Site «Immoready», Wix Editor (klassisch), Premium, Velo aktiv, eigene Domain.'],
- ['Formular, Speicherung, Benachrichtigungen in Wix',OPEN,'Noch nicht eingerichtet – braucht Ihre Freigabe (siehe Abschnitt 5).'],
- ['Gestaltung in Wix',OPEN,'Das Layout im klassischen Wix Editor lässt sich nicht über die Schnittstelle bauen; Umsetzung im Editor nach Anleitung (Abschnitt 5).'],
- ['Rechtliche Seiten',NO,'Live-Seiten Datenschutz, AGB, Rückerstattung sind Wix-Mustertexte mit dem Vermerk «kann nicht veröffentlicht werden».']
-]);
-
-h+='<h2 id="u-analyse">2. Analyse der bestehenden Website</h2>';
-h+=tbl(['Thema','Befund','Empfehlung'],[
- ['Logo','Verwendet: Ihre transparente Original-PNG (1536×1024 px, Balken beige und grau, Wortmarke IMMOREADY, «einfach bereit»).','Unverändert in Farbe, Form und Proportion. Entfernt wurde nur der leere, vollständig transparente Rand der Datei, damit das Logo gross genug erscheint. Einsatz in Navigation, mobilem Menü und Footer, jeweils auf hellem Hintergrund und verlinkt auf die Startseite.'],
- ['Farben','Aus den Logodateien gemessen: Hintergrund #FCF8F5, Beige #DCC5A8, Grau #9A9798, Wortmarke #5E5E5E.','Palette ausschliesslich daraus plus Abstufungen (Text #3B3A39, Hellbeige #F3EDE6, warmes Graphit #302E2C für Kontrastflächen). Frühere Paletten sind verworfen.'],
- ['Screenshots Website','Ausser dem Logo noch nicht gesehen (Desktop/Mobil-Ansicht, Schriften, Navigation). Der Wix-Bildserver ist aus meiner Umgebung gesperrt.','Bitte Screenshots senden; danach Schriften, Bildsprache und Seitenaufbau abgleichen.'],
- ['Inhalte','Startseite «Willkommen bei ImmoReady», Claim «Aufbereiten. Vermarkten. Erfolgreich vermitteln.», Aussagen «keine versteckten Kosten, keine Vorauszahlung, volle Transparenz».','Neuer Claim «Ihre Immobilie. Bereit für mehr.». Die Aussagen zu Kosten/Vorauszahlung nur übernehmen, wenn sie verbindlich gelten.'],
- ['Buchungen (Wix Bookings)','8 kostenlose Termine: Beratungsgespräch, Offerte Aufbereitung, Hauswartung, Verkauf &amp; Vermittlung, Immobilienbewertung, Leerstand-Management, 360° Rundgang, Drohnenfotografie.','Alle Services und Buchungs-URLs bleiben erhalten und werden von den Leistungsseiten verlinkt.'],
- ['Kontakt','076 340 44 01, info.immoready@gmail.com. Keine Adresse, keine Rechtsform, keine UID.','Telefon als antippbarer Link +41763404401. GmbH in Gründung: Adresse und Registerangaben erst nach der Eintragung (rise.json → firm.company).'],
- ['Social Media','Footer verlinkt facebook.com/wix, instagram.com/wix, x.com/wix, tiktok.com/@wix – das sind die Standardprofile von Wix, nicht Ihre.','Sofort entfernen oder durch echte Profile ersetzen.'],
- ['Hero-Bild','Wix-Stockbild (11062b_…).','Durch echtes Foto einer gepflegten Liegenschaft ersetzen.'],
- ['Rechtliche Seiten','/blank (Datenschutz), /blank-1 (Barrierefreiheit), /blank-2 (AGB), /blank-3 (Rückerstattung) – Mustertexte.','Neue Seiten /datenschutz und /impressum; AGB und Rückerstattung erst mit echten Inhalten; alte URLs weiterleiten.'],
- ['Navigation','Willkommen, Online buchen, Anmelden (Mitgliederbereich).','«Anmelden» ausblenden – ein Kundenkonto wird nicht benötigt.'],
- ['Installierte Apps','Bookings, Forms &amp; Payments (alte Version), Members Area, Invoices, Portfolio, Hotels, SEO.','Wix Hotels und Portfolio werden nicht gebraucht; nach Prüfung deinstallieren. Für das neue Formular: Wix Forms (neue Version).'],
- ['Automatisierung','Bestehender n8n-Workflow «Wix Lead Intake (Jarvis)» hängt an einem Wix-Formular.','Vor dem Wechsel klären, welches Formular angebunden ist, und den Workflow auf das neue Formular umstellen.']
-]);
-
-h+='<h2 id="u-urls">3. Seitenstruktur, URLs und Weiterleitungen</h2><p>Der klassische Wix Editor unterstützt keine Unterordner wie /leistungen/hauswartung. Deshalb kurze, flache URLs.</p>';
-h+=tbl(['Seite','Neue URL','Bestehende URL','Weiterleitung (301)'],[
- ['Startseite','/','/','–'],['Leistungen (Übersicht)','/leistungen','–','–'],
- ['Hauswartung','/hauswartung','–','–'],['Sanitär &amp; Unterhalt','/sanitaer','–','–'],['Gartenunterhalt','/gartenunterhalt','–','–'],['Reinigung','/reinigung','–','–'],['Räumung &amp; Aufbereitung','/raeumung-aufbereitung','–','–'],['Leerstandsmanagement','/leerstandsmanagement','–','–'],['Verkauf, Vermittlung &amp; Bewertung','/verkauf-bewertung','–','–'],['Fotografie, Drohne &amp; 360°','/immobilienfotografie','–','–'],
- ['Für Verwaltungen','/verwaltungen','–','–'],['Über ImmoReady','/ueber-immoready','–','–'],['Offerte anfragen','/offerte','–','–'],['Kontakt','/kontakt','–','–'],
- ['Terminbuchung','/book-online (bleibt)','/book-online','–, Buchungsseiten /booking-calendar/… bleiben unverändert'],
- ['Datenschutz','/datenschutz','/blank','/blank → /datenschutz'],
- ['Barrierefreiheit','/barrierefreiheit (optional)','/blank-1','/blank-1 → /barrierefreiheit oder → /'],
- ['AGB','erst mit echten AGB','/blank-2','/blank-2 → / (bis echte AGB vorliegen)'],
- ['Rückerstattung','entfällt','/blank-3','/blank-3 → /'],
- ['Impressum','/impressum','–','–']
-]);
-h+='<p>Einrichten unter <b>Dashboard → Marketing &amp; SEO → SEO-Tools → URL-Weiterleitungen</b>.</p>';
-
-h+='<h2 id="u-seo">4. Seitentitel und Meta-Beschreibungen</h2>';
-var seoRows=[['/','Startseite'].concat(META.start)];
-['leistungen','verwaltungen','ueber','offerte','kontakt'].forEach(function(k){seoRows.push(['/'+({ueber:'ueber-immoready'}[k]||k),k].concat(META[k]));});
-ORDER.forEach(function(k){seoRows.push(['/'+({raeumung:'raeumung-aufbereitung',leerstand:'leerstandsmanagement',verkauf:'verkauf-bewertung',fotografie:'immobilienfotografie'}[k]||k),S[k].name].concat(S[k].seo));});
-h+=tbl(['URL','Seite','Seitentitel','Meta-Beschreibung'],seoRows.map(function(r){return [r[0],esc(r[1]),esc(r[2]),esc(r[3])];}));
-h+='<ul><li>Pro Seite genau eine H1 (in der Vorschau umgesetzt).</li><li>Social-Vorschau (Open Graph): je Seite Titel und Beschreibung wie oben, Bild = echtes Liegenschaftsfoto 1200×630 px.</li><li>Alternativtexte: beschreibend, z. B. «Gepflegtes Treppenhaus eines Mehrfamilienhauses» – erst mit echten Bildern setzen.</li><li>Strukturierte Daten (LocalBusiness) erst mit bestätigter Adresse und Rechtsform. Keine Ortsseiten in Serie.</li><li>Keine Garantie für Platzierungen.</li></ul>';
-
-h+='<h2 id="u-wix">5. Umsetzung in Wix – Schritt für Schritt</h2>';
-h+='<h3>A. Sicher arbeiten</h3><ol><li>Im Editor <b>Website → Website-Verlauf</b> öffnen und die aktuelle Version notieren (Rücksprungpunkt).</li><li>Direkt in der bestehenden Website arbeiten, aber <b>nicht auf «Veröffentlichen» klicken</b>. Änderungen im Editor bleiben ein Entwurf, bis veröffentlicht wird. So bleiben Kontakte, Buchungen, Einstellungen und Domain erhalten.</li><li>Alternative: Website duplizieren und dort gestalten. Nachteil: Buchungsdaten, Kontakte und Domain hängen an der Original-Website; die Gestaltung müsste später zurückgeführt werden.</li><li>Domain-Verbindung nicht ändern.</li></ol>';
-h+='<h3>B. Design-Grundlagen (Editor → Website-Design)</h3>'+tbl(['Token','Wert','Verwendung'],[['Hintergrund (Logo)','#FCF8F5','Seitenhintergrund, Header'],['Hellbeige','#F3EDE6','Zweite helle Fläche, Footer'],['Beige (Logo-Balken)','#DCC5A8','Akzent, Hauptschaltfläche auf dunklen Flächen – nie als Textfarbe auf Hell'],['Grau (Logo-Balken)','#9A9798','Linien, Details'],['Wortmarke','#5E5E5E','Leichte Überschriftzeilen'],['Text','#3B3A39','Fliesstext, Hauptschaltfläche auf Hell'],['Graphit warm','#302E2C','Kontrastflächen (Hauswartung, Abschluss)'],['Nebentext','#68645F / #D3CCC4','auf Hell / auf Dunkel'],['Schrift','Archivo (Google Fonts, OFL)','Breiter Schnitt passend zur Wortmarke; leichte Titel mit fetter Betonung. Abgleich mit der heutigen Website-Schrift steht aus.']]);
-h+='<ul><li>Schaltflächen: vollständig abgerundet, Pfeil rechts; Hover: weicher Farbwechsel und warmer Lichtschein, Pfeil 4–6 px nach rechts; Klick: kurz auf 97 % skalieren; Fokus: deutlicher Rahmen.</li><li>Effekte in Wix: Startbereich «Einblenden» mit 0,1–0,6 s Verzögerung gestaffelt; Abschnitte «Einblenden + leicht nach oben» beim ersten Erscheinen; Bilder «Hover: Zoom»; Header «beim Scrollen verkleinern» mit halbtransparentem Graphit; Parallax als Hintergrund-Scrolleffekt nur auf 1–2 grossen Bildern, auf Mobil aus. Wix respektiert die Einstellung «Bewegung reduzieren».</li><li>Abschnittsabstände Desktop ca. 120–140 px, Mobil ca. 72 px. Inhaltsbreite max. 1320 px.</li></ul>';
-h+='<h3>C. Seiten anlegen</h3><ol><li>Seiten gemäss Tabelle in Abschnitt 3 anlegen, SEO-Einstellungen der Seite mit Titel/Beschreibung aus Abschnitt 4 füllen.</li><li>Texte aus der Vorschau übernehmen (öffentliche Ansicht: Schalter «Prüfhinweise anzeigen» oben ausschalten).</li><li>Menü: Leistungen (Untermenü mit 7 Leistungen), Für Verwaltungen, Über ImmoReady, Kontakt. Schaltfläche «Offerte anfragen» rechts im Header, im Header fixiert.</li><li>Mitgliederbereich-Login aus dem Header entfernen. Footer: Fake-Social-Links löschen.</li></ol>';
-h+='<h3>D. Terminbuchung</h3><ul><li>Bestehende 8 Services nicht löschen, damit vorhandene Buchungen erhalten bleiben. Leistungsseiten verlinken direkt auf die passende Buchungsseite.</li><li>Beschreibungen der Services an die neuen Texte angleichen; «kostenlos» nur belassen, wenn es so gilt.</li></ul>';
-h+='<h3>E. Mobile Kontaktleiste</h3><p>Im Mobil-Editor die «Mobile Aktionsleiste» bzw. einen fixierten Streifen unten mit zwei Schaltflächen: «Anrufen» (tel:+41763404401) und «Offerte» (/offerte). Auf der Seite /offerte ausblenden, damit sie keine Eingabefelder verdeckt. Im Fusszeilenbereich unten ca. 70 px Abstand lassen.</p>';
-h+='<h3>F. Cookie-Banner und Tracking</h3><p>Wix-Cookie-Banner aktivieren. Statistik- oder Marketing-Tools (z. B. Google Analytics, Meta Pixel) nur mit Einwilligung laden. Ohne solche Tools reicht der Hinweis auf technisch notwendige Cookies.</p>';
-
-h+='<h2 id="u-form">Formular in Wix (Wix Forms, neue Version)</h2>';
-h+='<p>Empfehlung: natives <b>Wix Forms</b> als einfaches einseitiges Formular in drei Abschnitten. Jede Anfrage wird im Dashboard gespeichert; Benachrichtigung und Bestätigungs-E-Mail laufen ohne eigenen Code.</p>';
-h+='<ol><li><b>App:</b> Installiert ist die alte Version «Wix Forms &amp; Payments». Empfohlen ist die neue Wix Forms App (kostenlos). Die Installation verändert die Live-Website nicht, solange das Formular nicht platziert und veröffentlicht ist.</li>';
-h+='<li><b>Kosten:</b> Das Feld «Datei-Upload» ist bei Wix an einen Premium-Plan ab «Core» gebunden. Ihre Website hat einen Premium-Plan – welcher genau, prüfe ich vor dem Einrichten. Ich bestelle nichts.</li>';
-h+='<li><b>Erfolgsmeldung:</b> «Vielen Dank für Ihre Anfrage. Wir prüfen Ihre Angaben und melden uns bei Ihnen, um die nächsten Schritte zu besprechen.» – Wix zeigt sie erst nach erfolgreicher Speicherung.</li>';
-h+='<li><b>Vorauswahl:</b> Links mit Parameter, z. B. <code>/offerte?leistung=sanitaer&amp;art=einzel</code>, per Velo ins Formular übernehmen (Code unten).</li></ol>';
-h+=tbl(['Feld (Schlüssel)','Typ','Pflicht'],[['leistung','Auswahl: Hauswartung, Sanitär &amp; Unterhalt, Gartenunterhalt, Reinigung, Räumung &amp; Aufbereitung, Leerstand, Vermarktung &amp; Vermittlung, Immobilienpräsentation, Mehrere','ja'],['auftragsart','Auswahl: Einmaliger Auftrag / Regelmässige Betreuung','nein'],['ort','Ort oder Postleitzahl','ja'],['beschreibung','Langtext','ja'],['fotos','Datei-Upload, max. 5 Bilder','nein'],['name, email','Kontaktfelder (mit Kontakt verknüpft)','ja'],['telefon','Telefon','nein']]);
-h+='<p>Velo-Code für die Seite /offerte (Element-ID des Formulars anpassen; die Methode <code>setFieldValues</code> der neuen Wix-Forms-Elemente vor dem Einsatz im Editor testen):</p>';
-h+='<pre>import wixLocationFrontend from \'wix-location-frontend\';\n\nconst LEISTUNG = {\n  hauswartung: \'Hauswartung / Liegenschaftsbetreuung\', sanitaer: \'Sanitär &amp; Unterhalt\',\n  gartenunterhalt: \'Gartenunterhalt\', reinigung: \'Reinigung\',\n  raeumung: \'Räumung &amp; Aufbereitung\', leerstand: \'Leerstandsmanagement\',\n  verkauf: \'Verkauf, Vermittlung &amp; Bewertung\', fotografie: \'Fotografie, Drohne &amp; 360°\'\n};\nconst ART = { einzel: \'Einzelauftrag\', laufend: \'Regelmässige Betreuung\' };\n\n$w.onReady(() =&gt; {\n  const q = wixLocationFrontend.query;\n  const v = {};\n  if (LEISTUNG[q.leistung]) v.leistung = LEISTUNG[q.leistung];\n  if (ART[q.art]) v.auftragsart = ART[q.art];\n  if (Object.keys(v).length) $w(\'#offerteForm\').setFieldValues(v);\n});</pre>';
-h+='<h3>Benachrichtigungen und n8n</h3><ol><li>Formular-Einstellungen → Benachrichtigungen: E-Mail an <b>info.immoready@gmail.com</b> bei jeder Anfrage (enthält alle Felder und Fotos als Links).</li><li>Automation «Formular abgeschickt» → «E-Mail an Absender senden» mit dem Text aus Abschnitt 6.</li><li>n8n: den Auslöser des Workflows «Wix Lead Intake (Jarvis)» auf das neue Formular umstellen (z. B. Wix-Automation «Webhook senden» oder die bestehende Anbindung). Erst testen, dann altes Formular entfernen.</li><li>Test mit klar markierten Daten («TEST ImmoReady – bitte ignorieren», test@…), danach nur diese Testeinträge löschen.</li></ol>';
-
-h+='<h2 id="u-mails">6. E-Mail-Texte</h2><h3>Eingangsbestätigung an den Kunden</h3><pre>Betreff: Ihre Anfrage bei ImmoReady ist eingegangen\n\nGuten Tag {Name}\n\nVielen Dank für Ihre Anfrage. Wir haben folgende Angaben erhalten:\n\nLeistung: {Leistung}\nArt: {Auftragsart}\nObjekt: {PLZ} {Ort}\nBeschreibung: {Beschreibung}\n\nBitte beachten Sie: Diese E-Mail bestätigt nur den Eingang Ihrer Anfrage.\nSie ist keine Auftrags- und keine Terminbestätigung.\n\nWir prüfen Ihre Angaben und melden uns bei Ihnen, um die nächsten Schritte\nzu besprechen.\n\nFreundliche Grüsse\nArdit Gashi\nImmoReady · 076 340 44 01 · info.immoready@gmail.com</pre>';
-h+='<h3>Benachrichtigung an ImmoReady</h3><pre>Betreff: Neue Anfrage: {Leistung} – {PLZ} {Ort} ({Kundentyp})\n\n{Name} · {Firma}\n{E-Mail} · {Telefon} · Kontaktweg: {Kontaktweg}\n\nLeistung: {Leistung} · {Auftragsart}\nObjekt: {PLZ} {Ort}\nZusatzangaben: {bedingte Felder}\nWunschzeitraum: {Zeitraum}\nBeschreibung: {Beschreibung}\nFotos: {Links}</pre>';
-
-h+='<h2 id="u-bilder">7. Bildserie (mit Canva generiert)</h2><p>Die sieben Fotos der Vorschau wurden am 6.10.2026 mit der Canva-Bildgenerierung (KI) erstellt, in Canva im Entwurf «ImmoReady photo board» gesammelt und für die Vorschau komprimiert (1200 px, JPG). Sie zeigen <b>keine echten ImmoReady-Objekte</b> und sind auf der Website als «Symbolbild» gekennzeichnet. Nicht für «Vorher – nachher» oder Referenzen verwenden.</p>';
-h+=tbl(['Einsatz','Motiv','Canva-Medien-ID','Sichtprüfung'],[
- ['Startseite','Moderne Wohnliegenschaft, Hecken, Abendlicht','MAHXQOWmzz8','Architektur stimmig; Balkone und Fenster plausibel'],
- ['Hauswartung','Helles Treppenhaus','MAHXQF3vVsU','Treppenlauf und Geländer plausibel'],
- ['Sanitär','Waschtischarmatur','MAHXQD6j0II','Armatur glaubwürdig; Überlaufloch im Becken leicht ungewöhnlich'],
- ['Gartenunterhalt','Hecke, Rasen, Lavendel','MAHXQObXe7Y','Ohne sichtbare Fehler'],
- ['Reinigung/Aufbereitung','Heller leerer Wohnraum','MAHXQL4RSwI','Ohne sichtbare Fehler'],
- ['Eingang/Leerstand','Hauseingang mit Vordach','MAHXQFIIWVk','Briefkastenanlage ohne Text; plausibel'],
- ['Vermarktung','Luftaufnahme Überbauung','MAHXQA9PyUY','Dachbegrünung plausibel; Details bei starker Vergrösserung prüfen']
-]);
-h+='<p>Für Wix: Die Bilder liegen in Ihrem Canva-Konto. In Canva öffnen, als JPG herunterladen und im Wix-Medienmanager hochladen. Mobile Ausschnitte über den Fokuspunkt in Wix setzen. Rechte: Prüfen Sie die aktuellen Canva-Nutzungsbedingungen für KI-generierte Inhalte vor der Veröffentlichung. Echte Fotos Ihrer Objekte haben weiterhin Vorrang.</p>';
-
-h+='<h2 id="u-fragen">8. Offene Punkte – was ich noch von Ihnen brauche</h2><ol>';
-['<b>Screenshots</b> der heutigen Website (Desktop und Smartphone), damit Schriften, Navigation und Seitenaufbau genau abgeglichen werden können.',
- '<b>Logo als Vektordatei</b> (SVG/PDF) für maximale Schärfe – und falls vorhanden eine waagrechte Logo-Variante für die Navigation.',
- '<b>Fotos:</b> echte Aufnahmen gepflegter Liegenschaften, Arbeitsbilder und ein Porträt. Die Vorschau enthält Illustrationen als Platzhalter.',
- '<b>Unternehmensangaben (GmbH in Gründung):</b> eingetragener Firmenname, Sitz, Geschäftsadresse, UID, Handelsregister, zeichnungsberechtigte Person(en) und Funktion, MWST – erst nach bestätigter Eintragung in rise.json → firm.company eintragen; Prüfung: python3 tools/rise.py --launch.',
- '<b>Sanitär:</b> Welche der fünf markierten Arbeiten führen Sie bzw. Ihr Techniker selbst aus? Gibt es Einschränkungen (z. B. Arbeiten, die eine konzessionierte Fachfirma erfordern)?',
- '<b>Social Media:</b> Echte Profiladressen – oder sollen die Links ganz weg?',
- '<b>WhatsApp:</b> Darf 076 340 44 01 geschäftlich über WhatsApp genutzt werden?',
- '<b>Vermarktung:</b> Wer führt Verkauf/Vermittlung und Bewertung aus, wer macht Drohnen- und 360°-Aufnahmen (selbst oder Partner)?',
- '<b>Aussagen:</b> Sollen «kostenlose Offerte», «keine Vorauszahlung» und «keine versteckten Kosten» verbindlich auf der Website stehen?',
- '<b>Vertrauen:</b> Soll die Betriebshaftpflichtversicherung erwähnt werden? Falls ja, mit welcher Formulierung?',
- '<b>Einsatzgebiet:</b> Gibt es Regionen, die Sie ausdrücklich nennen möchten (z. B. Bezirke)?',
- '<b>Fotos:</b> Gibt es bereits eigene Fotos von Objekten, Arbeiten oder ein Porträt?',
- '<b>Freigabe für Wix:</b> Darf ich die neue Wix Forms App installieren, das Formular samt Benachrichtigungen anlegen und mit Testdaten prüfen (ohne Veröffentlichung)?'
-].forEach(function(x){h+='<li>'+x+'</li>';});
-h+='</ol>';
-
-h+='<h2 id="u-motion">8b. Bewegungssystem (V8)</h2><p>Zentrale Werte: direkte Rückmeldung 80–180 ms (Drücken, Hover), Zustandswechsel 200–320 ms (Menüs, Akkordeon, Felder), grössere Übergänge 420–800 ms (Bildwechsel, Überschriften), Staffelung 35–70 ms. Kurven: ease-out cubic-bezier(.23,1,.32,1); Schublade cubic-bezier(.32,.72,0,1); Feder nur für den Radio-Punkt. Alle Übergänge über transform und opacity, unterbrechbar (CSS-Transitions und Web Animations API ohne Warteschlange). Hover-Effekte nur bei echter Maus; «Bewegung reduzieren» wird live berücksichtigt. Impeccable war in dieser Umgebung nicht verfügbar; die Prüfung erfolgte mit dem Design-Critique-Werkzeug und eigener Kontrastmessung (Akzenttext neu #7E6343, 5.3:1).</p>';
-h+='<p><b>V9:</b> Bewegungswerte als CSS-Variablen (--ease-out .22,1,.36,1 · --duration-press 140 ms · --duration-ui 240 ms · --duration-reveal 650 ms · --stagger-step 60 ms). Neu: Maskenenthüllung und Zoom 1.05→1 im Einstieg, Parallaxe nur auf dem Einstiegsbild (Desktop), wandernde Markierung in der Leistungsbühne, räumliche Neigung (max. 3°, Lichtreflex) auf Hauswartungsbild und Karten der Leistungsübersicht – nur bei Maus und ohne reduzierte Bewegung, Magnet-Label (max. 4 px) auf den zwei Hauptaktionen, Kopfzeile kompakt ohne Layoutsprung (sticky mit negativem top), Fokusfalle im mobilen Menü. Initialisierung mit Guard gegen Doppelaufrufe, Cleanup über window.__irFx.destroy().</p>';
-h+='<h2 id="u-v10">8c. Futuristische Richtung (V10) und Übertragung nach Wix</h2>';
-h+='<p><b>Gebäude:</b> echtes 3D in WebGL, selbst geschrieben (keine Bibliothek, keine 3D-Datei, kein Spline). Das Modell ist prozedural aus Grundkörpern aufgebaut: 5 Geschosse, Balkone, Eingang mit Vordach, Fallrohr mit Technikschacht, Rasen, Hecken, Bäume. Konturlinien mit einmaligem Lichtlauf, Kamera folgt der Maus begrenzt (±0.07 rad), Rendern nur bei Bedarf, Pause ausserhalb des Sichtbereichs und bei inaktivem Tab, Auflösung auf schwachen Geräten 1×. Standbild (aus derselben Szene gerendert) erscheint sofort; Smartphone, «Bewegung reduzieren» und fehlendes WebGL zeigen das Standbild mit denselben Markierungen.</p>';
-h+='<p><b>Spline:</b> nicht verwendet – es gibt keine Spline-Szene und keinen Spline-Zugang in dieser Umgebung; es wurde keine Szenen-URL erfunden. Sobald eine Szene existiert, kann sie den Bereich #bstage ersetzen (Spline-Viewer als Web-Komponente), Markierungen und Infofläche bleiben.</p>';
-h+='<p><b>GSAP + ScrollTrigger:</b> in V12 entfernt (war nur eine ungetestete Erweiterung für Bildenthüllungen); alle Effekte laufen nativ und sind getestet. <b>Motion</b> nicht verwendet (kein React im Projekt).</p>';
-h+='<div style="overflow-x:auto;max-width:100%"><table><thead><tr><th>Effekt</th><th>Wix nativ</th><th>Wix mit eigener Komponente</th></tr></thead><tbody>'+
-[['Interaktives 3D-Gebäude mit Markierungen','–','Custom Element (Velo) oder HTML-Embed (iFrame) mit diesem Code; Markierungen als Teil der Komponente'],
- ['Standbild-Fallback','Bild-Element','–'],
- ['Scroll-Einblendungen','Animationen/Scroll-Effekte im Editor (eingeschränkt steuerbar)','Custom Element für exakte Zeiten'],
- ['Maskenenthüllung, Scroll-Übergang (GSAP)','teilweise (Reveal-Effekte)','Custom Element bzw. Embed (natives JavaScript)'],
- ['Leistungsbühne mit wandernder Markierung','Tabs/Multi-State-Box (ohne wandernde Markierung)','Velo-Code + Custom Element'],
- ['Neigung, Magnet-Label, Lichtreflex','Hover-Effekte (einfach)','Custom Element'],
- ['Kopfzeile kompakt','„Fixierte Kopfzeile“ mit Scroll-Effekt','–'],
- ['Formular mit Zuständen','Wix Forms (Validierung, Bestätigung nach Speicherung)','Feinschliff der Zustände über Velo']].map(function(r){return '<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td></tr>';}).join('')+'</tbody></table></div>';
-h+='<h2 id="u-v11">8d. Rundgang durch den Wohnblock (V11/V12)</h2>';
-h+='<p><b>Stand:</b> funktionsfähiger Zwischenstand mit einfachen Geometrien. Echtes 3D in eigenem WebGL-Code (keine Bibliothek: Three.js, npm und cdnjs waren in der Arbeitsumgebung gesperrt; kein Blender verfügbar). Gebäude, Garten, Eingangshalle mit Treppe, Wohnungsflur, Wohnung und Bad gehören zur selben Szene; die Kamera fährt nur durch reale Öffnungen (automatische Prüfung: 2000 Punkte der Route, Mindestabstand 12 cm zu allen Wänden).</p>';
-h+='<p><b>Verbindung Modell – Scroll – Website:</b> Der Abschnitt #reise ist 760 vh hoch, die Szene bleibt darin sticky. Aus der Scrollposition entsteht ein Fortschritt p (0…1). Daraus werden Kamera (Catmull-Rom-Pfade für Position und Blickziel, 21 Stützpunkte), Bildwinkel, Haustür (zu → offen 0.31–0.355 → zu 0.94–0.975), Sanitär-Hervorhebung, Tageslichtrichtung und die HTML-Einblendungen berechnet. Die Kamera folgt p zeitbasiert geglättet (τ≈110 ms). Kein Ereignis wird einmalig ausgelöst – rückwärts entsteht exakt derselbe Zustand. Stationen (V12): Aussen 0–0.15 · Garten 0.15–0.30 · Eingang/Hauswartung 0.30–0.47 · Wohnung/Aufbereitung 0.47–0.63 · Bad/Sanitär 0.63–0.80 · Rückfahrt/Kontakt 0.80–1. Haustür und Wohnungstür öffnen sich vor dem Durchfahren und schliessen nach der Rückfahrt.</p>';
-h+='<p><b>Modelldatei:</b> immoready-wohnblock.glb (289 KB, 10 benannte Objekte, u. a. Eingangstuer mit Scharnier als Ursprung, Sanitaer_Waschtisch_Armatur_Siphon_Eckventile) – exportiert aus genau der Geometrie der Website (geo_to_glb.py). Sie dient zur Verfeinerung in Blender; die Website lädt sie derzeit nicht, sondern erzeugt die Geometrie im Code.</p>';
-h+='<p><b>Fallback:</b> Smartphone, «Bewegung reduzieren», kein WebGL oder Kontextverlust → sechs Stationsbilder aus derselben Szene mit Stationsknöpfen (Touch, Pfeiltasten), Texte und Anfrage-Knöpfe identisch, Abschnitt kurz.</p>';
-h+='<p><b>Wix:</b> Ein HTML-Einbettungsfeld (iFrame) hat einen eigenen Scrollbereich – eine an das Seitenscrollen gekoppelte Fahrt funktioniert darin nicht sinnvoll (verschachteltes Scrollen). Möglich ist ein <b>Custom Element (Velo)</b>, das im Seiten-DOM läuft, das Fenster-Scrollen auswertet und eine eigene Höhe von ca. 760 vh bekommt; ob position:sticky innerhalb der Wix-Sektion zuverlässig greift, muss im Editor getestet werden. Voraussetzungen: Velo aktiv (ist es), Skript als öffentliche Datei bzw. Custom-Element-Quelle, Premium-Domain. Alternative ohne Risiko: Rundgang als eigene, schnelle Unterseite ausserhalb von Wix verlinken. Umgesetzt wurde in Wix nichts.</p>';
-h+='<h2 id="u-v12">8e. Wix-Prüfung und Einbindung des Rundgangs (V12)</h2>';
-h+='<p><b>Geprüft (7.10.2026):</b> Verbunden ist die Website «Immoready» (Classic Editor, Premium, eigene Domain, Velo aktiv). Über die verfügbare Wix-Verbindung lassen sich Daten und Einstellungen per API lesen/schreiben sowie Bilder in die Medienverwaltung hochladen. <b>Nicht</b> möglich: Seiten, Layout, Elemente oder Velo-Code des Classic Editors bearbeiten, Entwürfe oder Kopien anlegen. Die Custom-Embeds-API würde Code sofort auf der veröffentlichten Website ausspielen – das wurde ohne Freigabe nicht genutzt. <b>In Wix wurde nichts verändert.</b></p>';
-h+='<p><b>Gewählte Einbindung:</b> eigenständige Komponente immoready-rundgang-embed.html im HTML-iFrame (Website-Adresse). Im iFrame steht das Scrollen der Wix-Seite nicht zur Verfügung; der Rundgang läuft dort im Stationsmodus mit «Weiter»/«Zurück», Stationsnavigation und weichen Kamerafahrten. Nachrichten: SCENE_READY und REQUEST_QUOTE {leistung} an die Seite (nur an freigegebene Ursprünge https://www.immoready.ch und https://immoready.ch), GO_TO_STATION {index} und SET_PROGRESS {value} von der Seite (Quelle = Elternfenster, Ursprung geprüft, Typen streng geprüft). Keine Formulardaten.</p>';
-h+='<ol><li>immoready-rundgang-embed.html auf einer eigenen Adresse veröffentlichen (Hosting noch offen – keine Adresse festgelegt).</li><li>Im Wix Editor auf der Startseite oben ein HTML-iFrame einfügen, ID «rundgang», volle Breite, Höhe ca. 100 % Bildschirm, Modus «Website-Adresse».</li><li>Velo-Seitencode aus velo-seitencode-startseite.js einfügen; Zielseite der Offertanfrage prüfen.</li><li>In der Vorschau testen. Erscheint in der Browser-Konsole «Nachricht von nicht freigegebenem Ursprung ignoriert», diesen Ursprung (Editor-Vorschau) in IR_ALLOWED_ORIGINS ergänzen.</li><li>Erst nach Freigabe veröffentlichen.</li></ol>';
-h+='<h2 id="u-v12b">8f. RISE-Datei und Web Component (V12)</h2>';
-h+='<p><b>rise.json</b> ist die einzige Quelle für Firmen- und Kontaktdaten, Leistungen, Tour-Stationen, Texte, Kameraroute (21 Stützpunkte), Türen, Hervorhebung, Ereignisse und Wix-Regeln. Unbekanntes steht als «[UNSPECIFIED]» und darf nicht erfunden werden. build.py prüft die Datei gegen rise.schema.json und inhaltliche Regeln (lückenlose Stationen, aufsteigende Keyframes, geordnete Türfenster, bekannte Leistungen, kein «ß») und erzeugt daraus Rundgang-Markup, Laufzeitkonfiguration und die Komponente.</p>';
-h+='<p><b>&lt;immoready-tour&gt;</b> (dist/component/immoready-tour.js, 164 KB, Bilder in https://cdn.jsdelivr.net/gh/arditgashi535-blip/immoready@aa719dff96a8b9419bdb732f0b44c0255ead3984/dist-release/cdn/assets/tour/ als WebP; Variante mit eingebetteten Bildern: immoready-tour.inline.js). Shadow DOM, mehrfach einsetzbar, räumt beim Entfernen WebGL, Beobachter und alle Listener auf. Attribute: mode=steps|scroll, station=0–5, assets-base. Ereignisse (CustomEvent): tour-ready {version, mode}, station-change {station, index, progress}, request-quote {service, station, source:"tour", version:1}, tour-error {code, fallback:"stills"}. Velo-Beispiel: wix/velo-custom-element.js.</p>';
-h+='<h2 id="u-v13">8g. Visueller Ausbau «Digital Twin at Dusk» (V13)</h2>';
-h+='<p><b>Szene:</b> dasselbe Gebäude, derselbe Grundriss. Neu: blaue Stunde mit eigenem Himmel und Dunst, warme, unterschiedlich helle Fenster, Fensterlaibungen, Fensterbänke und Lamellenstoren, Balkone mit Staketengeländer, Attika, Vordach mit Leuchten, Wegleuchten, Beete mit Stahlkanten, Gräser und Stauden, Bodenschatten, Terrasse mit Schiebetür, möblierter Wohnraum (Küche, Sideboard, Sessel, Leuchten, Vorhänge), Bad mit Keramik-Waschtisch, Einhebelmischer, Siphon, Eckventilen, Spiegelschrank mit Lichtleiste, Wand-WC und Dusche. Licht wird pro Eckpunkt vorberechnet (gebacken), damit die Szene auch auf schwächerer Hardware flüssig bleibt.</p>';
-h+='<p><b>Fahrt:</b> Blickrichtung ohne Sprünge (max. 25° je 1 % Fortschritt statt 459°), Türen erst bei voller Öffnung durchfahren, Rückweg über die Terrassentür statt durch alle Räume zurück. Einmalige Scan-Kante (1,2 s) nach dem Laden, kurzes Aufleuchten der Sanitär-Konturen im Bad, beides entfällt bei «Bewegung reduzieren».</p>';
-h+='<p><b>Oberfläche:</b> Stationspunkte mit Namen (Gebäude · Garten · Eingang · Wohnung · Sanitär · Offerte), ruhige Textanordnung direkt auf der Szene, Auswahl Reinigung / Räumung & Aufbereitung / Leerstandsmanagement in der Wohnung, «Kontakt aufnehmen» am Schluss, kein Magnet-Effekt. Smartphone: eigene Hochformat-Bilder; Tablet hochkant: Text unten, Motiv oben.</p>';
-h+='<p><b>Wix:</b> Einbau weiterhin vorbereitet, nicht ausgeführt. Empfohlen ist das Custom Element im Stationsmodus (Element-ID immoreadyTour); Anleitung: wix/EINBAU.md.</p>';
-h+='<h2 id="u-test">9. Testprotokoll</h2><p>Automatisiert im Browser (Chromium) geprüft am 6.10.2026, mit klar bezeichneten Testdaten («TEST ImmoReady», test@beispiel.ch). In Wix wurden keine Testdaten angelegt.</p>'+tbl(['Prüfung','Ergebnis'],[
- ['Alle 17 Seiten auf Desktop (1440 px), Tablet (820 px), Smartphone (390 px): kein horizontales Scrollen, genau eine H1',OK],
- ['Keine Skriptfehler (nur Webschrift in der Testumgebung nicht ladbar)',OK],
- ['Desktop-Untermenü öffnen/schliessen (Maus, Esc), mobiles Menü öffnen/schliessen, Menülinks',OK],
- ['Vorauswahl: Sanitär-Link setzt Sanitär + Einzelauftrag; Hauswartungs-Link setzt Hauswartung + regelmässige Betreuung',OK],
- ['Pflichtfelder und verständliche Fehlermeldungen, Fehlerübersicht mit Sprunglinks',OK],
- ['Effekte: gestaffelter Einstieg, Einblenden beim Scrollen, kompakter Header, Parallax nur Desktop, Vorher-nachher-Regler per Maus und Tastatur',OK],
- ['Reduzierte Bewegung: Einstieg, Einblenden und Parallax abgeschaltet, alle Inhalte sichtbar',OK],
- ['Pflichtfelder Leistung, Ort, Beschreibung, Name, E-Mail; Telefon optional mit Formatprüfung',OK],
- ['Foto-Upload (Auswahl, Anzeige, Entfernen, Grössen-/Anzahlgrenze)',OK],
- ['Eingaben bleiben bei simuliertem Übermittlungsfehler erhalten',OK],
- ['Demo-Abschluss zeigt deutlich «nichts gesendet» statt echter Erfolgsmeldung',OK],
- ['Öffentliche Ansicht blendet Prüfhinweise und unbestätigte Leistungen aus',OK],
- ['Telefonlinks einheitlich tel:+41763404401, E-Mail-Links mailto:',OK],
- ['Original-Logo in Header, mobilem Menü und Footer scharf und unverzerrt',OK],
- ['Mobile Kontaktleiste: erst nach dem ersten Bildschirm, auf Formularseite und bei offener Tastatur ausgeblendet',OK],
- ['Tatsächliche Speicherung in Wix, Firmenbenachrichtigung, Kundenbestätigung, n8n-Anbindung','<span class="status st-open">nicht getestet</span> – noch nicht eingerichtet'],
- ['Echte Geräte (iPhone/Android), Screenreader','<span class="status st-open">nicht getestet</span>']
-])+'';
-h+='</div></section>';
-var el=document.getElementById('umsetzungPage');el.innerHTML=h;
-}
+function renderUmsetzung(){}
 var TESTLOG='';
 
 /* ---------------- Start ---------------- */

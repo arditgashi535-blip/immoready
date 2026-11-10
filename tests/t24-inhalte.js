@@ -18,7 +18,7 @@ const ROUTES = ['start', 'leistungen', 'hauswartung', 'sanitaer', 'gartenunterha
 const SERVICES = ['hauswartung', 'sanitaer', 'gartenunterhalt', 'reinigung', 'raeumung', 'leerstand', 'verkauf', 'fotografie'];
 const txt = () => document.body.innerText.replace(/­/g, '');
 /* Text ohne eingebettete Bilddaten (Base64 enthält zufällig jede Buchstabenfolge) */
-const plain = f => fs.readFileSync(path.join(ROOT, f), 'utf8').replace(/data:[a-z/+-]+;base64,[A-Za-z0-9+/=]+/g, '');
+const plain = f => fs.readFileSync(path.join(ROOT, f), 'utf8').replace(/data:[a-z/+-]+;base64,[A-Za-z0-9+/=]+/g, '').replace(/[A-Za-z0-9+/=]{400,}/g, ''); // auch eingebettete Lichtdaten (Base64 ohne data:-Präfix)
 (async () => {
   /* 1 WSF: Quelle und Builds */
   ok(!JSON.stringify(RISE.firm).includes('WSF') && RISE.firm.qualifications.join() === 'Fachmann Betriebsunterhalt EFZ', 'rise.json: nur «Fachmann Betriebsunterhalt EFZ»');

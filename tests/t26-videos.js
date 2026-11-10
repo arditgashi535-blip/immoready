@@ -39,7 +39,7 @@ const rules = rise => execFileSync('python3', ['-c', 'import json,sys;sys.path.i
     await p.goto(url); await p.waitForTimeout(500);
     const s0 = await p.evaluate(() => { const s = document.getElementById('einblicke'), r = document.getElementById('reise'), v = s && s.querySelector('video');
       return { s: !!s, before: !!(s && r && (s.compareDocumentPosition(r) & Node.DOCUMENT_POSITION_FOLLOWING)), tag: s && s.querySelector('.ph-tag').textContent, src: v && v.getAttribute('src'), muted: v && v.muted, loop: v && v.loop, pi: v && v.hasAttribute('playsinline'), n: s ? s.querySelectorAll('.vclip').length : 0,
-        btn: s && s.querySelector('.vclip-play').getBoundingClientRect().height, pre: s && s.querySelector('[data-pre]').dataset.pre, cred: (document.querySelector('[data-page="impressum"]') || document.body).textContent.includes('Symbolvideo Treppenhaus und Reinigung: Testmuster') };
+        btn: s && s.querySelector('.vclip-play').getBoundingClientRect().height, pre: s && s.querySelector('[data-pre]').dataset.pre, cred: (document.querySelector('[data-page="impressum"]') || document.body).textContent.replace(/\u00ad/g, '').includes('Symbolvideo Treppenhaus und Reinigung: Testmuster') };
     });
     ok(s0.s && s0.before && s0.n === 1, 'Abschnitt «Im Alltag» mit einem Clip direkt vor dem Rundgang');
     ok(s0.tag === 'Symbolvideo', 'Stockclip als «Symbolvideo» gekennzeichnet');

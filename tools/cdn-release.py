@@ -1,7 +1,8 @@
 """Release-Fassung mit Dateien über ein CDN (jsDelivr aus dem GitHub-Repository).
 
 Wix hostet dann nur die Startdatei index.html; Stil, Skript, Bilder, Texturen und Lichtdaten kommen über
-https://cdn.jsdelivr.net/gh/<repo>@<commit>/dist-release/cdn/ (feste Commits → unveränderliche Adressen, CORS erlaubt).
+https://cdn.jsdelivr.net/gh/<repo>@<commit>/ – Commits des schlanken Zweigs «cdn-site», der nur die Website-Dateien enthält
+(jsDelivr: Repository-Stand höchstens 50 MB). Feste Commits → unveränderliche Adressen, CORS erlaubt.
 
 Aufruf (nach python3 build.py --release), zweistufig, weil eine Datei nicht ihren eigenen Commit kennen kann:
   python3 tools/cdn-release.py <assets-commit>                  Bilder/Texturen/Lichtdaten aus <assets-commit>
@@ -28,7 +29,10 @@ def main():
     refs_in = refs_in[:2]
     if len(refs_in) not in (1, 2) or not all(re.fullmatch(r'[0-9a-f]{40}', r) for r in refs_in):
         sys.exit('Aufruf: python3 tools/cdn-release.py <assets-commit> [<code-commit>]  (volle 40-stellige Commit-IDs)')
-    url = lambda c: 'https://cdn.jsdelivr.net/gh/%s@%s/dist-release/cdn/' % (REPO, c)
+    # Pfad der Dateien im Repository zum gepinnten Commit. Standard: eigener schlanker Zweig «cdn-site» mit den Dateien im Wurzelordner
+    # (jsDelivr liefert nur aus Repository-Ständen unter 50 MB; der Hauptzweig ist grösser). IR_CDN_PREFIX=dist-release/cdn/ für das alte Schema.
+    prefix = os.environ.get('IR_CDN_PREFIX', '')
+    url = lambda c: 'https://cdn.jsdelivr.net/gh/%s@%s/%s' % (REPO, c, prefix)
     base, code_base = url(refs_in[0]), url(refs_in[-1])
     assert os.path.exists(os.path.join(SRC, 'index.html')), 'zuerst python3 build.py --release'
     if os.path.isdir(OUT):

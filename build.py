@@ -15,7 +15,7 @@ import base64, json, os, re, shutil, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 os.chdir(HERE)
 sys.path.insert(0, HERE)
-from tools.rise import load, tour_config, tour_markup, firm_markup, launch_check, careers_markup, photo_credits, videos_markup, video_slots, LIVE_STATUS  # noqa: E402
+from tools.rise import load, tour_config, tour_markup, firm_markup, launch_check, careers_markup, photo_credits, videos_markup, video_slots, LIVE_STATUS, seo_head  # noqa: E402
 
 # IR_RISE / IR_DIST nur für Prüfungen (andere Quelldatei, anderer Ausgabeordner); normal: rise.json → dist/
 RISE = load(os.environ.get('IR_RISE'))  # bricht bei Schemafehlern ab
@@ -115,6 +115,11 @@ def firm(h):
     h = h.replace('<!--{{FIRM_FOOTER}}-->', FIRM['footer']).replace('{{FIRM_ROLE}}', RISE['firm']['role'])
     h = h.replace('<!--{{CAREERS}}-->', careers_markup(RISE)).replace('<!--{{PHOTO_CREDITS}}-->', photo_credits(RISE))
     h = h.replace('<!--{{TOUR_VIDEOS}}-->', videos_markup(RISE))
+    # Terminbuchung bleibt auf der bisherigen Wix-Seite (Wix Bookings); Adresse aus rise.json → contact.bookingSite
+    bs = RISE['contact'].get('bookingSite', 'https://www.immoready.ch').rstrip('/')
+    h = h.replace('https://www.immoready.ch/book-online', bs + '/book-online').replace('https://www.immoready.ch/booking-calendar', bs + '/booking-calendar')
+    if LIVE_OK and '</title>' in h:
+        h = h.replace('</title>', '</title>\n' + seo_head(RISE), 1)
     return release_strip(h) if LIVE_OK else h
 
 
@@ -126,13 +131,19 @@ RELEASE_TEXT = [
     ('<span class="missing">Datum bei Veröffentlichung</span>', '%s.%s.%s' % (_D[8:10], _D[5:7], _D[:4])),
     (' sowie hochgeladene Fotos (höchstens fünf Bilder, je bis 10 MB)', ''),
     ('      <li><b>Terminbuchungen:</b> Angaben, die Sie bei der Buchung eines Beratungstermins über Wix Bookings machen.</li>\n', ''),
-    ('Hosting der Website, Speicherung der Offertanfragen und Fotos, Terminbuchung.', 'Hosting der Website und Speicherung der Offertanfragen (Wix Forms).'),
+    ('Hosting der Website, Speicherung der Offertanfragen und Fotos, Terminbuchung.', 'Hosting der Website und Speicherung der Offertanfragen (Wix Forms). Wix prüft eingehende Anfragen automatisch auf Spam (auch mit automatisierter Textprüfung) und legt zu einer Anfrage einen Kontakt mit Ihrer E-Mail-Adresse an. Die Terminbuchung läuft über Wix Bookings auf unserer bisherigen Wix-Seite.'),
+    (' <span class="missing">Alternative: Schrift selbst hosten – vor der Veröffentlichung entscheiden</span></li>', '</li>\n      <li><b>jsDelivr und GitHub</b> – Gestaltung, Programmcode und Bilder dieser Website werden über das Auslieferungsnetz jsDelivr aus unserem GitHub-Verzeichnis geladen; dabei wird Ihre IP-Adresse an diese Anbieter übermittelt (unter anderem in die USA). Es werden keine Cookies gesetzt.</li>'),
     (' <span class="missing">Garantien gemäss Wix-Vertrag ergänzen</span>', ''),
-    (' <span class="missing">Alternative: Schrift selbst hosten – vor der Veröffentlichung entscheiden</span>', ''),
     ('      <li><span class="missing">Weitere Dienste (z. B. eine Automatisierung) nur aufführen, falls sie tatsächlich eingesetzt werden</span></li>\n', ''),
-    ('<span class="missing">Frist festlegen, z. B. nach 12 Monaten</span>', 'sobald sie für die Bearbeitung nicht mehr benötigt werden'),
+    ('löschen wir <span class="missing">Frist festlegen, z. B. nach 12 Monaten</span>', 'löschen wir, sobald sie für die Bearbeitung nicht mehr benötigt werden'),
+    (' Der Hosting-Anbieter kann technisch notwendige Cookies setzen. <span class="missing">Mit der Cookie-Konfiguration der Wix-Website abgleichen</span>',
+     ' Der Hosting-Anbieter Wix setzt technisch notwendige Cookies für den Betrieb der Seite (Sitzungskennungen wie «bSession», «client-session-bind», «server-session-bind») und erfasst dabei technische Nutzungsdaten. Ihr Browser speichert ausserdem eine Anzeige-Einstellung ohne Personenbezug.'),
     (' <span class="missing">Mit der Cookie-Konfiguration der Wix-Website abgleichen</span>', ''),
     ("'datenschutz','umsetzung'];", "'datenschutz'];"),
+    # Release ohne Foto-Upload (Wix-Gratisplan): Texte, die den Upload versprechen, anpassen
+    ('Ja. Im Anfrageformular können Sie bis zu fünf Fotos hochladen oder sie später per E-Mail nachreichen.', 'Ja, gerne – senden Sie Fotos nach Ihrer Anfrage per E-Mail an info.immoready@gmail.com. Sie helfen uns bei der Einschätzung.'),
+    ('Ja. Im Formular können Sie bis zu fünf Fotos hochladen. Ein Foto', 'Ja, gerne per E-Mail an info.immoready@gmail.com nach Ihrer Anfrage. Ein Foto'),
+    ('Mit Foto-Upload, rund zwei Minuten', 'Kurzes Formular, rund zwei Minuten'),
 ]
 
 
@@ -144,8 +155,13 @@ def release_strip(h):
     if demo:
         h = h[:demo.start()] + '<input type="checkbox" id="reviewToggle" hidden aria-hidden="true">' + h[demo.end():]
     h = h.replace('<div data-page="umsetzung" hidden id="umsetzungPage"></div>', '<div hidden id="umsetzungPage"></div>')
+    # interne Umsetzungsmappe nicht mit ausliefern (nur Vorschau)
+    m = re.search(r'function renderUmsetzung\(\)\{.*?var el=document\.getElementById\(\'umsetzungPage\'\);el\.innerHTML=h;\n\}', h, re.S)
+    if m:
+        h = h[:m.start()] + 'function renderUmsetzung(){}' + h[m.end():]
     h = re.sub(r'<p class="review-only[^"]*"[^>]*>.*?</p>', '', h, flags=re.S)
     h = re.sub(r'<figcaption class="review-only">.*?</figcaption>', '', h, flags=re.S)
+    h = re.sub(r'<span class="tbc">[^<]*</span>', '', h)
     h = re.sub(r'<section class="sec review-only[^"]*".*?</section>', '', h, flags=re.S)
     return h
 
@@ -299,6 +315,19 @@ def build_site():
         with open(out + 'assets/img/%s.%s' % (k, ext), 'wb') as f:
             f.write(base64.b64decode(data))
         ph[k] = 'assets/img/%s.%s' % (k, ext)
+        if LIVE_OK and ext == 'jpg':
+            # öffentliche Fassung: Fotos als WebP (etwa halb so gross); das JPG bleibt für die Social-Media-Vorschau (og:image)
+            try:
+                from PIL import Image
+                Image.open(out + 'assets/img/%s.jpg' % k).save(out + 'assets/img/%s.webp' % k, 'WEBP', quality=80, method=6)
+                ph[k] = 'assets/img/%s.webp' % k
+                if k == 'hero':  # kleinere Variante für Handys (srcset im vorgerenderten Startbild)
+                    im = Image.open(out + 'assets/img/hero.jpg')
+                    im.resize((800, round(im.height * 800 / im.width)), Image.LANCZOS).save(out + 'assets/img/hero-800.webp', 'WEBP', quality=78, method=6)
+                if k != 'hero':
+                    os.remove(out + 'assets/img/%s.jpg' % k)
+            except ImportError:
+                pass
     h = h[:i] + 'var PH=' + json.dumps(ph) + h[j + 1:]
     a = h.index('<style>')
     b = h.index('</style>', a)
@@ -335,3 +364,10 @@ def build_site():
 
 
 build_site()
+if LIVE_OK:
+    # Fotos der Startseite direkt ins HTML (früher sichtbar, ohne JavaScript lesbar): tools/prerender-illus.js
+    import subprocess
+    r = subprocess.run(['node', 'tools/prerender-illus.js', DIST + 'site/index.html'], capture_output=True, text=True)
+    print((r.stdout or r.stderr).strip().splitlines()[-1] if (r.stdout or r.stderr).strip() else 'prerender: keine Ausgabe')
+    if r.returncode:
+        sys.exit('prerender-illus fehlgeschlagen')
